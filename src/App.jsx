@@ -3,13 +3,20 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ThemeProvider } from "./contexts/theme-provider";
 import DashboardPage from "./routes/dashboard/page";
 import Layout from "./routes/layouts";
+import LoginPage from "./Pages/login";
 
-;
 
 function App() {
     const router = createBrowserRouter([
+
+
         {
-            path: "/",
+            path: "/login",
+            element: <LoginPage />,
+        },
+        
+        {
+            path: "/dashboard",
             element: <Layout />,
             children: [
                 {
