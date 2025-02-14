@@ -1,4 +1,4 @@
-import { ChartColumn, Home, NotepadText, Package, PackagePlus, Settings, ShoppingBag, UserCheck, UserPlus, Users, ListChecks, MessageSquare, Calendar } from "lucide-react";
+import { ChartColumn, Home, NotepadText, Package, PackagePlus, Settings, ShoppingBag, UserPlus, Users, ListChecks, MessageSquare, Calendar } from "lucide-react";
 import ProfileImage from "../assets/profile-image.jpg";
 import ProductImage from "../assets/product-image.jpg";
 
@@ -27,20 +27,27 @@ export const navbarLinks = [
         title: "Utilisateurs",
         links: [
             {
-                label: "Utilisateurs",
+                label: "Liste des Utilisateurs",
                 icon: Users,
                 path: "/users",
             },
+        ],
+    },
+
+    {
+        title: "Admin",
+        links: [
             {
-                label: "Nouvel Utilisateur",
+                label: "Liste des Admins",
+                icon: Users,
+                path: "/admins",
+            },
+            {
+                label: "Nouvel Admin",
                 icon: UserPlus,
-                path: "/new-user",
+                path: "/new-admin",
             },
-            {
-                label: "Utilisateurs Vérifiés",
-                icon: UserCheck,
-                path: "/verified-users",
-            },
+           
         ],
     },
     {

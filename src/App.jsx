@@ -3,9 +3,9 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ThemeProvider } from "./contexts/theme-provider";
 import DashboardPage from "./routes/dashboard/page";
 import Layout from "./routes/layouts";
-
-;
-
+import UsersTable from "./routes/users/page";
+import AdminsTable from "./routes/admins/page";
+import NewAdmin from "./routes/new-admin/page";
 function App() {
     const router = createBrowserRouter([
         {
@@ -26,15 +26,19 @@ function App() {
                 },
                 {
                     path: "users",
-                    element: <h1 className="title">Utilisateurs</h1>, // Page des Utilisateurs
+                    element: <UsersTable />, // Page des Utilisateurs
                 },
                 {
                     path: "new-user",
-                    element: <h1 className="title">Nouvel Utilisateur</h1>, // Page pour ajouter un nouvel utilisateur
+                    element: <h1 className="title">Nouvel utilisateur</h1>, // Page des utilisateurs vérifiés
                 },
                 {
-                    path: "verified-users",
-                    element: <h1 className="title">Utilisateurs Vérifiés</h1>, // Page des utilisateurs vérifiés
+                    path: "admins",
+                    element: <AdminsTable /> // Page des Utilisateurs
+                },
+                {
+                    path: "new-admin",
+                    element:<NewAdmin />, // Page des utilisateurs vérifiés
                 },
                 {
                     path: "news",

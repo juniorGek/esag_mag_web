@@ -12,9 +12,11 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.0.5",
     "@uidotdev/usehooks": "^2.4.1",
+    "clsx": "^2.1.1",
     "lucide-react": "^0.475.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-paginate": "^8.3.0",
     "react-router-dom": "^7.1.5",
     "recharts": "^2.15.1",
     "tailwind-merge": "^3.0.1"
