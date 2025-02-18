@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ReactPaginate from "react-paginate";
+import { PencilLine, Trash } from "lucide-react";
 
 const studentsData = [
   { id: 1, nom: "Dupont", prenom: "Jean", etat: "Actif" },
@@ -27,11 +28,7 @@ export default function AdminsTable() {
   const currentStudents = filteredStudents.slice(offset, offset + rowsPerPage);
 
   return (
-    <div className="max-w-4xl mx-auto p-4 bg-slate-100 shadow-lg rounded-lg transition-colors dark:bg-slate-900">
-      <h2 className="text-center text-2xl font-semibold mb-4 text-slate-900 dark:text-slate-50">
-        Liste des Admins
-      </h2>
-
+    <div className="flex flex-col gap-y-4">
       {/* Barre de recherche et filtre de lignes */}
       <div className="flex flex-col sm:flex-row justify-between gap-4 mb-4">
         <input
@@ -55,33 +52,49 @@ export default function AdminsTable() {
         </select>
       </div>
 
-      {/* Tableau */}
-      <table className="w-full border-collapse border border-gray-200 transition-colors dark:border-slate-700">
-        <thead>
-          <tr className="bg-gray-100 dark:bg-slate-800">
-            <th className="border p-2 text-gray-900 dark:text-slate-50">Nom</th>
-            <th className="border p-2 text-gray-900 dark:text-slate-50">Prénom</th>
-            <th className="border p-2 text-gray-900 dark:text-slate-50">État</th>
-            <th className="border p-2 text-gray-900 dark:text-slate-50">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {currentStudents.map((student) => (
-            <tr key={student.id} className="text-center border-t dark:border-slate-700">
-              <td className="border p-2 text-gray-900 dark:text-slate-50">{student.nom}</td>
-              <td className="border p-2 text-gray-900 dark:text-slate-50">{student.prenom}</td>
-              <td className={`border p-2 font-medium ${student.etat === "Actif" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
-                {student.etat}
-              </td>
-              <td className="border p-2">
-                <button className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition dark:bg-blue-600 dark:hover:bg-blue-700">
-                  Modifier
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* Tableau des admins */}
+      <div className="card">
+        <div className="card-header">
+          <p className="card-title">Liste des Admins</p>
+        </div>
+        <div className="card-body p-0">
+          <div className="relative h-[500px] w-full flex-shrink-0 overflow-auto rounded-none [scrollbar-width:_thin]">
+            <table className="table">
+              <thead className="table-header">
+                <tr className="table-row">
+                  <th className="table-head">#</th>
+                  <th className="table-head">Nom</th>
+                  <th className="table-head">Prénom</th>
+                  <th className="table-head">État</th>
+                  <th className="table-head">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="table-body">
+                {currentStudents.map((student) => (
+                  <tr key={student.id} className="table-row">
+                    <td className="table-cell">{student.id}</td>
+                    <td className="table-cell">{student.nom}</td>
+                    <td className="table-cell">{student.prenom}</td>
+                    <td className={`table-cell font-medium ${student.etat === "Actif" ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                      {student.etat}
+                    </td>
+                    <td className="table-cell">
+                      <div className="flex items-center gap-x-4">
+                        <button className="text-blue-500 dark:text-blue-600">
+                          <PencilLine size={20} />
+                        </button>
+                        <button className="text-red-500">
+                          <Trash size={20} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
       {/* Pagination */}
       <div className="mt-4">
