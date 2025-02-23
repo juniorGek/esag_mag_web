@@ -46,6 +46,7 @@ export const Sidebar = forwardRef(({ collapsed }, ref) => {
                                 key={link.label}
                                 to={link.path}
                                 className={cn("sidebar-item", collapsed && "md:w-[45px]")}
+                                end
                             >
                                 <link.icon
                                     size={22}

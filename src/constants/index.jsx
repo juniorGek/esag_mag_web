@@ -1,4 +1,4 @@
-import { ChartColumn, Home, NotepadText, Package, PackagePlus, Settings, ShoppingBag, UserCheck, UserPlus, Users, ListChecks, MessageSquare, Calendar } from "lucide-react";
+import { ChartColumn, Home, NotepadText, Package, PackagePlus, Settings, ShoppingBag, UserPlus, Users, ListChecks, MessageSquare, Calendar } from "lucide-react";
 import ProfileImage from "../assets/profile-image.jpg";
 import ProductImage from "../assets/product-image.jpg";
 
@@ -9,17 +9,17 @@ export const navbarLinks = [
             {
                 label: "Dashboard",
                 icon: Home,
-                path: "/home",
+                path: "/admin/dashboard",
             },
             {
                 label: "Analytiques",
                 icon: ChartColumn,
-                path: "/analytics",
+                path: "/admin/analytics",
             },
             {
                 label: "Rapports",
                 icon: NotepadText,
-                path: "/reports",
+                path: "/admin/reports",
             },
         ],
     },
@@ -27,20 +27,27 @@ export const navbarLinks = [
         title: "Utilisateurs",
         links: [
             {
-                label: "Utilisateurs",
+                label: "Liste des Utilisateurs",
                 icon: Users,
-                path: "/users",
+                path: "/admin/users",
+            },
+        ],
+    },
+
+    {
+        title: "Admin",
+        links: [
+            {
+                label: "Liste des Admins",
+                icon: Users,
+                path: "/admin/admins",
             },
             {
-                label: "Nouvel Utilisateur",
+                label: "Nouvel Admin",
                 icon: UserPlus,
-                path: "/new-user",
+                path: "/admin/new-admin",
             },
-            {
-                label: "Utilisateurs Vérifiés",
-                icon: UserCheck,
-                path: "/verified-users",
-            },
+           
         ],
     },
     {
@@ -49,17 +56,17 @@ export const navbarLinks = [
             {
                 label: "Actualités",
                 icon: Package,
-                path: "/news",
+                path: "/admin/news",
             },
             {
                 label: "Nouvelle Actualité",
                 icon: PackagePlus,
-                path: "/new-news",
+                path: "/admin/new-news",
             },
             {
                 label: "Blogs",
                 icon: ShoppingBag,
-                path: "/blogs",
+                path: "/admin/blogs",
             },
         ],
     },
@@ -69,12 +76,12 @@ export const navbarLinks = [
             {
                 label: "Sondages",
                 icon: ListChecks,
-                path: "/polls",
+                path: "/admin/polls",
             },
             {
                 label: "Nouveau Sondage",
                 icon: PackagePlus,
-                path: "/new-poll",
+                path: "/admin/new-poll",
             },
         ],
     },
@@ -84,7 +91,7 @@ export const navbarLinks = [
             {
                 label: "Suggestions",
                 icon: MessageSquare,
-                path: "/suggestions",
+                path: "/admin/suggestions",
             },
         ],
     },
@@ -94,12 +101,12 @@ export const navbarLinks = [
             {
                 label: "Événements",
                 icon: Calendar,
-                path: "/events",
+                path: "/admin/events",
             },
             {
                 label: "Nouvel Événement",
                 icon: PackagePlus,
-                path: "/new-event",
+                path: "/admin/new-event",
             },
         ],
     },
@@ -109,7 +116,7 @@ export const navbarLinks = [
             {
                 label: "Paramètres",
                 icon: Settings,
-                path: "/settings",
+                path: "/admin/settings",
             },
         ],
     },
