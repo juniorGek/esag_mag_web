@@ -16,6 +16,8 @@ import Sondage from "./Pages/Sondage";
 import Evenement from "./Pages/Evenement";
 import Blog from "./Pages/Blog";
 import Actualites from "./Pages/Actualites";
+import { PublicRoute } from "./hooks/PublicRoute";
+import { ProtectedRoute } from "./hooks/ProtectedRoute";
 function App() {
     const router = createBrowserRouter([
         {
@@ -33,11 +35,19 @@ function App() {
           },
         {
             path: "/login",
-            element: <Login />, // Page d'accueil (Tableau de Bord)
+            element: (
+                <PublicRoute>
+                    <Login />
+                </PublicRoute>
+            ), // Page d'accueil (Tableau de Bord)
         },
         {
             path: "/admin",
-            element: <Layout />,
+            element: (
+                <ProtectedRoute>
+                    <Layout />
+                </ProtectedRoute>
+            ),
             children: [
                 {
                     index: true,
