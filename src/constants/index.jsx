@@ -9,17 +9,17 @@ export const navbarLinks = [
             {
                 label: "Dashboard",
                 icon: Home,
-                path: "/",
+                path: "/admin/dashboard",
             },
             {
                 label: "Analytiques",
                 icon: ChartColumn,
-                path: "/analytics",
+                path: "/admin/analytics",
             },
             {
                 label: "Rapports",
                 icon: NotepadText,
-                path: "/reports",
+                path: "/admin/reports",
             },
         ],
     },
@@ -29,7 +29,7 @@ export const navbarLinks = [
             {
                 label: "Liste des Utilisateurs",
                 icon: Users,
-                path: "/users",
+                path: "/admin/users",
             },
         ],
     },
@@ -40,12 +40,12 @@ export const navbarLinks = [
             {
                 label: "Liste des Admins",
                 icon: Users,
-                path: "/admins",
+                path: "/admin/admins",
             },
             {
                 label: "Nouvel Admin",
                 icon: UserPlus,
-                path: "/new-admin",
+                path: "/admin/new-admin",
             },
            
         ],
@@ -56,17 +56,17 @@ export const navbarLinks = [
             {
                 label: "Actualités",
                 icon: Package,
-                path: "/news",
+                path: "/admin/news",
             },
             {
                 label: "Nouvelle Actualité",
                 icon: PackagePlus,
-                path: "/new-news",
+                path: "/admin/new-news",
             },
             {
                 label: "Blogs",
                 icon: ShoppingBag,
-                path: "/blogs",
+                path: "/admin/blogs",
             },
         ],
     },
@@ -76,12 +76,12 @@ export const navbarLinks = [
             {
                 label: "Sondages",
                 icon: ListChecks,
-                path: "/polls",
+                path: "/admin/polls",
             },
             {
                 label: "Nouveau Sondage",
                 icon: PackagePlus,
-                path: "/new-poll",
+                path: "/admin/new-poll",
             },
         ],
     },
@@ -91,7 +91,7 @@ export const navbarLinks = [
             {
                 label: "Suggestions",
                 icon: MessageSquare,
-                path: "/suggestions",
+                path: "/admin/suggestions",
             },
         ],
     },
@@ -101,12 +101,12 @@ export const navbarLinks = [
             {
                 label: "Événements",
                 icon: Calendar,
-                path: "/events",
+                path: "/admin/events",
             },
             {
                 label: "Nouvel Événement",
                 icon: PackagePlus,
-                path: "/new-event",
+                path: "/admin/new-event",
             },
         ],
     },
@@ -116,7 +116,7 @@ export const navbarLinks = [
             {
                 label: "Paramètres",
                 icon: Settings,
-                path: "/settings",
+                path: "/admin/settings",
             },
         ],
     },

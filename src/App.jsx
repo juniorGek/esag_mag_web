@@ -6,14 +6,42 @@ import Layout from "./routes/layouts";
 import UsersTable from "./routes/users/page";
 import AdminsTable from "./routes/admins/page";
 import NewAdmin from "./routes/new-admin/page";
+import Login from "./Pages/Auth/Login";
+import FrontLayout from "./routes/frontLayout";
+import Home from "./Pages/Home";
+import NotFound from "./Pages/NotFound";
+import Suggestions from "./Pages/suggestions";
+import About from "./Pages/About";
+import Sondage from "./Pages/Sondage";
+import Evenement from "./Pages/Evenement";
+import Blog from "./Pages/Blog";
+import Actualites from "./Pages/Actualites";
 function App() {
     const router = createBrowserRouter([
         {
             path: "/",
+            element: <FrontLayout />, // Ce layout contient le Navbar, le Footer, etc.
+            children: [
+              { index: true, element: <Home /> },
+              { path: "suggestions", element: <Suggestions /> },
+              { path: "actualites", element: <Actualites /> },
+              { path: "blog", element: <Blog /> },
+              { path: "evenements", element: <Evenement /> },
+              { path: "sondages", element: <Sondage /> },
+              { path: "about", element: <About /> },
+            ],
+          },
+        {
+            path: "/login",
+            element: <Login />, // Page d'accueil (Tableau de Bord)
+        },
+        {
+            path: "/admin",
             element: <Layout />,
             children: [
                 {
                     index: true,
+                    path: "dashboard",
                     element: <DashboardPage />, // Page d'accueil (Tableau de Bord)
                 },
                 {
@@ -78,6 +106,10 @@ function App() {
                 },
             ],
         },
+        {
+            path: "*",
+            element: <NotFound />, // Page par défaut pour une URL invalide
+        }
     ]);
     
 
