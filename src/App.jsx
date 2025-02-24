@@ -26,15 +26,15 @@ function App() {
             path: "/",
             element: <FrontLayout />, // Ce layout contient le Navbar, le Footer, etc.
             children: [
-              { index: true, element: <Home /> },
-              { path: "suggestions", element: <Suggestions /> },
-              { path: "actualites", element: <Actualites /> },
-              { path: "blog", element: <Blog /> },
-              { path: "evenements", element: <Evenement /> },
-              { path: "sondages", element: <Sondage /> },
-              { path: "about", element: <About /> },
+                { index: true, element: <Home /> },
+                { path: "suggestions", element: <Suggestions /> },
+                { path: "actualites", element: <Actualites /> },
+                { path: "blog", element: <Blog /> },
+                { path: "evenements", element: <Evenement /> },
+                { path: "sondages", element: <Sondage /> },
+                { path: "about", element: <About /> },
             ],
-          },
+        },
         {
             path: "/login",
             element: (
@@ -46,9 +46,9 @@ function App() {
         {
             path: "/admin",
             element: (
-               
+                <ProtectedRoute>
                     <Layout />
-               
+                </ProtectedRoute>
             ),
             children: [
                 {
@@ -78,7 +78,7 @@ function App() {
                 },
                 {
                     path: "new-admin",
-                    element:<NewAdmin />, // Page des utilisateurs vérifiés
+                    element: <NewAdmin />, // Page des utilisateurs vérifiés
                 },
                 {
                     path: "news",
@@ -123,7 +123,7 @@ function App() {
             element: <NotFound />, // Page par défaut pour une URL invalide
         }
     ]);
-    
+
 
     return (
         <ThemeProvider storageKey="theme">

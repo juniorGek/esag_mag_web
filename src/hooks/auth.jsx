@@ -15,10 +15,10 @@ export function getUserData() {
     }
 
     // Vérifier que l'utilisateur est admin (ajustez selon votre payload)
-    if (decodedToken.compte !== "admin") {
+   /* if (decodedToken.compte !== "admin") {
       console.error("L'utilisateur n'est pas admin.");
       return null;
-    }
+    }*/
 
     return {
       id: decodedToken.id,
