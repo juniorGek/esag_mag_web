@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { APIURL } from '../../../config/endPoint';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useMessage } from '../../utils/messageContext';
+
+
 
 
 const Login = () => {
@@ -10,9 +15,10 @@ const Login = () => {
   });
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+const {setMessage}=useMessage()
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  const handleChange = (e) => {;
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -35,12 +41,15 @@ const Login = () => {
       console.log(data);
       if (reponse.status === 200) {
         localStorage.setItem('token', data.token);
+       setMessage({ type: 'success', text: data.message });
         navigate('/admin/dashboard');
       } else {
-        setError(data.message);
+
+        toast.error(data.message,{position: "top-right"});
       }
 
     } catch (error) {
+      toast.error("erreur de connexion",{position: "top-right",autoClose: 5000});
       console.log(error);
 
     }
@@ -122,7 +131,7 @@ const Login = () => {
 
 
         </form>
-
+        <ToastContainer />
 
       </div>
     </div>

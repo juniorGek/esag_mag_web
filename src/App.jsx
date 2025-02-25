@@ -21,6 +21,7 @@ import { PublicRoute } from "./hooks/PublicRoute";
 import { ProtectedRoute } from "./hooks/ProtectedRoute";
 import ActualiteDetail from './Pages/ActualiteDetail';
 import EvenementDetail from './Pages/EvenementDetail';
+import { MessageProvider } from "./utils/messageContext";
 
 function App() {
     const router = createBrowserRouter([
@@ -130,7 +131,10 @@ function App() {
 
     return (
         <ThemeProvider storageKey="theme">
-            <RouterProvider router={router} />
+             <MessageProvider>
+             <RouterProvider router={router} />
+             </MessageProvider>
+            
         </ThemeProvider>
     );
 }
