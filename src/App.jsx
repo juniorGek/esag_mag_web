@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import { ThemeProvider } from "./contexts/theme-provider";
 import DashboardPage from "./routes/dashboard/page";
@@ -18,10 +19,11 @@ import Blog from "./Pages/Blog";
 import Actualites from "./Pages/Actualites";
 import { PublicRoute } from "./hooks/PublicRoute";
 import { ProtectedRoute } from "./hooks/ProtectedRoute";
+import ActualiteDetail from './Pages/ActualiteDetail';
+import EvenementDetail from './Pages/EvenementDetail';
+
 function App() {
     const router = createBrowserRouter([
-
-
         {
             path: "/",
             element: <FrontLayout />, // Ce layout contient le Navbar, le Footer, etc.
@@ -29,8 +31,10 @@ function App() {
                 { index: true, element: <Home /> },
                 { path: "suggestions", element: <Suggestions /> },
                 { path: "actualites", element: <Actualites /> },
+                { path: "actualite/:id", element: <ActualiteDetail /> },
                 { path: "blog", element: <Blog /> },
                 { path: "evenements", element: <Evenement /> },
+                { path: "evenement/:id", element: <EvenementDetail /> },
                 { path: "sondages", element: <Sondage /> },
                 { path: "about", element: <About /> },
             ],
@@ -123,7 +127,6 @@ function App() {
             element: <NotFound />, // Page par défaut pour une URL invalide
         }
     ]);
-
 
     return (
         <ThemeProvider storageKey="theme">

@@ -58,84 +58,84 @@ const Home = () => {
 
   const actualites = [
     {
+      id: 1,
       title: "Nouvelle rentrée académique",
       date: "12 Février 2025",
       description: "Découvrez les nouveautés pour cette nouvelle année universitaire.",
-      link: "/actualites/1",
       image: "/images/news1.jpg",
     },
     {
+      id: 2,
       title: "Conférence sur l'IA",
       date: "20 Mars 2025",
       description: "Un événement à ne pas manquer sur l'intelligence artificielle.",
-      link: "/actualites/2",
       image: "/images/news2.jpg",
     },
     {
+      id: 3,
       title: "Forum des entreprises",
       date: "15 Avril 2025",
       description: "Rencontrez vos futurs employeurs lors de notre forum annuel.",
-      link: "/actualites/3",
       image: "/images/news3.jpg",
     },
     {
+      id: 4,
       title: "Nouveaux partenariats",
       date: "5 Mai 2025",
       description: "Découvrez nos nouveaux partenaires internationaux.",
-      link: "/actualites/4",
       image: "/images/news4.jpg",
     },
     {
+      id: 5,
       title: "Innovation Lab",
       date: "1 Juin 2025",
       description: "Ouverture du nouveau laboratoire d'innovation.",
-      link: "/actualites/5",
       image: "/images/news5.jpg",
     }
   ];
 
   const evenements = [
     {
+      id: 1,
       title: "Hackathon 2025",
       date: "15 Avril 2025",
       description: "Un challenge de programmation ouvert à tous les étudiants.",
-      link: "/evenements/1",
       image: "/images/event2.png",
       location: "Campus Principal",
       time: "09:00 - 18:00"
     },
     {
+      id: 2,
       title: "Gala des 20 ans",
       date: "30 Juin 2025",
       description: "Célébration spéciale des 20 ans de ESAG-NDE.",
-      link: "/evenements/2",
       image: "/images/event1.jpg",
       location: "Salle des fêtes",
       time: "19:00 - 23:00"
     },
     {
+      id: 3,
       title: "Forum Entreprises",
       date: "10 Mai 2025",
       description: "Rencontrez les plus grandes entreprises du secteur.",
-      link: "/evenements/3",
       image: "/images/event3.jpg",
       location: "Hall des conférences",
       time: "10:00 - 17:00"
     },
     {
+      id: 4,
       title: "Conférence Tech",
       date: "25 Mai 2025",
       description: "Les dernières innovations technologiques présentées par des experts.",
-      link: "/evenements/4",
       image: "/images/event4.jpg",
       location: "Amphithéâtre A",
       time: "14:00 - 16:00"
     },
     {
+      id: 5,
       title: "Journée Culturelle",
       date: "5 Juin 2025",
       description: "Découvrez la diversité culturelle de notre école.",
-      link: "/evenements/5",
       image: "/images/event5.jpg",
       location: "Esplanade",
       time: "11:00 - 20:00"
@@ -174,7 +174,7 @@ const Home = () => {
       </Swiper>
 
       {/* Actualités Section - Style amélioré */}
-      <section className="section-padding bg-gray-50">
+      <section className="section-padding bg-white m-5 p-3">
         <div className="container-width">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
             Dernières Actualités
@@ -191,8 +191,8 @@ const Home = () => {
             autoplay={{ delay: 5000, disableOnInteraction: false }}
             className="pb-8"
           >
-            {actualites.map((news, index) => (
-              <SwiperSlide key={index}>
+            {actualites.map((news) => (
+              <SwiperSlide key={news.id}>
                 <div className="bg-white rounded-lg overflow-hidden shadow-md h-[380px]">
                   <div className="relative h-48">
                     <img 
@@ -208,7 +208,7 @@ const Home = () => {
                     <h3 className="text-xl font-bold mb-2 text-gray-800">{news.title}</h3>
                     <p className="text-gray-600 mb-4">{news.description}</p>
                     <Link 
-                      to={news.link} 
+                      to={`/actualite/${news.id}`}
                       className="text-blue-600 font-medium hover:text-blue-700"
                     >
                       En savoir plus →
@@ -239,8 +239,8 @@ const Home = () => {
             autoplay={{ delay: 2000, disableOnInteraction: false }}
             className="pb-8"
           >
-            {evenements.map((event, index) => (
-              <SwiperSlide key={index}>
+            {evenements.map((event) => (
+              <SwiperSlide key={event.id}>
                 <div className="group mb-3 bg-white rounded-xl overflow-hidden  hover:transition-all duration-300 transform hover:-translate-y-2 h-[360px]">
                   <div className="relative overflow-hidden h-40">
                     <img 
@@ -276,7 +276,7 @@ const Home = () => {
                     </div>
                     <p className="text-gray-600 mb-3 text-sm line-clamp-2">{event.description}</p>
                     <Link 
-                      to={event.link} 
+                      to={`/evenement/${event.id}`}
                       className="inline-flex items-center w-full justify-center px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors duration-300 group"
                     >
                       Participer
@@ -296,7 +296,7 @@ const Home = () => {
       </section>
 
       {/* Newsletter Section */}
-      <section className="bg-blue-600 py-12">
+      <section className="bg-blue-600 section-padding  m-5 p-3">
         <div className="container-width">
           <h2 className="text-3xl font-bold text-center text-white mb-4">
             Restez informé
@@ -321,7 +321,7 @@ const Home = () => {
       </section>
 
       {/* Nouvelle section Suggestions */}
-      <section className="section-padding bg-white">
+      <section className="section-padding  m-5 p-3 bg-white">
         <div className="container-width max-w-3xl mx-auto">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-8">
             Donnez vos avis
