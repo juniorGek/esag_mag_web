@@ -1,6 +1,4 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-
 import { ThemeProvider } from "./contexts/theme-provider";
 import DashboardPage from "./routes/dashboard/page";
 import Layout from "./routes/layouts";
@@ -23,6 +21,9 @@ import ActualiteDetail from './Pages/ActualiteDetail';
 import EvenementDetail from './Pages/EvenementDetail';
 import { MessageProvider } from "./utils/messageContext";
 
+import NewNews from "./routes/new-news/page";
+
+import NewsTable from "./routes/news/page";
 function App() {
     const router = createBrowserRouter([
         {
@@ -51,9 +52,11 @@ function App() {
         {
             path: "/admin",
             element: (
-                <ProtectedRoute>
-                    <Layout />
-                </ProtectedRoute>
+                    <ProtectedRoute>
+                        <Layout />
+                    </ProtectedRoute>
+                    
+               
             ),
             children: [
                 {
@@ -87,11 +90,11 @@ function App() {
                 },
                 {
                     path: "news",
-                    element: <h1 className="title">Actualités</h1>, // Page des Actualités
+                    element: <NewsTable/>, // Page des Actualités
                 },
                 {
                     path: "new-news",
-                    element: <h1 className="title">Nouvelle Actualité</h1>, // Page pour ajouter une nouvelle actualité
+                    element: <NewNews/>, // Page pour ajouter une nouvelle actualité
                 },
                 {
                     path: "blogs",

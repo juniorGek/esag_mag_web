@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { APIURL } from '../../../config/endPoint';
+import { API_URL } from '../../../config/endPoint';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useMessage } from '../../utils/messageContext';
@@ -13,7 +13,6 @@ const Login = () => {
     email: '',
     password: '',
   });
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 const {setMessage}=useMessage()
   const navigate = useNavigate();
@@ -30,7 +29,7 @@ const {setMessage}=useMessage()
     e.preventDefault();
     console.log(formData);
     try {
-      const reponse = await fetch(`${APIURL}/AdminLogin`, {
+      const reponse = await fetch(`${API_URL}/AdminLogin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -111,12 +110,6 @@ const {setMessage}=useMessage()
               <a href="#" className="text-sm text-blue-600 hover:text-blue-800">Forgot password?</a>
             </div>
           </div>
-
-          {error && (
-            <div className="text-red-500 text-sm text-center">
-              {error}
-            </div>
-          )}
 
           <button
             type="submit"
