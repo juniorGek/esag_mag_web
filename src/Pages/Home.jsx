@@ -58,84 +58,84 @@ const Home = () => {
 
   const actualites = [
     {
+      id: 1,
       title: "Nouvelle rentrée académique",
       date: "12 Février 2025",
       description: "Découvrez les nouveautés pour cette nouvelle année universitaire.",
-      link: "/actualites/1",
       image: "/images/news1.jpg",
     },
     {
+      id: 2,
       title: "Conférence sur l'IA",
       date: "20 Mars 2025",
       description: "Un événement à ne pas manquer sur l'intelligence artificielle.",
-      link: "/actualites/2",
       image: "/images/news2.jpg",
     },
     {
+      id: 3,
       title: "Forum des entreprises",
       date: "15 Avril 2025",
       description: "Rencontrez vos futurs employeurs lors de notre forum annuel.",
-      link: "/actualites/3",
       image: "/images/news3.jpg",
     },
     {
+      id: 4,
       title: "Nouveaux partenariats",
       date: "5 Mai 2025",
       description: "Découvrez nos nouveaux partenaires internationaux.",
-      link: "/actualites/4",
       image: "/images/news4.jpg",
     },
     {
+      id: 5,
       title: "Innovation Lab",
       date: "1 Juin 2025",
       description: "Ouverture du nouveau laboratoire d'innovation.",
-      link: "/actualites/5",
       image: "/images/news5.jpg",
     }
   ];
 
   const evenements = [
     {
+      id: 1,
       title: "Hackathon 2025",
       date: "15 Avril 2025",
       description: "Un challenge de programmation ouvert à tous les étudiants.",
-      link: "/evenements/1",
       image: "/images/event2.png",
       location: "Campus Principal",
       time: "09:00 - 18:00"
     },
     {
+      id: 2,
       title: "Gala des 20 ans",
       date: "30 Juin 2025",
       description: "Célébration spéciale des 20 ans de ESAG-NDE.",
-      link: "/evenements/2",
       image: "/images/event1.jpg",
       location: "Salle des fêtes",
       time: "19:00 - 23:00"
     },
     {
+      id: 3,
       title: "Forum Entreprises",
       date: "10 Mai 2025",
       description: "Rencontrez les plus grandes entreprises du secteur.",
-      link: "/evenements/3",
       image: "/images/event3.jpg",
       location: "Hall des conférences",
       time: "10:00 - 17:00"
     },
     {
+      id: 4,
       title: "Conférence Tech",
       date: "25 Mai 2025",
       description: "Les dernières innovations technologiques présentées par des experts.",
-      link: "/evenements/4",
       image: "/images/event4.jpg",
       location: "Amphithéâtre A",
       time: "14:00 - 16:00"
     },
     {
+      id: 5,
       title: "Journée Culturelle",
       date: "5 Juin 2025",
       description: "Découvrez la diversité culturelle de notre école.",
-      link: "/evenements/5",
       image: "/images/event5.jpg",
       location: "Esplanade",
       time: "11:00 - 20:00"
@@ -174,47 +174,44 @@ const Home = () => {
       </Swiper>
 
       {/* Actualités Section - Style amélioré */}
-      <section className="section-padding bg-gray-100 m-5 p-3 ">
+      <section className="section-padding bg-white m-5 p-3">
         <div className="container-width">
-          <h2 className="text-4xl font-bold text-center text-gray-900 mb-12 relative">
+          <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
             Dernières Actualités
-            <div className="h-1 w-24 bg-blue-600 mx-auto mt-4 rounded-full"></div>
           </h2>
           <Swiper
-            modules={[Autoplay, Pagination]}
-            spaceBetween={16}
+            modules={[Autoplay]}
+            spaceBetween={24}
             slidesPerView={1}
             breakpoints={{
-              640: { slidesPerView: 3 },
-              1024: { slidesPerView: 4 },
+              640: { slidesPerView: 2 },
+              768: { slidesPerView: 3 },
+              1024: { slidesPerView: 4 }
             }}
-            autoplay={{ delay: 2000, disableOnInteraction: false }}
-            className="pb-8 "
+            autoplay={{ delay: 5000, disableOnInteraction: false }}
+            className="pb-8"
           >
-            {actualites.map((news, index) => (
-              <SwiperSlide key={index}>
-                <div className="group bg-white rounded-xl overflow-hidden hover:transition-all duration-300 transform hover:-translate-y-2 h-[320px]">
-                  <div className="relative overflow-hidden h-40">
+            {actualites.map((news) => (
+              <SwiperSlide key={news.id}>
+                <div className="bg-white rounded-lg overflow-hidden shadow-md h-[380px]">
+                  <div className="relative h-48">
                     <img 
                       src={news.image} 
                       alt={news.title} 
-                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                      className="w-full h-full object-cover"
                     />
-                    <div className="absolute top-3 right-3 bg-blue-600/90 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs">
+                    <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
                       {news.date}
                     </div>
                   </div>
-                  <div className="p-3">
-                    <h3 className="text-lg font-bold mb-2 text-gray-800 line-clamp-1">{news.title}</h3>
-                    <p className="text-gray-600 mb-3 text-sm line-clamp-2">{news.description}</p>
+                  <div className="p-5">
+                    <h3 className="text-xl font-bold mb-2 text-gray-800">{news.title}</h3>
+                    <p className="text-gray-600 mb-4">{news.description}</p>
                     <Link 
-                      to={news.link} 
-                      className="inline-flex items-center px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors duration-300"
+                      to={`/actualite/${news.id}`}
+                      className="text-blue-600 font-medium hover:text-blue-700"
                     >
-                      En savoir + 
-                      <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"/>
-                      </svg>
+                      En savoir plus →
                     </Link>
                   </div>
                 </div>
@@ -242,8 +239,8 @@ const Home = () => {
             autoplay={{ delay: 2000, disableOnInteraction: false }}
             className="pb-8"
           >
-            {evenements.map((event, index) => (
-              <SwiperSlide key={index}>
+            {evenements.map((event) => (
+              <SwiperSlide key={event.id}>
                 <div className="group mb-3 bg-white rounded-xl overflow-hidden  hover:transition-all duration-300 transform hover:-translate-y-2 h-[360px]">
                   <div className="relative overflow-hidden h-40">
                     <img 
@@ -279,7 +276,7 @@ const Home = () => {
                     </div>
                     <p className="text-gray-600 mb-3 text-sm line-clamp-2">{event.description}</p>
                     <Link 
-                      to={event.link} 
+                      to={`/evenement/${event.id}`}
                       className="inline-flex items-center w-full justify-center px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors duration-300 group"
                     >
                       Participer
@@ -299,50 +296,35 @@ const Home = () => {
       </section>
 
       {/* Newsletter Section */}
-      <section className="section-padding bg-gradient-to-r from-blue-500 to-indigo-600">
+      <section className="bg-blue-600 section-padding  m-5 p-3">
         <div className="container-width">
-          <div className="max-w-2xl mx-auto text-center text-white">
-            <h2 className="text-3xl font-bold mb-4 animate-fade-in">
-              Restez informé
-            </h2>
-            <p className="mb-8 animate-fade-in">
-              Inscrivez-vous à notre newsletter pour ne rien manquer des
-              actualités de lESAG-nde.
-            </p>
-            {isSubscribed ? (
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 animate-scale-in">
-                <p className="text-lg">Merci pour votre inscription ! 🎉</p>
-              </div>
-            ) : (
-              <form onSubmit={handleSubscribe} className="animate-fade-in">
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Votre adresse email"
-                    className="input-field bg-white/10 backdrop-blur-sm text-white placeholder-white/60 border-white/20 focus:border-white"
-                    required
-                  />
-                  <button
-                    type="submit"
-                    className="btn-secondary bg-white text-blue-600 hover:bg-gray-100"
-                  >
-                    Sinscrire
-                  </button>
-                </div>
-              </form>
-            )}
+          <h2 className="text-3xl font-bold text-center text-white mb-4">
+            Restez informé
+          </h2>
+          <p className="text-center text-white mb-8">
+            Inscrivez-vous à notre newsletter pour ne rien manquer des actualités de lESAG-nde.
+          </p>
+          <div className="max-w-2xl mx-auto flex justify-center">
+            <input
+              type="email"
+              placeholder="Votre adresse email"
+              className="flex-1 p-2 rounded-l border-0"
+            />
+            <button
+              type="submit"
+              className="bg-white text-blue-600 px-6 py-2 rounded-r font-medium hover:bg-gray-100"
+            >
+              Sinscrire
+            </button>
           </div>
         </div>
       </section>
 
       {/* Nouvelle section Suggestions */}
-      <section className="section-padding bg-gray-50">
-        <div className="container-width max-w-4xl mx-auto">
-          <h2 className="text-4xl font-bold text-center text-gray-900 mb-12 relative">
-            Donnez vos avis 
-            <div className="h-1 w-24 bg-blue-600 mx-auto mt-4 rounded-full"></div>
+      <section className="section-padding  m-5 p-3 bg-white">
+        <div className="container-width max-w-3xl mx-auto">
+          <h2 className="text-4xl font-bold text-center text-gray-900 mb-8">
+            Donnez vos avis
           </h2>
           
           {showSuccessMessage ? (
@@ -351,30 +333,27 @@ const Home = () => {
             </div>
           ) : null}
 
-          <form onSubmit={handleSuggestionSubmit} className="bg-white rounded-xl shadow-lg p-8">
-            <div className="mb-6">
-              <label htmlFor="title" className="block text-gray-700 font-semibold mb-2">
+          <form onSubmit={handleSuggestionSubmit} className="space-y-6">
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
                 Titre de votre suggestion
               </label>
               <input
                 type="text"
-                id="title"
                 value={suggestion.title}
                 onChange={(e) => setSuggestion({...suggestion, title: e.target.value})}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                className="w-full p-3 border border-gray-300 rounded-lg"
                 required
               />
             </div>
-
-            <div className="mb-6">
-              <label htmlFor="category" className="block text-gray-700 font-semibold mb-2">
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
                 Catégorie
               </label>
               <select
-                id="category"
                 value={suggestion.category}
                 onChange={(e) => setSuggestion({...suggestion, category: e.target.value})}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors"
+                className="w-full p-3 border border-gray-300 rounded-lg"
               >
                 <option value="general">Général</option>
                 <option value="academic">Académique</option>
@@ -382,23 +361,20 @@ const Home = () => {
                 <option value="facilities">Infrastructures</option>
               </select>
             </div>
-
-            <div className="mb-6">
-              <label htmlFor="description" className="block text-gray-700 font-semibold mb-2">
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">
                 Votre suggestion
               </label>
               <textarea
-                id="description"
                 value={suggestion.description}
                 onChange={(e) => setSuggestion({...suggestion, description: e.target.value})}
-                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors h-32 resize-none"
+                className="w-full p-3 border border-gray-300 rounded-lg h-32"
                 required
               ></textarea>
             </div>
-
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transform hover:scale-[1.02] transition-all duration-300"
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700"
             >
               Envoyer ma suggestion
             </button>

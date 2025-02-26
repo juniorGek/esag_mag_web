@@ -7,13 +7,30 @@ import { overviewData, recentSalesData, topProducts } from "../../constants";
 import { Footer } from "../../layouts/Footer";
 
 import { CreditCard, DollarSign, Package, PencilLine, Star, Trash, TrendingUp, Users } from "lucide-react";
+import { useMessage } from "../../utils/messageContext";
+import { use, useEffect } from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const DashboardPage = () => {
     const { theme } = useTheme();
+    const {message,setMessage}=useMessage()
+    useEffect(() => {
+        if (message) {
+          if (message.type === 'success') {
+            toast.success(message.text, { position: 'top-right',autoClose: 5000 });
+          } else if (message.type === 'error') {
+            toast.error(message.text, { position: 'top-right', autoClose: 5000 });
+          }
+          // Réinitialiser le message une fois affiché
+          setMessage(null);
+        }
+      }, [message, setMessage]);  
 
     return (
         <div className="flex flex-col gap-y-4">
           <h1 className="title">Dashboard</h1>
+          <ToastContainer />
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 <div className="card">
                     <div className="card-header">

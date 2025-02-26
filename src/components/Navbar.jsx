@@ -12,8 +12,8 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
-      <div className="container-width">
-        <div className="flex justify-between items-center py-4 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-full mx-auto px-8">
+        <div className="flex justify-between items-center py-8">
           {/* Logo */}
           <Link 
             to="/" 
@@ -23,19 +23,21 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-12">
             {navigation.map((item, index) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={`nav-link animate-fade-in flex items-center space-x-1 ${
-                  isActive(item.href) ? 'text-blue-600' : 'text-gray-600'
-                }`}
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <span className="opacity-75">{item.icon}</span>
-                <span>{item.name}</span>
-              </Link>
+              item.name !== "À propos" && (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`nav-link animate-fade-in flex items-center space-x-1 text-lg font-medium transition-transform transform hover:scale-105 ${
+                    isActive(item.href) ? 'text-blue-600' : 'text-gray-600'
+                  }`}
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
+                  <span className="opacity-75">{item.icon}</span>
+                  <span>{item.name}</span>
+                </Link>
+              )
             ))}
           </div>
 
