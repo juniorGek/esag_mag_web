@@ -25,6 +25,12 @@ import NewNews from "./routes/new-news/page";
 
 import NewsTable from "./routes/news/page";
 import ForgetPassPage from "./Pages/Auth/forgetPassPage";
+import BlogTable from "./routes/blogs/page";
+import NewBlog from "./routes/new-blogs/page";
+import NewPoll from "./routes/new-poll/page";
+import PollsTable from "./routes/polls/page";
+import NewEvent from "./routes/new-event/page";
+import EventsTable from "./routes/events/page";
 function App() {
     const router = createBrowserRouter([
         {
@@ -74,14 +80,6 @@ function App() {
                     element: <DashboardPage />, // Page d'accueil (Tableau de Bord)
                 },
                 {
-                    path: "analytics",
-                    element: <h1 className="title">Analytiques</h1>, // Page des Analytiques
-                },
-                {
-                    path: "reports",
-                    element: <h1 className="title">Rapports</h1>, // Page des Rapports
-                },
-                {
                     path: "users",
                     element: <UsersTable />, // Page des Utilisateurs
                 },
@@ -107,15 +105,19 @@ function App() {
                 },
                 {
                     path: "blogs",
-                    element: <h1 className="title">Blogs</h1>, // Page des Blogs
+                    element: <BlogTable />, // Page des Blogs
+                },
+                {
+                    path: "new-blogs",
+                    element: <NewBlog />, // Page pour ajouter un nouveau blog
                 },
                 {
                     path: "polls",
-                    element: <h1 className="title">Sondages</h1>, // Page des Sondages
+                    element: <PollsTable />, // Page des Sondages
                 },
                 {
                     path: "new-poll",
-                    element: <h1 className="title">Nouveau Sondage</h1>, // Page pour créer un nouveau sondage
+                    element: <NewPoll />, // Page pour créer un nouveau sondage
                 },
                 {
                     path: "suggestions",
@@ -123,11 +125,11 @@ function App() {
                 },
                 {
                     path: "events",
-                    element: <h1 className="title">Événements</h1>, // Page des Événements
+                    element: <EventsTable />, // Page des Événements
                 },
                 {
                     path: "new-event",
-                    element: <h1 className="title">Nouvel Événement</h1>, // Page pour créer un nouvel événement
+                    element: <NewEvent />, // Page pour créer un nouvel événement
                 },
                 {
                     path: "settings",

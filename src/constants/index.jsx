@@ -59,6 +59,11 @@ export const navbarLinks = [
                 icon: ShoppingBag,
                 path: "/admin/blogs",
             },
+            {
+                label: "Nouveau Blogs",
+                icon: PackagePlus,
+                path: "/admin/new-blogs",
+            },
         ],
     },
     {

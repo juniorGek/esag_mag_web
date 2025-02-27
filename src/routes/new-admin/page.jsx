@@ -194,7 +194,7 @@ const NewAdmin = () => {
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default NewAdmin;
+export default NewAdmin
