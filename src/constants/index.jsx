@@ -1,4 +1,4 @@
-import {  Home,  Package, PackagePlus, Settings, ShoppingBag, UserPlus, Users, ListChecks, MessageSquare, Calendar } from "lucide-react";
+import {  Home,  Package, PackagePlus, ShoppingBag, UserPlus, Users, ListChecks, MessageSquare, Calendar } from "lucide-react";
 import ProfileImage from "../assets/profile-image.jpg";
 import ProductImage from "../assets/product-image.jpg";
 
@@ -101,16 +101,17 @@ export const navbarLinks = [
             },
         ],
     },
-    {
-        title: "Paramètres",
-        links: [
-            {
-                label: "Paramètres",
-                icon: Settings,
-                path: "/admin/settings",
-            },
-        ],
-    },
+    // {
+    //     title: "Paramètres",
+    //     links: [
+    //         {
+    //             label: "Paramètres",
+    //             icon: Settings,
+    //             path: "/admin/settings",
+    //         },
+    //     ],
+    // },
+    
 ];
 export const overviewData = [
     {

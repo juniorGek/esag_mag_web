@@ -21,6 +21,8 @@ import { ProtectedRoute } from "./hooks/ProtectedRoute";
 import NewNews from "./routes/new-news/page";
 
 import NewsTable from "./routes/news/page";
+import ProfilePage from "./routes/profile/page";
+import SettingsPage from "./routes/settings/page";
 function App() {
     const router = createBrowserRouter([
         {
@@ -47,8 +49,9 @@ function App() {
         {
             path: "/admin",
             element: (
-              
+                // <ProtectedRoute>
                     <Layout />
+                // </ProtectedRoute> 
                
             ),
             children: [
@@ -115,7 +118,11 @@ function App() {
                 },
                 {
                     path: "settings",
-                    element: <h1 className="title">Paramètres</h1>, // Page des Paramètres
+                    element: <SettingsPage/>, // Page des Paramètres
+                },
+                {
+                    path: "Profile",
+                    element: <ProfilePage/>, // Page des Paramètres
                 },
             ],
         },

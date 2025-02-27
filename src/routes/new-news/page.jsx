@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Upload,  X,Heading, Heading2 } from "lucide-react";
+import { Upload, X, Heading, Heading2 } from "lucide-react";
 import { API_URL } from "../../../config/endpoint";
 
 const NewNews = () => {
@@ -44,28 +44,37 @@ const NewNews = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData.imageCover)
-    // Ajouter ici la logique pour envoyer les données au serveur
+
     const formValues = new FormData();
-    formValues.append("titre", formData.titre),
-    formValues.append("description", formData.description), 
-    formValues.append("sous_titre",formData.sous_titre),
-    formValues.append("image", formData.imageCover),
-    formValues.append("enabled", formData.enabled)
-    console.log("Données soumises:", formValues);
+    formValues.append("titre", formData.titre);
+    formValues.append("description", formData.description);
+    formValues.append("sous_titre", formData.sous_titre);
+    formValues.append("image", formData.imageCover);
+    formValues.append("enabled", formData.enabled);
 
-    const response = await fetch (`${API_URL}/createActualite`,{
-      method : "POST",
-      headers : {
-        'Content-Type': 'multipart/form-data'
-      },
-      body : JSON.stringify(formValues),
+    try {
+      const response = await fetch(`${API_URL}/createActualite`, {
+        method: "POST",
+        body: formValues,
+      });
 
-    } )
-  if (response.status === 200) {
-    console.log("Actualité créée avec succès");
-  }
-    
+      if (response.ok) {
+        console.log("Actualité créée avec succès");
+        // Réinitialiser le formulaire après un envoi réussi
+        setFormData({
+          titre: "",
+          sous_titre: "",
+          description: "",
+          imageCover: null,
+          enabled: false,
+        });
+        setPreview(null);
+      } else {
+        console.error("Erreur lors de la création de l'actualité");
+      }
+    } catch (error) {
+      console.error("Erreur réseau:", error);
+    }
   };
 
   return (
@@ -117,6 +126,22 @@ const NewNews = () => {
                 </>
               )}
             </div>
+            {/* Champ Description */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Description
+              </label>
+              <div className="relative">
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Entrez la description"
+                  rows="4"
+                />
+              </div>
+            </div>
           </div>
 
           {/* Section droite pour le formulaire */}
@@ -140,7 +165,7 @@ const NewNews = () => {
                     placeholder="Entrez le titre"
                     required
                   />
-                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                     <Heading className="w-5 h-5 text-gray-400" />
                   </span>
                 </div>
@@ -160,27 +185,9 @@ const NewNews = () => {
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     placeholder="Entrez le sous-titre"
                   />
-                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                     <Heading2 className="w-5 h-5 text-gray-400" />
                   </span>
-                </div>
-              </div>
-
-              {/* Champ Description */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </label>
-                <div className="relative">
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Entrez la description"
-                    rows="4"
-                  />
-                 
                 </div>
               </div>
 
@@ -204,7 +211,7 @@ const NewNews = () => {
                   type="submit"
                   className="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                  Ajouter lactualité
+                  Ajouter l actualité
                 </button>
               </div>
             </form>
