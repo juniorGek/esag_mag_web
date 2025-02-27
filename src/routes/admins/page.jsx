@@ -196,5 +196,5 @@ export default function AdminsTable() {
         onConfirm={handleDelete}
       />
     </div>
-  );
+  )
 }
