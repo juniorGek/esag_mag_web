@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Upload, X, Heading, Heading2 } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { API_URL } from "../../../config/endpoint";
+import { API_URL } from "../../../config/ApiUrl";
+
 
 const NewNews = () => {
   const [formData, setFormData] = useState({

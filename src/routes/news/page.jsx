@@ -7,7 +7,8 @@ import { tr } from "framer-motion/m";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loader from "../../components/Laoder";
-import { API_URL, ImageApi } from "../../../config/endPoint";
+import { API_URL, ImageApi } from "../../../config/ApiUrl";
+
 
 // Données de démonstration pour les actualités
 

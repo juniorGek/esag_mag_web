@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { API_URL } from "../../../config/endPoint";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useMessage } from "../../utils/messageContext";
+import { API_URL } from "../../../config/ApiUrl";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -60,9 +60,7 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Bienvenue !
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Bienvenue !</h1>
           <p className="text-gray-600">
             Renseignez vos informations pour vous connectez
           </p>
@@ -119,7 +117,10 @@ const Login = () => {
               </button>
             </div>
             <div className="flex justify-end mt-2">
-              <Link to='/login/forgetPassword' className="text-sm text-blue-600 hover:text-blue-800">
+              <Link
+                to="/login/forgetPassword"
+                className="text-sm text-blue-600 hover:text-blue-800"
+              >
                 Mot de passe oublié?
               </Link>
             </div>

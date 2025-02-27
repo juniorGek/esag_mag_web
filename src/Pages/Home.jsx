@@ -5,7 +5,7 @@ import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
-import { API_URL } from "../../config/endpoint";
+import { API_URL } from "../../config/ApiUrl";
 
 const Home = () => {
   const [email, setEmail] = useState("");
