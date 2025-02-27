@@ -374,7 +374,7 @@ export default function BlogTable() {
               Supprimer le blog
             </h2>
             <p className="text-gray-700 dark:text-slate-300 mb-6">
-              Êtes-vous sûr de vouloir supprimer cet blog ?
+              Êtes-vous sûr de vouloir supprimer ce blog ?
             </p>
             <div className="flex justify-end gap-4">
               <button

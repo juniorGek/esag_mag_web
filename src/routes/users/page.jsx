@@ -3,7 +3,7 @@
 const UsersTable = () => {
   return (
     <div>
-      Liste des utilisaturs
+      Liste des utilisateurs
     </div>
   )
 }
