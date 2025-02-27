@@ -1,9 +1,10 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { evenements } from '../data';
 
 const EvenementDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const evenement = evenements.find(evt => evt.id.toString() === id);
 
   if (!evenement) {
@@ -11,6 +12,11 @@ const EvenementDetail = () => {
       <h1 className="text-2xl text-gray-600">Événement non trouvé</h1>
     </div>;
   }
+
+  const handleSimilarClick = (evenementId) => {
+    navigate(`/evenement/${evenementId}`);
+    window.scrollTo(0, 0);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
@@ -96,10 +102,10 @@ const EvenementDetail = () => {
             <h2 className="text-3xl font-bold mb-8 text-center">Événements similaires</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {evenements.slice(0, 3).map((evt, index) => (
-                <Link 
+                <motion.div
                   key={index}
-                  to={`/evenement/${index + 1}`}
-                  className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+                  onClick={() => handleSimilarClick(index + 1)}
+                  className="cursor-pointer bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
                 >
                   <div className="relative h-48">
                     <img 
@@ -120,7 +126,7 @@ const EvenementDetail = () => {
                     <h3 className="text-xl font-semibold mb-2">{evt.title}</h3>
                     <p className="text-gray-600 line-clamp-2">{evt.description}</p>
                   </div>
-                </Link>
+                </motion.div>
               ))}
             </div>
           </div>

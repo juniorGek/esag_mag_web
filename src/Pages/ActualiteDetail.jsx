@@ -1,9 +1,10 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { actualites } from '../data';
 
 const ActualiteDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const actualite = actualites.find(act => act.id.toString() === id);
 
   if (!actualite) {
@@ -11,6 +12,11 @@ const ActualiteDetail = () => {
       <h1 className="text-2xl text-gray-600">Actualité non trouvée</h1>
     </div>;
   }
+
+  const handleSimilarClick = (actualiteId) => {
+    navigate(`/actualite/${actualiteId}`);
+    window.scrollTo(0, 0);
+  };
 
   return (
     <motion.div 
