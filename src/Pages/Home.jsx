@@ -1,18 +1,20 @@
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
+import { API_URL } from "../../config/ApiUrl";
 
 const Home = () => {
   const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
+  const [dernierAcu, setDernierAcu] = useState([]);
   const [suggestion, setSuggestion] = useState({
     title: "",
     description: "",
-    category: "general"
+    category: "general",
   });
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
@@ -28,6 +30,24 @@ const Home = () => {
     setSuggestion({ title: "", description: "", category: "general" });
     setTimeout(() => setShowSuccessMessage(false), 3000);
   };
+
+  const handleEvent = (eventData) => {
+    window.location.href = `/evenement/${eventData.id}`;
+  };
+
+  const fetchDernierActu = async() =>{
+    try {
+      const response = await fetch(`${API_URL}/listeDernierActu`);
+      const data = await response.json();
+      console.log("DATAAA",data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    fetchDernierActu();
+  }, []);
 
   const heroSlides = [
     {
@@ -61,21 +81,24 @@ const Home = () => {
       id: 1,
       title: "Nouvelle rentrée académique",
       date: "12 Février 2025",
-      description: "Découvrez les nouveautés pour cette nouvelle année universitaire.",
+      description:
+        "Découvrez les nouveautés pour cette nouvelle année universitaire.",
       image: "/images/news1.jpg",
     },
     {
       id: 2,
       title: "Conférence sur l'IA",
       date: "20 Mars 2025",
-      description: "Un événement à ne pas manquer sur l'intelligence artificielle.",
+      description:
+        "Un événement à ne pas manquer sur l'intelligence artificielle.",
       image: "/images/news2.jpg",
     },
     {
       id: 3,
       title: "Forum des entreprises",
       date: "15 Avril 2025",
-      description: "Rencontrez vos futurs employeurs lors de notre forum annuel.",
+      description:
+        "Rencontrez vos futurs employeurs lors de notre forum annuel.",
       image: "/images/news3.jpg",
     },
     {
@@ -91,7 +114,7 @@ const Home = () => {
       date: "1 Juin 2025",
       description: "Ouverture du nouveau laboratoire d'innovation.",
       image: "/images/news5.jpg",
-    }
+    },
   ];
 
   const evenements = [
@@ -102,7 +125,7 @@ const Home = () => {
       description: "Un challenge de programmation ouvert à tous les étudiants.",
       image: "/images/event2.png",
       location: "Campus Principal",
-      time: "09:00 - 18:00"
+      time: "09:00 - 18:00",
     },
     {
       id: 2,
@@ -111,7 +134,7 @@ const Home = () => {
       description: "Célébration spéciale des 20 ans de ESAG-NDE.",
       image: "/images/event1.jpg",
       location: "Salle des fêtes",
-      time: "19:00 - 23:00"
+      time: "19:00 - 23:00",
     },
     {
       id: 3,
@@ -120,16 +143,17 @@ const Home = () => {
       description: "Rencontrez les plus grandes entreprises du secteur.",
       image: "/images/event3.jpg",
       location: "Hall des conférences",
-      time: "10:00 - 17:00"
+      time: "10:00 - 17:00",
     },
     {
       id: 4,
       title: "Conférence Tech",
       date: "25 Mai 2025",
-      description: "Les dernières innovations technologiques présentées par des experts.",
+      description:
+        "Les dernières innovations technologiques présentées par des experts.",
       image: "/images/event4.jpg",
       location: "Amphithéâtre A",
-      time: "14:00 - 16:00"
+      time: "14:00 - 16:00",
     },
     {
       id: 5,
@@ -138,8 +162,8 @@ const Home = () => {
       description: "Découvrez la diversité culturelle de notre école.",
       image: "/images/event5.jpg",
       location: "Esplanade",
-      time: "11:00 - 20:00"
-    }
+      time: "11:00 - 20:00",
+    },
   ];
 
   return (
@@ -186,7 +210,7 @@ const Home = () => {
             breakpoints={{
               640: { slidesPerView: 2 },
               768: { slidesPerView: 3 },
-              1024: { slidesPerView: 4 }
+              1024: { slidesPerView: 4 },
             }}
             autoplay={{ delay: 5000, disableOnInteraction: false }}
             className="pb-8"
@@ -195,9 +219,9 @@ const Home = () => {
               <SwiperSlide key={news.id}>
                 <div className="bg-white rounded-lg overflow-hidden shadow-md h-[380px]">
                   <div className="relative h-48">
-                    <img 
-                      src={news.image} 
-                      alt={news.title} 
+                    <img
+                      src={news.image}
+                      alt={news.title}
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
@@ -205,9 +229,11 @@ const Home = () => {
                     </div>
                   </div>
                   <div className="p-5">
-                    <h3 className="text-xl font-bold mb-2 text-gray-800">{news.title}</h3>
+                    <h3 className="text-xl font-bold mb-2 text-gray-800">
+                      {news.title}
+                    </h3>
                     <p className="text-gray-600 mb-4">{news.description}</p>
-                    <Link 
+                    <Link
                       to={`/actualite/${news.id}`}
                       className="text-blue-600 font-medium hover:text-blue-700"
                     >
@@ -243,54 +269,103 @@ const Home = () => {
               <SwiperSlide key={event.id}>
                 <div className="group mb-3 bg-white rounded-xl overflow-hidden  hover:transition-all duration-300 transform hover:-translate-y-2 h-[360px]">
                   <div className="relative overflow-hidden h-40">
-                    <img 
-                      src={event.image} 
-                      alt={event.title} 
+                    <img
+                      src={event.image}
+                      alt={event.title}
                       className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                     <div className="absolute bottom-3 left-3 text-white">
                       <div className="flex items-center space-x-2">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
                         </svg>
-                        <span className="text-sm font-medium">{event.date}</span>
+                        <span className="text-sm font-medium">
+                          {event.date}
+                        </span>
                       </div>
                     </div>
                   </div>
                   <div className="p-3">
-                    <h3 className="text-lg font-bold mb-2 text-gray-800 line-clamp-1">{event.title}</h3>
+                    <h3 className="text-lg font-bold mb-2 text-gray-800 line-clamp-1">
+                      {event.title}
+                    </h3>
                     <div className="mb-2 text-xs text-gray-600">
                       <div className="flex items-center space-x-2 mb-1">
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <svg
+                          className="w-3 h-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                          />
                         </svg>
                         <span>{event.location}</span>
                       </div>
                       <div className="flex items-center space-x-2">
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        <svg
+                          className="w-3 h-3"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                          />
                         </svg>
                         <span>{event.time}</span>
                       </div>
                     </div>
-                    <p className="text-gray-600 mb-3 text-sm line-clamp-2">{event.description}</p>
-                    <Link 
-                      to={`/evenement/${event.id}`}
+                    <p className="text-gray-600 mb-3 text-sm line-clamp-2">
+                      {event.description}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={() => handleEvent(event)}
                       className="inline-flex items-center w-full justify-center px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors duration-300 group"
                     >
                       Participer
-                      <svg className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                      <svg
+                        className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M17 8l4 4m0 0l-4 4m4-4H3"
+                        />
                       </svg>
-                    </Link>
+                    </button>
                   </div>
                 </div>
               </SwiperSlide>
             ))}
           </Swiper>
           <div className="text-center mt-8">
-            <Link to="/evenements" className="btn-primary">Tout voir</Link>
+            <Link to="/evenements" className="btn-primary">
+              Tout voir
+            </Link>
           </div>
         </div>
       </section>
@@ -302,7 +377,8 @@ const Home = () => {
             Restez informé
           </h2>
           <p className="text-center text-white mb-8">
-            Inscrivez-vous à notre newsletter pour ne rien manquer des actualités de lESAG-nde.
+            Inscrivez-vous à notre newsletter pour ne rien manquer des
+            actualités de lESAG-nde.
           </p>
           <div className="max-w-2xl mx-auto flex justify-center">
             <input
@@ -326,10 +402,12 @@ const Home = () => {
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-8">
             Donnez vos avis
           </h2>
-          
+
           {showSuccessMessage ? (
             <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6 animate-fade-in">
-              <p className="text-center">Merci pour votre suggestion ! Nous l examinerons avec attention.</p>
+              <p className="text-center">
+                Merci pour votre suggestion ! Nous l examinerons avec attention.
+              </p>
             </div>
           ) : null}
 
@@ -341,7 +419,9 @@ const Home = () => {
               <input
                 type="text"
                 value={suggestion.title}
-                onChange={(e) => setSuggestion({...suggestion, title: e.target.value})}
+                onChange={(e) =>
+                  setSuggestion({ ...suggestion, title: e.target.value })
+                }
                 className="w-full p-3 border border-gray-300 rounded-lg"
                 required
               />
@@ -352,7 +432,9 @@ const Home = () => {
               </label>
               <select
                 value={suggestion.category}
-                onChange={(e) => setSuggestion({...suggestion, category: e.target.value})}
+                onChange={(e) =>
+                  setSuggestion({ ...suggestion, category: e.target.value })
+                }
                 className="w-full p-3 border border-gray-300 rounded-lg"
               >
                 <option value="general">Général</option>
@@ -367,7 +449,9 @@ const Home = () => {
               </label>
               <textarea
                 value={suggestion.description}
-                onChange={(e) => setSuggestion({...suggestion, description: e.target.value})}
+                onChange={(e) =>
+                  setSuggestion({ ...suggestion, description: e.target.value })
+                }
                 className="w-full p-3 border border-gray-300 rounded-lg h-32"
                 required
               ></textarea>
@@ -381,7 +465,6 @@ const Home = () => {
           </form>
         </div>
       </section>
-      
     </div>
   );
 };

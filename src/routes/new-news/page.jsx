@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Upload,  X,Heading, Heading2 } from "lucide-react";
-import { API_URL } from "../../../config/endPoint";
+import { Upload, X, Heading, Heading2 } from "lucide-react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { API_URL } from "../../../config/ApiUrl";
 
 
 const NewNews = () => {
@@ -13,6 +15,7 @@ const NewNews = () => {
   });
 
   const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -39,38 +42,59 @@ const NewNews = () => {
     }
   };
 
+  const resetFormData = () => {
+    setFormData({
+      titre: "",
+      sous_titre: "",
+      description: "",
+      imageCover: null,
+      enabled: false,
+    });
+  };
+
   const handleDragOver = (e) => {
     e.preventDefault();
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log(formData.imageCover)
-    // Ajouter ici la logique pour envoyer les données au serveur
-    const formValues = new FormData();
-    formValues.append("titre", formData.titre),
-    formValues.append("description", formData.description), 
-    formValues.append("sous_titre",formData.sous_titre),
-    formValues.append("image", formData.imageCover),
-    formValues.append("enabled", formData.enabled)
-    console.log("Données soumises:", formValues);
+    try {
+      e.preventDefault();
+      setLoading(true);
+      // Ajouter ici la logique pour envoyer les données au serveur
+      const formValues = new FormData();
+      formValues.append("titre", formData.titre),
+        formValues.append("description", formData.description),
+        formValues.append("sous_titre", formData.sous_titre),
+        formValues.append("image", formData.imageCover),
+        formValues.append("enabled", formData.enabled);
 
-    const response = await fetch (`${API_URL}/createActualite`,{
-      method : "POST",
-      headers : {
-        'Content-Type': 'multipart/form-data'
-      },
-      body : JSON.stringify(formValues),
-
-    } )
-  if (response.status === 200) {
-    console.log("Actualité créée avec succès");
-  }
-    
+      const response = await fetch(`${API_URL}/createActualite`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: formValues,
+      });
+      const data = await response.json();
+      if (response.status === 200) {
+        toast.success("Actualité créée avec succès", { autoClose: 3000 });
+        resetFormData();
+      } else if (response.status === 400) {
+        toast.error(data.message, { autoClose: 3000 });
+      }
+    } catch (error) {
+      toast.error("Erreur lors de la création de l'actualité", {
+        autoClose: 3000,
+      });
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+      <ToastContainer />
       <div className="bg-white rounded-xl shadow-lg w-full max-w-4xl overflow-hidden">
         <div className="md:flex">
           {/* Section gauche pour l'upload d'image */}
@@ -141,7 +165,7 @@ const NewNews = () => {
                     placeholder="Entrez le titre"
                     required
                   />
-                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                     <Heading className="w-5 h-5 text-gray-400" />
                   </span>
                 </div>
@@ -161,7 +185,7 @@ const NewNews = () => {
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     placeholder="Entrez le sous-titre"
                   />
-                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                     <Heading2 className="w-5 h-5 text-gray-400" />
                   </span>
                 </div>
@@ -181,7 +205,6 @@ const NewNews = () => {
                     placeholder="Entrez la description"
                     rows="4"
                   />
-                 
                 </div>
               </div>
 
@@ -203,9 +226,41 @@ const NewNews = () => {
               <div>
                 <button
                   type="submit"
-                  className="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  disabled={loading}
+                  className={`w-full text-white py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                    loading
+                      ? "bg-indigo-300 cursor-not-allowed"
+                      : "bg-indigo-500 hover:bg-indigo-600"
+                  }`}
                 >
-                  Ajouter lactualité
+                  {loading ? (
+                    <div className="flex items-center justify-center">
+                      {/* Spinner SVG */}
+                      <svg
+                        className="animate-spin h-5 w-5 mr-2 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        />
+                      </svg>
+                      Chargement...
+                    </div>
+                  ) : (
+                    "Ajouter l'actualité"
+                  )}
                 </button>
               </div>
             </form>
