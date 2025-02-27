@@ -31,6 +31,8 @@ import NewPoll from "./routes/new-poll/page";
 import PollsTable from "./routes/polls/page";
 import NewEvent from "./routes/new-event/page";
 import EventsTable from "./routes/events/page";
+import SettingsPage from "./routes/settings/page";
+import ProfilePage from "./routes/profile/page";
 function App() {
     const router = createBrowserRouter([
         {
@@ -133,7 +135,11 @@ function App() {
                 },
                 {
                     path: "settings",
-                    element: <h1 className="title">Paramètres</h1>, // Page des Paramètres
+                    element: <SettingsPage/>, // Page des Paramètres
+                },
+                {
+                    path: "Profile",
+                    element: <ProfilePage/>, // Page des Paramètres
                 },
             ],
         },

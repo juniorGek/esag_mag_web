@@ -142,6 +142,22 @@ const NewNews = () => {
                 </>
               )}
             </div>
+            {/* Champ Description */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Description
+              </label>
+              <div className="relative">
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Entrez la description"
+                  rows="4"
+                />
+              </div>
+            </div>
           </div>
 
           {/* Section droite pour le formulaire */}
@@ -188,23 +204,6 @@ const NewNews = () => {
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                     <Heading2 className="w-5 h-5 text-gray-400" />
                   </span>
-                </div>
-              </div>
-
-              {/* Champ Description */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </label>
-                <div className="relative">
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Entrez la description"
-                    rows="4"
-                  />
                 </div>
               </div>
 
