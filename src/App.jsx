@@ -24,6 +24,7 @@ import { MessageProvider } from "./utils/messageContext";
 import NewNews from "./routes/new-news/page";
 
 import NewsTable from "./routes/news/page";
+import ForgetPassPage from "./Pages/Auth/forgetPassPage";
 function App() {
     const router = createBrowserRouter([
         {
@@ -46,6 +47,14 @@ function App() {
             element: (
                 <PublicRoute>
                     <Login />
+                </PublicRoute>
+            ), // Page d'accueil (Tableau de Bord)
+        },
+        {
+            path: "/login/forgetPassword",
+            element: (
+                <PublicRoute>
+                    <ForgetPassPage />
                 </PublicRoute>
             ), // Page d'accueil (Tableau de Bord)
         },
