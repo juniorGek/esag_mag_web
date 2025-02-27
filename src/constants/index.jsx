@@ -11,16 +11,6 @@ export const navbarLinks = [
                 icon: Home,
                 path: "/admin/dashboard",
             },
-            {
-                label: "Analytiques",
-                icon: ChartColumn,
-                path: "/admin/analytics",
-            },
-            {
-                label: "Rapports",
-                icon: NotepadText,
-                path: "/admin/reports",
-            },
         ],
     },
     {
@@ -67,6 +57,11 @@ export const navbarLinks = [
                 label: "Blogs",
                 icon: ShoppingBag,
                 path: "/admin/blogs",
+            },
+            {
+                label: "Nouveau Blogs",
+                icon: PackagePlus,
+                path: "/admin/new-blogs",
             },
         ],
     },

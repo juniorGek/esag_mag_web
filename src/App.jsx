@@ -17,7 +17,16 @@ import Evenement from "./Pages/Evenement";
 import Blog from "./Pages/Blog";
 import Actualites from "./Pages/Actualites";
 import { PublicRoute } from "./hooks/PublicRoute";
-import { ProtectedRoute } from "./hooks/ProtectedRoute";
+import NewsTable from "./routes/news/page";
+import NewsNews from "./routes/news-news/page";
+import BlogTable from "./routes/blogs/page";
+import NewBlogs from "./routes/new-blogs/page";
+import PollsTable from "./routes/polls/page";
+import NewPoll from "./routes/new-poll/page";
+import EventsTable from "./routes/events/page";
+import NewEvent from "./routes/new-event/page";
+
+
 function App() {
     const router = createBrowserRouter([
         {
@@ -44,23 +53,15 @@ function App() {
         {
             path: "/admin",
             element: (
-                <ProtectedRoute>
+                
                     <Layout />
-                </ProtectedRoute>
+                
             ),
             children: [
                 {
                     index: true,
                     path: "dashboard",
                     element: <DashboardPage />, // Page d'accueil (Tableau de Bord)
-                },
-                {
-                    path: "analytics",
-                    element: <h1 className="title">Analytiques</h1>, // Page des Analytiques
-                },
-                {
-                    path: "reports",
-                    element: <h1 className="title">Rapports</h1>, // Page des Rapports
                 },
                 {
                     path: "users",
@@ -80,23 +81,27 @@ function App() {
                 },
                 {
                     path: "news",
-                    element: <h1 className="title">Actualités</h1>, // Page des Actualités
+                    element: <NewsTable />, // Page des Actualités
                 },
                 {
                     path: "new-news",
-                    element: <h1 className="title">Nouvelle Actualité</h1>, // Page pour ajouter une nouvelle actualité
+                    element: <NewsNews />, // Page pour ajouter une nouvelle actualité
                 },
                 {
                     path: "blogs",
-                    element: <h1 className="title">Blogs</h1>, // Page des Blogs
+                    element: <BlogTable />, // Page des Blogs
+                },
+                {
+                    path: "new-blogs",
+                    element: <NewBlogs />, // Page pour ajouter un nouveau blog
                 },
                 {
                     path: "polls",
-                    element: <h1 className="title">Sondages</h1>, // Page des Sondages
+                    element: <PollsTable />, // Page des Sondages
                 },
                 {
                     path: "new-poll",
-                    element: <h1 className="title">Nouveau Sondage</h1>, // Page pour créer un nouveau sondage
+                    element: <NewPoll />, // Page pour créer un nouveau sondage
                 },
                 {
                     path: "suggestions",
@@ -104,11 +109,11 @@ function App() {
                 },
                 {
                     path: "events",
-                    element: <h1 className="title">Événements</h1>, // Page des Événements
+                    element: <EventsTable />, // Page des Événements
                 },
                 {
                     path: "new-event",
-                    element: <h1 className="title">Nouvel Événement</h1>, // Page pour créer un nouvel événement
+                    element: <NewEvent />, // Page pour créer un nouvel événement
                 },
                 {
                     path: "settings",
