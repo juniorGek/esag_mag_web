@@ -186,23 +186,7 @@ const NewBlog = () => {
         </div>
       </div>
 
-      {/* Styles personnalisés */}
-      <style jsx global>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes bounceSlow {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-5px); }
-        }
-        .animate-fade-in {
-          animation: fadeIn 0.5s ease-in;
-        }
-        .animate-bounce-slow {
-          animation: bounceSlow 2s infinite;
-        }
-      `}</style>
+      
     </div>
   );
 };
