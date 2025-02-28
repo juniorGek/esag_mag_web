@@ -88,3 +88,26 @@
 .recharts-tooltip-item {
     @apply text-base font-medium !text-blue-500 dark:!text-blue-600;
 }
+
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes bounceSlow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
+  @keyframes progress {
+    0% { width: 0%; }
+    100% { width: 100%; }
+  }
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in;
+  }
+  .animate-bounce-slow {
+    animation: bounceSlow 2s infinite;
+  }
+  .animate-progress {
+    animation: progress 2s infinite ease-in-out;
+  }
