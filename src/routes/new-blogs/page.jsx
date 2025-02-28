@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { Upload,  X,Heading, Heading2 } from "lucide-react";
+import { Upload, X } from "lucide-react";
 
 const NewBlog = () => {
   const [formData, setFormData] = useState({
     titre: "",
-    auteur: "",
+    sous_titre: "",
     description: "",
     imageCover: null,
-    enabled: false,
+    enabled: true,
   });
 
   const [preview, setPreview] = useState(null);
@@ -43,18 +43,19 @@ const NewBlog = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Données soumises:", formData);
-    // Ajouter ici la logique pour envoyer les données au serveur
+    console.log("Données soumises:", formData);
+    // Ajouter ici la logique pour envoyer les données au serveur
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-4xl overflow-hidden">
-        <div className="md:flex">
-          {/* Section gauche pour l'upload d'image */}
-          <div className="w-full md:w-1/2 p-8 bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-10">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl p-10">
+        <h2 className="text-3xl font-bold text-gray-900 mb-10">Ajouter un Blog</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+          {/* Colonne de gauche pour l'upload (plus étroite) */}
+          <div className="md:col-span-1">
             <div
-              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-indigo-500 transition-colors"
+              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-indigo-500 transition-colors cursor-pointer"
               onDrop={handleDrop}
               onDragOver={handleDragOver}
             >
@@ -62,8 +63,8 @@ const NewBlog = () => {
                 <div className="relative">
                   <img
                     src={preview}
-                    alt="Aperçu de l'image"
-                    className="w-full h-48 object-cover rounded-lg"
+                    alt="Aperçu de l'image"
+                    className="w-full h-64 object-cover rounded-lg"
                   />
                   <button
                     onClick={() => {
@@ -76,10 +77,10 @@ const NewBlog = () => {
                   </button>
                 </div>
               ) : (
-                <>
+                <div>
                   <Upload className="w-10 h-10 mx-auto text-gray-400" />
                   <p className="mt-4 text-gray-600">
-                    Glissez-déposez une image ou{" "}
+                    Glissez-déposez une image ou{" "}
                     <label className="text-indigo-500 cursor-pointer hover:underline">
                       parcourez
                       <input
@@ -87,83 +88,76 @@ const NewBlog = () => {
                         accept="image/*"
                         onChange={handleFileChange}
                         className="hidden"
+                        required
                       />
                     </label>
                   </p>
                   <p className="text-sm text-gray-400 mt-2">
-                    Formats supportés : JPEG, PNG
+                    Formats supportés : JPEG, PNG,JPG
                   </p>
-                </>
+                </div>
               )}
             </div>
           </div>
 
-          {/* Section droite pour le formulaire */}
-          <div className="w-full md:w-1/2 p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Ajouter un Blog
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Champ Titre */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Titre
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    name="titre"
-                    value={formData.titre}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Entrez le titre"
-                    required
-                  />
-                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <Heading className="w-5 h-5 text-gray-400" />
-                  </span>
+          {/* Colonne de droite pour le formulaire (occupant 2/3 de la largeur) */}
+          <div className="md:col-span-2">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Champ Titre */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Titre
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="titre"
+                      value={formData.titre}
+                      onChange={handleChange}
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      placeholder="Entrez le titre"
+                      required
+                    />
+                    
+                  </div>
+                </div>
+
+                {/* Champ Auteur */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Sous titre
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="sous_titre"
+                      value={formData.auteur}
+                      onChange={handleChange}
+                      className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      placeholder="Entrez l'auteur"
+                    />
+                    
+                  </div>
                 </div>
               </div>
 
-              {/* Champ Auteur */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Auteur
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    name="auteur"
-                    value={formData.auteur}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Entrez l'auteur"
-                  />
-                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <Heading2 className="w-5 h-5 text-gray-400" />
-                  </span>
-                </div>
-              </div>
-
-              {/* Champ Description */}
-              <div>
+              {/* Champ Description (plus d'espace et en pleine largeur) */}
+              <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Description
                 </label>
-                <div className="relative">
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Entrez la description"
-                    rows="4"
-                  />
-                 
-                </div>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  className="w-full p-6 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Entrez la description"
+                  rows="8"
+                />
               </div>
 
-              {/* Champ Activé/Désactivé */}
+              {/* Champ Activer/Desactiver */}
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -178,14 +172,12 @@ const NewBlog = () => {
               </div>
 
               {/* Bouton de soumission */}
-              <div>
-                <button
-                  type="submit"
-                  className="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                >
-                  Ajouter le blog
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="w-full bg-indigo-500 text-white py-3 px-6 rounded-xl hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                Ajouter le blog
+              </button>
             </form>
           </div>
         </div>

@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Upload, X, Heading, Heading2 } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { API_URL } from "../../../config/ApiUrl";
-
+import { useQuill } from "react-quilljs";
+import "quill/dist/quill.snow.css";
 
 const NewNews = () => {
   const [formData, setFormData] = useState({
@@ -16,6 +17,28 @@ const NewNews = () => {
 
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // Initialisation de react-quilljs
+  const { quill, quillRef } = useQuill({
+    theme: "snow",
+    placeholder: "Entrez la description...",
+  });
+
+  useEffect(() => {
+    if (quill) {
+      // Si vous souhaitez initialiser l'éditeur avec une valeur existante :
+      if (formData.description) {
+        quill.clipboard.dangerouslyPasteHTML(formData.description);
+      }
+      // On écoute l'événement "text-change" pour mettre à jour le state
+      quill.on("text-change", () => {
+        setFormData((prev) => ({
+          ...prev,
+          description: quill.root.innerHTML,
+        }));
+      });
+    }
+  }, [quill]); // S'exécute dès que quill est défini
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -50,6 +73,10 @@ const NewNews = () => {
       imageCover: null,
       enabled: false,
     });
+    if (quill) {
+      quill.setText(''); // Réinitialise le contenu de l'éditeur
+    }
+    setPreview(null)
   };
 
   const handleDragOver = (e) => {
@@ -93,14 +120,14 @@ const NewNews = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+    <div className=" bg-gray-50 flex  justify-center p-10">
       <ToastContainer />
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-4xl overflow-hidden">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-6xl overflow-hidden">
         <div className="md:flex">
-          {/* Section gauche pour l'upload d'image */}
-          <div className="w-full md:w-1/2 p-8 bg-gray-50">
+          {/* Section gauche pour l'upload d'image et l'éditeur de description */}
+          <div className="w-full md:w-1/2 p-10 bg-gray-50">
             <div
-              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-indigo-500 transition-colors"
+              className="border-2 border-dashed border-gray-300 rounded-lg p-10 text-center cursor-pointer hover:border-indigo-500 transition-colors"
               onDrop={handleDrop}
               onDragOver={handleDragOver}
             >
@@ -109,7 +136,7 @@ const NewNews = () => {
                   <img
                     src={preview}
                     alt="Aperçu de l'image"
-                    className="w-full h-48 object-cover rounded-lg"
+                    className="w-full h-56 object-cover rounded-lg"
                   />
                   <button
                     onClick={() => {
@@ -142,30 +169,24 @@ const NewNews = () => {
                 </>
               )}
             </div>
-            {/* Champ Description */}
-            <div>
+            {/* Éditeur de description avec react-quilljs */}
+            <div className="mt-8">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Description
               </label>
-              <div className="relative">
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Entrez la description"
-                  rows="4"
-                />
-              </div>
+              <div
+                ref={quillRef}
+                className="h-72 border border-gray-300 rounded-lg p-4 overflow-auto"
+              />
             </div>
           </div>
 
           {/* Section droite pour le formulaire */}
-          <div className="w-full md:w-1/2 p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <div className="w-full md:w-1/2 p-10">
+            <h2 className="text-2xl font-bold text-gray-900 mb-8">
               Ajouter une Actualité
             </h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-8">
               {/* Champ Titre */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -177,7 +198,7 @@ const NewNews = () => {
                     name="titre"
                     value={formData.titre}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     placeholder="Entrez le titre"
                     required
                   />
@@ -198,7 +219,7 @@ const NewNews = () => {
                     name="sous_titre"
                     value={formData.sous_titre}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     placeholder="Entrez le sous-titre"
                   />
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
@@ -226,7 +247,7 @@ const NewNews = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`w-full text-white py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                  className={`w-full text-white py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                     loading
                       ? "bg-indigo-300 cursor-not-allowed"
                       : "bg-indigo-500 hover:bg-indigo-600"
@@ -234,7 +255,6 @@ const NewNews = () => {
                 >
                   {loading ? (
                     <div className="flex items-center justify-center">
-                      {/* Spinner SVG */}
                       <svg
                         className="animate-spin h-5 w-5 mr-2 text-white"
                         xmlns="http://www.w3.org/2000/svg"
