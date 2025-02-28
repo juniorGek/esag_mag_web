@@ -33,6 +33,7 @@ import NewEvent from "./routes/new-event/page";
 import EventsTable from "./routes/events/page";
 import SettingsPage from "./routes/settings/page";
 import ProfilePage from "./routes/profile/page";
+import BlogDetail from "./Pages/BlogDetail";
 function App() {
     const router = createBrowserRouter([
         {
@@ -44,6 +45,7 @@ function App() {
                 { path: "actualites", element: <Actualites /> },
                 { path: "actualite/:id", element: <ActualiteDetail /> },
                 { path: "blog", element: <Blog /> },
+                { path: "blog/:id", element: <BlogDetail /> },
                 { path: "evenements", element: <Evenement /> },
                 { path: "evenement/:id", element: <EvenementDetail /> },
                 { path: "sondages", element: <Sondage /> },
