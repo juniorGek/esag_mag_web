@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Upload, X, Heading, Heading2 } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,6 +16,28 @@ const NewNews = () => {
 
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // Initialisation de react-quilljs
+  const { quill, quillRef } = useQuill({
+    theme: "snow",
+    placeholder: "Entrez la description...",
+  });
+
+  useEffect(() => {
+    if (quill) {
+      // Si vous souhaitez initialiser l'éditeur avec une valeur existante :
+      if (formData.description) {
+        quill.clipboard.dangerouslyPasteHTML(formData.description);
+      }
+      // On écoute l'événement "text-change" pour mettre à jour le state
+      quill.on("text-change", () => {
+        setFormData((prev) => ({
+          ...prev,
+          description: quill.root.innerHTML,
+        }));
+      });
+    }
+  }, [quill]); // S'exécute dès que quill est défini
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -47,6 +69,7 @@ const NewNews = () => {
       titre: "",
       sous_titre: "",
       description: "",
+     
       imageCover: null,
       enabled: false,
     });
@@ -60,13 +83,13 @@ const NewNews = () => {
     try {
       e.preventDefault();
       setLoading(true);
-      // Ajouter ici la logique pour envoyer les données au serveur
       const formValues = new FormData();
-      formValues.append("titre", formData.titre),
-        formValues.append("description", formData.description),
-        formValues.append("sous_titre", formData.sous_titre),
-        formValues.append("image", formData.imageCover),
-        formValues.append("enabled", formData.enabled);
+      formValues.append("titre", formData.titre);
+      formValues.append("sous_titre", formData.sous_titre);
+      formValues.append("description", formData.description);
+    
+      formValues.append("image", formData.imageCover);
+      formValues.append("enabled", formData.enabled);
 
       const response = await fetch(`${API_URL}/createActualite`, {
         method: "POST",
@@ -182,14 +205,14 @@ const NewNews = () => {
                     required
                   />
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <Heading className="w-5 h-5 text-gray-400" />
+                    <Heading className="w-5 h-5 text-yellow-500 group-hover:text-yellow-600 transition-colors" />
                   </span>
                 </div>
               </div>
 
-              {/* Champ Sous-titre */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              {/* Sous-titre */}
+              <div className="group">
+                <label className="block text-sm font-medium text-gray-800 mb-1">
                   Sous-titre
                 </label>
                 <div className="relative">
@@ -202,22 +225,41 @@ const NewNews = () => {
                     placeholder="Entrez le sous-titre"
                   />
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <Heading2 className="w-5 h-5 text-gray-400" />
+                    <Heading2 className="w-5 h-5 text-yellow-500 group-hover:text-yellow-600 transition-colors" />
                   </span>
                 </div>
               </div>
+            </div>
 
-              {/* Champ Activé/Désactivé */}
-              <div className="flex items-center">
+           
+
+            {/* Description */}
+            <div className="group">
+              <label className="block text-sm font-medium text-gray-800 mb-1">
+                Description
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md resize-y"
+                placeholder="Détails de l'actualité..."
+                rows="4"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center group">
                 <input
                   type="checkbox"
                   name="enabled"
                   checked={formData.enabled}
                   onChange={handleChange}
-                  className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                  className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500 cursor-pointer transition-all duration-300"
                 />
-                <label className="ml-2 text-sm text-gray-700">
-                  Activer cette actualité
+                <label className="ml-2 text-sm font-medium text-gray-800 group-hover:text-yellow-600 transition-colors">
+                  Publier immédiatement
                 </label>
               </div>
 
@@ -262,10 +304,35 @@ const NewNews = () => {
                   )}
                 </button>
               </div>
-            </form>
-          </div>
+            )}
+          </form>
         </div>
       </div>
+
+      {/* Styles personnalisés */}
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes bounceSlow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-5px); }
+        }
+        @keyframes progress {
+          0% { width: 0%; }
+          100% { width: 100%; }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.5s ease-in;
+        }
+        .animate-bounce-slow {
+          animation: bounceSlow 2s infinite;
+        }
+        .animate-progress {
+          animation: progress 2s infinite ease-in-out;
+        }
+      `}</style>
     </div>
   );
 };

@@ -1,20 +1,25 @@
 import { useState } from "react";
 import { useTheme } from "../hooks/use-theme";
 import { Bell, ChevronsLeft, Moon, Search, Sun, User, LogOut, Settings } from "lucide-react";
-import { Link } from "react-router-dom"; // Import de Link pour la navigation
+import { Link, useNavigate } from "react-router-dom"; // Import de Link pour la navigation
 import profileImg from "../assets/profile-image.jpg";
 import PropTypes from "prop-types";
+import { useMessage } from "../utils/messageContext";
 
 export const Header = ({ collapsed, setCollapsed }) => {
     const { theme, setTheme } = useTheme();
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+    const {setMessage} = useMessage();
+    const navigate = useNavigate();
 
     const toggleProfileMenu = () => {
         setIsProfileMenuOpen(!isProfileMenuOpen);
     };
 
-    const handleLogout = () => {
-        console.log("Déconnexion...");
+    const handleLogout = async() => {
+         localStorage.removeItem('token')
+         setMessage({ type: "success", text: "Vous etes deconnectés !" })
+         navigate("/login")
     };
 
     return (

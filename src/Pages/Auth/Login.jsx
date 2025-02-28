@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,8 +12,20 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const { setMessage } = useMessage();
+  const { message, setMessage } = useMessage();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (message) {
+      if (message.type === "success") {
+        toast.success(message.text, { position: "top-right", autoClose: 5000 });
+      } else if (message.type === "error") {
+        toast.error(message.text, { position: "top-right", autoClose: 5000 });
+      }
+      // Réinitialiser le message une fois affiché
+      setMessage(null);
+    }
+  }, [message, setMessage]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,7 +37,6 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
     try {
       setLoading(true);
       const reponse = await fetch(`${API_URL}/AdminLogin`, {
@@ -38,8 +49,8 @@ const Login = () => {
       const data = await reponse.json();
       if (reponse.status === 200) {
         localStorage.setItem("token", data.token);
-        setMessage({ type: "success", text: data.message });
-        navigate("/admin/dashboard");
+        navigate("/admin/dashboard", { state: { message: { type: "success", text: data.message } } });
+
       } else if (reponse.status === 400) {
         toast.error(data.message, { position: "top-right" });
       } else {

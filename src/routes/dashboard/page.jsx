@@ -2,30 +2,31 @@ import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "rec
 
 import { useTheme } from "../../hooks/use-theme";
 
-import { overviewData, recentSalesData, topProducts } from "../../constants";
+import { overviewData, recentSalesData } from "../../constants";
 
 import { Footer } from "../../layouts/Footer";
 
-import { CreditCard, DollarSign, Package, PencilLine, Star, Trash, TrendingUp, Users } from "lucide-react";
-import { useMessage } from "../../utils/messageContext";
-import { use, useEffect } from "react";
+import { CreditCard, DollarSign, Package, TrendingUp, Users } from "lucide-react";
+import {  useEffect } from "react";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useLocation } from "react-router-dom";
 
 const DashboardPage = () => {
     const { theme } = useTheme();
-    const {message,setMessage}=useMessage()
+    const location = useLocation();
     useEffect(() => {
-        if (message) {
-          if (message.type === 'success') {
-            toast.success(message.text, { position: 'top-right',autoClose: 5000 });
-          } else if (message.type === 'error') {
-            toast.error(message.text, { position: 'top-right', autoClose: 5000 });
+        if (location.state && location.state.message) {
+          const { message } = location.state;
+          if (message.type === "success") {
+            toast.success(message.text, { position: "top-right", autoClose: 5000 });
+          } else if (message.type === "error") {
+            toast.error(message.text, { position: "top-right", autoClose: 5000 });
           }
-          // Réinitialiser le message une fois affiché
-          setMessage(null);
+          // Optionnel : nettoyer l'état de navigation pour éviter les affichages multiples
+          window.history.replaceState({}, document.title);
         }
-      }, [message, setMessage]);  
+      }, [location]); 
 
     return (
         <div className="flex flex-col gap-y-4">
@@ -189,118 +190,7 @@ const DashboardPage = () => {
                     </div>
                 </div>
             </div>
-            <div className="card">
-                <div className="card-header">
-                    <p className="card-title">Top Orders</p>
-                </div>
-                <div className="card-body p-0">
-                    <div className="relative h-[500px] w-full flex-shrink-0 overflow-auto rounded-none [scrollbar-width:_thin]">
-                        <table className="table">
-                            <thead className="table-header">
-                                <tr className="table-row">
-                                    <th className="table-head">#</th>
-                                    <th className="table-head">Product</th>
-                                    <th className="table-head">Price</th>
-                                    <th className="table-head">Status</th>
-                                    <th className="table-head">Rating</th>
-                                    <th className="table-head">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="table-body">
-                                {topProducts.map((product) => (
-                                    <tr
-                                        key={product.number}
-                                        className="table-row"
-                                    >
-                                        <td className="table-cell">{product.number}</td>
-                                        <td className="table-cell">
-                                            <div className="flex w-max gap-x-4">
-                                                <img
-                                                    src={product.image}
-                                                    alt={product.name}
-                                                    className="size-14 rounded-lg object-cover"
-                                                />
-                                                <div className="flex flex-col">
-                                                    <p>{product.name}</p>
-                                                    <p className="font-normal text-slate-600 dark:text-slate-400">{product.description}</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="table-cell">${product.price}</td>
-                                        <td className="table-cell">{product.status}</td>
-                                        <td className="table-cell">
-                                            <div className="flex items-center gap-x-2">
-                                                <Star
-                                                    size={18}
-                                                    className="fill-yellow-600 stroke-yellow-600"
-                                                />
-                                                {product.rating}
-                                            </div>
-                                        </td>
-                                        <td className="table-cell">
-                                            <div className="flex items-center gap-x-4">
-                                                <button className="text-blue-500 dark:text-blue-600">
-                                                    <PencilLine size={20} />
-                                                </button>
-                                                <button className="text-red-500">
-                                                    <Trash size={20} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div className="card">
-                <div className="card-header">
-                    <p className="card-title">Liste des utilsteurs</p>
-                </div>
-                <div className="card-body p-0">
-                    <div className="relative h-[500px] w-full flex-shrink-0 overflow-auto rounded-none [scrollbar-width:_thin]">
-                        <table className="table">
-                            <thead className="table-header">
-                                <tr className="table-row">
-                                    <th className="table-head">#</th>
-                                    <th className="table-head">Nom</th>
-                                    <th className="table-head">Prenom</th>
-                                    <th className="table-head">Etat</th>
-                                    
-                                    <th className="table-head">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="table-body">
-                                {topProducts.map((product) => (
-                                    <tr
-                                        key={product.number}
-                                        className="table-row"
-                                    >
-                                        <td className="table-cell">{product.number}</td>
-                                        <td className="table-cell">
-                                        {product.name}
-                                        </td>
-                                        <td className="table-cell">${product.price}</td>
-                                        <td className="table-cell">{product.status}</td>
-                                      
-                                        <td className="table-cell">
-                                            <div className="flex items-center gap-x-4">
-                                                <button className="text-blue-500 dark:text-blue-600">
-                                                    <PencilLine size={20} />
-                                                </button>
-                                                <button className="text-red-500">
-                                                    <Trash size={20} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
+            
             <Footer />
         </div>
         

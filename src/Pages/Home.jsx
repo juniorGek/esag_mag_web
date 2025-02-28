@@ -5,12 +5,14 @@ import { Autoplay, Pagination, Navigation } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
-import { API_URL } from "../../config/ApiUrl";
+import { API_URL, ImageApi } from "../../config/ApiUrl";
+import { formatDate } from "../utils/formatDate";
 
 const Home = () => {
   const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [dernierAcu, setDernierAcu] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [suggestion, setSuggestion] = useState({
     title: "",
     description: "",
@@ -39,9 +41,11 @@ const Home = () => {
     try {
       const response = await fetch(`${API_URL}/listeDernierActu`);
       const data = await response.json();
-      console.log("DATAAA",data);
+      setDernierAcu(data.dernierActu);
     } catch (error) {
       console.log(error);
+    }finally{
+      setLoading(false);
     }
   }
 
@@ -73,47 +77,6 @@ const Home = () => {
       link: "/sondages",
       linkText: "Participer aux sondages",
       image: "/images/2.jpg",
-    },
-  ];
-
-  const actualites = [
-    {
-      id: 1,
-      title: "Nouvelle rentrée académique",
-      date: "12 Février 2025",
-      description:
-        "Découvrez les nouveautés pour cette nouvelle année universitaire.",
-      image: "/images/news1.jpg",
-    },
-    {
-      id: 2,
-      title: "Conférence sur l'IA",
-      date: "20 Mars 2025",
-      description:
-        "Un événement à ne pas manquer sur l'intelligence artificielle.",
-      image: "/images/news2.jpg",
-    },
-    {
-      id: 3,
-      title: "Forum des entreprises",
-      date: "15 Avril 2025",
-      description:
-        "Rencontrez vos futurs employeurs lors de notre forum annuel.",
-      image: "/images/news3.jpg",
-    },
-    {
-      id: 4,
-      title: "Nouveaux partenariats",
-      date: "5 Mai 2025",
-      description: "Découvrez nos nouveaux partenaires internationaux.",
-      image: "/images/news4.jpg",
-    },
-    {
-      id: 5,
-      title: "Innovation Lab",
-      date: "1 Juin 2025",
-      description: "Ouverture du nouveau laboratoire d'innovation.",
-      image: "/images/news5.jpg",
     },
   ];
 
@@ -199,10 +162,20 @@ const Home = () => {
 
       {/* Actualités Section - Style amélioré */}
       <section className="section-padding bg-white m-5 p-3">
-        <div className="container-width">
-          <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
-            Dernières Actualités
-          </h2>
+      <div className="container-width">
+        <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
+          Dernières Actualités
+        </h2>
+
+        {loading ? (
+          // 📌 Skeleton Loader
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {Array(4).fill(0).map((_, index) => (
+              <div key={index} className="bg-gray-200 rounded-lg animate-pulse h-[380px]" />
+            ))}
+          </div>
+        ) : (
+          // 📌 Swiper avec les données réelles
           <Swiper
             modules={[Autoplay]}
             spaceBetween={24}
@@ -215,37 +188,44 @@ const Home = () => {
             autoplay={{ delay: 5000, disableOnInteraction: false }}
             className="pb-8"
           >
-            {actualites.map((news) => (
+            {dernierAcu.map((news) => (
               <SwiperSlide key={news.id}>
-                <div className="bg-white rounded-lg overflow-hidden shadow-md h-[380px]">
-                  <div className="relative h-48">
+                <div className="bg-white rounded-lg overflow-hidden shadow-md min-h-[380px] flex flex-col">
+                  <div className="relative h-48 flex items-center justify-center bg-gray-200">
+                    {/* Loader pour l'image */}
                     <img
-                      src={news.image}
-                      alt={news.title}
-                      className="w-full h-full object-cover"
+                      src={`${ImageApi}/${news.imageCover}`}
+                      alt={news.titre}
+                      className="w-full h-full object-cover transition-opacity duration-500"
+                      onLoad={(e) => e.currentTarget.classList.remove("opacity-0")}
                     />
-                    <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
-                      {news.date}
-                    </div>
                   </div>
-                  <div className="p-5">
-                    <h3 className="text-xl font-bold mb-2 text-gray-800">
-                      {news.title}
+                  <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
+                    {formatDate(news.createdAt)}
+                    </div>
+                  <div className="p-5 flex-1 flex flex-col">
+                    <h3 className="text-xl font-bold mb-2 text-gray-800 line-clamp-2">
+                      {news.titre}
                     </h3>
-                    <p className="text-gray-600 mb-4">{news.description}</p>
-                    <Link
-                      to={`/actualite/${news.id}`}
-                      className="text-blue-600 font-medium hover:text-blue-700"
-                    >
-                      En savoir plus →
-                    </Link>
+                    <p className="text-gray-600 mb-4 line-clamp-3">
+                      {news.sous_titre}
+                    </p>
+                    <div className="mt-auto">
+                      <Link
+                        to={`/actualite/${news.id}`}
+                        className="text-blue-600 font-medium hover:text-blue-700"
+                      >
+                        En savoir plus →
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </SwiperSlide>
             ))}
           </Swiper>
-        </div>
-      </section>
+        )}
+      </div>
+    </section>
 
       {/* Événements Section - Style amélioré */}
       <section className="section-padding bg-white m-5 p-3">
@@ -262,7 +242,7 @@ const Home = () => {
               640: { slidesPerView: 3 },
               1024: { slidesPerView: 4 },
             }}
-            autoplay={{ delay: 2000, disableOnInteraction: false }}
+            autoplay={{ delay: 2000, disableOnInteraction: false, reverseDirection: true }}
             className="pb-8"
           >
             {evenements.map((event) => (

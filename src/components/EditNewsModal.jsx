@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { ImageApi } from "../../config/ApiUrl";
 
 export default function EditNewsModal({ isOpen, onClose, news, onSave }) {
   // Initialiser editedNews avec un objet vide si news est null
@@ -92,7 +93,11 @@ export default function EditNewsModal({ isOpen, onClose, news, onSave }) {
                 {editedNews.imageCover && (
                   <div className="w-16 h-16 rounded-lg overflow-hidden">
                     <img
-                      src={editedNews.imageCover}
+                      src={
+                        editedNews.imageCover.startsWith("blob:")
+                          ? editedNews.imageCover
+                          : `${ImageApi}/${editedNews.imageCover}`
+                      }
                       alt="Aperçu de l'image"
                       className="w-full h-full object-cover"
                     />
@@ -100,7 +105,7 @@ export default function EditNewsModal({ isOpen, onClose, news, onSave }) {
                 )}
                 <label className="cursor-pointer">
                   <span className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600">
-                    Changer l image
+                    Changer image
                     <input
                       type="file"
                       accept="image/*"

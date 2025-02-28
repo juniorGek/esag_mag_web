@@ -1,17 +1,50 @@
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { actualites } from '../data';
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { API_URL, ImageApi } from "../../config/ApiUrl";
+import { ActualitesSkeleton } from "../components/ActualiteSkeleton";
+import { formatDate } from "../utils/formatDate";
+
+// Composant Skeleton pour afficher un indicateur de chargement
+
 
 const Actualites = () => {
+  const [listeActu, setListeActu] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchListeActu = async () => {
+    try {
+      const response = await fetch(`${API_URL}/listeActu`);
+      const data = await response.json();
+      if (response.status === 200) {
+        // Mise à jour du state avec les actualités récupérées
+        setListeActu(data.actu);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des actualités :", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchListeActu();
+  }, []);
+
   // Séparation des actualités pour différentes sections
-  const featuredActualites = actualites.slice(0, 2); // 2 premières actualités
-  const otherActualites = actualites.slice(2); // Reste des actualités
+  const featuredActualites = listeActu.slice(0, 2); // 2 premières actualités
+  const otherActualites = listeActu.slice(2); // Reste des actualités
+
+  // Affichage du skeleton pendant le chargement
+  if (loading) {
+    return <ActualitesSkeleton />;
+  }
 
   return (
     <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-6">
-        {/* Section des 2 actualités principales */}
         <div className="max-w-5xl mx-auto">
+          {/* Section des 2 actualités principales */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
             {featuredActualites.map((actualite, index) => (
               <motion.article
@@ -27,8 +60,8 @@ const Actualites = () => {
                     <motion.img
                       whileHover={{ scale: 1.03 }}
                       transition={{ duration: 0.4 }}
-                      src={actualite.image}
-                      alt={actualite.title}
+                      src={`${ImageApi}/${actualite.imageCover}`}
+                      alt={actualite.titre}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -36,27 +69,20 @@ const Actualites = () => {
                   {/* Catégorie */}
                   <div className="mb-1.5">
                     <span className="text-sm font-medium uppercase tracking-wide text-blue-600">
-                      {actualite.category || 'TECHNOLOGY'}
+                      {actualite.titre}
                     </span>
                   </div>
 
                   {/* Titre */}
                   <h2 className="text-lg font-semibold mb-2 group-hover:text-blue-600 transition-colors line-clamp-2">
-                    {actualite.title}
+                    {actualite.sous_titre}
                   </h2>
 
                   {/* Auteur et Date */}
                   <div className="flex items-center text-sm text-gray-600">
-                    <div className="flex items-center">
-                      <img 
-                        src={actualite.authorImage} 
-                        alt={actualite.author}
-                        className="w-4 h-4 rounded-full mr-2"
-                      />
-                      <span>{actualite.author}</span>
-                    </div>
+                    
                     <span className="mx-2">•</span>
-                    <span>{actualite.date}</span>
+                    <span>{formatDate(actualite.createdAt)}</span>
                   </div>
                 </Link>
               </motion.article>
@@ -79,8 +105,8 @@ const Actualites = () => {
                     <motion.img
                       whileHover={{ scale: 1.03 }}
                       transition={{ duration: 0.4 }}
-                      src={actualite.image}
-                      alt={actualite.title}
+                      src={`${ImageApi}/${actualite.imageCover}`}
+                      alt={actualite.titre}
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -88,20 +114,19 @@ const Actualites = () => {
                   {/* Catégorie */}
                   <div className="mb-1">
                     <span className="text-xs font-medium uppercase tracking-wide text-blue-600">
-                      {actualite.category || 'TECHNOLOGY'}
+                      {actualite.titre}
                     </span>
                   </div>
 
                   {/* Titre plus compact */}
                   <h2 className="text-sm font-semibold mb-1.5 group-hover:text-blue-600 transition-colors line-clamp-2">
-                    {actualite.title}
+                    {actualite.sous_titre}
                   </h2>
 
                   {/* Auteur et Date version minimale */}
                   <div className="flex items-center text-xs text-gray-600">
-                    <span>{actualite.author}</span>
                     <span className="mx-1.5">•</span>
-                    <span>{actualite.date}</span>
+                    <span>{formatDate(actualite.createdAt)}</span>
                   </div>
                 </Link>
               </motion.article>
