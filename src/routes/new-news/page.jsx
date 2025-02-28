@@ -3,8 +3,7 @@ import { Upload, X, Heading, Heading2 } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { API_URL } from "../../../config/ApiUrl";
-import { useQuill } from "react-quilljs";
-import "quill/dist/quill.snow.css";
+
 
 const NewNews = () => {
   const [formData, setFormData] = useState({
@@ -70,13 +69,10 @@ const NewNews = () => {
       titre: "",
       sous_titre: "",
       description: "",
+     
       imageCover: null,
       enabled: false,
     });
-    if (quill) {
-      quill.setText(''); // Réinitialise le contenu de l'éditeur
-    }
-    setPreview(null)
   };
 
   const handleDragOver = (e) => {
@@ -87,13 +83,13 @@ const NewNews = () => {
     try {
       e.preventDefault();
       setLoading(true);
-      // Ajouter ici la logique pour envoyer les données au serveur
       const formValues = new FormData();
-      formValues.append("titre", formData.titre),
-        formValues.append("description", formData.description),
-        formValues.append("sous_titre", formData.sous_titre),
-        formValues.append("image", formData.imageCover),
-        formValues.append("enabled", formData.enabled);
+      formValues.append("titre", formData.titre);
+      formValues.append("sous_titre", formData.sous_titre);
+      formValues.append("description", formData.description);
+    
+      formValues.append("image", formData.imageCover);
+      formValues.append("enabled", formData.enabled);
 
       const response = await fetch(`${API_URL}/createActualite`, {
         method: "POST",
@@ -120,14 +116,14 @@ const NewNews = () => {
   };
 
   return (
-    <div className=" bg-gray-50 flex  justify-center p-10">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <ToastContainer />
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-6xl overflow-hidden">
+      <div className="bg-white rounded-xl shadow-lg w-full max-w-4xl overflow-hidden">
         <div className="md:flex">
-          {/* Section gauche pour l'upload d'image et l'éditeur de description */}
-          <div className="w-full md:w-1/2 p-10 bg-gray-50">
+          {/* Section gauche pour l'upload d'image */}
+          <div className="w-full md:w-1/2 p-8 bg-gray-50">
             <div
-              className="border-2 border-dashed border-gray-300 rounded-lg p-10 text-center cursor-pointer hover:border-indigo-500 transition-colors"
+              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-indigo-500 transition-colors"
               onDrop={handleDrop}
               onDragOver={handleDragOver}
             >
@@ -136,7 +132,7 @@ const NewNews = () => {
                   <img
                     src={preview}
                     alt="Aperçu de l'image"
-                    className="w-full h-56 object-cover rounded-lg"
+                    className="w-full h-48 object-cover rounded-lg"
                   />
                   <button
                     onClick={() => {
@@ -169,24 +165,30 @@ const NewNews = () => {
                 </>
               )}
             </div>
-            {/* Éditeur de description avec react-quilljs */}
-            <div className="mt-8">
+            {/* Champ Description */}
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Description
               </label>
-              <div
-                ref={quillRef}
-                className="h-72 border border-gray-300 rounded-lg p-4 overflow-auto"
-              />
+              <div className="relative">
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Entrez la description"
+                  rows="4"
+                />
+              </div>
             </div>
           </div>
 
           {/* Section droite pour le formulaire */}
-          <div className="w-full md:w-1/2 p-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">
+          <div className="w-full md:w-1/2 p-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
               Ajouter une Actualité
             </h2>
-            <form onSubmit={handleSubmit} className="space-y-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
               {/* Champ Titre */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -198,19 +200,19 @@ const NewNews = () => {
                     name="titre"
                     value={formData.titre}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     placeholder="Entrez le titre"
                     required
                   />
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <Heading className="w-5 h-5 text-gray-400" />
+                    <Heading className="w-5 h-5 text-yellow-500 group-hover:text-yellow-600 transition-colors" />
                   </span>
                 </div>
               </div>
 
-              {/* Champ Sous-titre */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+              {/* Sous-titre */}
+              <div className="group">
+                <label className="block text-sm font-medium text-gray-800 mb-1">
                   Sous-titre
                 </label>
                 <div className="relative">
@@ -219,26 +221,45 @@ const NewNews = () => {
                     name="sous_titre"
                     value={formData.sous_titre}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     placeholder="Entrez le sous-titre"
                   />
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <Heading2 className="w-5 h-5 text-gray-400" />
+                    <Heading2 className="w-5 h-5 text-yellow-500 group-hover:text-yellow-600 transition-colors" />
                   </span>
                 </div>
               </div>
+            </div>
 
-              {/* Champ Activé/Désactivé */}
-              <div className="flex items-center">
+           
+
+            {/* Description */}
+            <div className="group">
+              <label className="block text-sm font-medium text-gray-800 mb-1">
+                Description
+              </label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md resize-y"
+                placeholder="Détails de l'actualité..."
+                rows="4"
+              />
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+              <div className="flex items-center group">
                 <input
                   type="checkbox"
                   name="enabled"
                   checked={formData.enabled}
                   onChange={handleChange}
-                  className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+                  className="w-4 h-4 text-yellow-600 border-gray-300 rounded focus:ring-yellow-500 cursor-pointer transition-all duration-300"
                 />
-                <label className="ml-2 text-sm text-gray-700">
-                  Activer cette actualité
+                <label className="ml-2 text-sm font-medium text-gray-800 group-hover:text-yellow-600 transition-colors">
+                  Publier immédiatement
                 </label>
               </div>
 
@@ -247,7 +268,7 @@ const NewNews = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className={`w-full text-white py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                  className={`w-full text-white py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
                     loading
                       ? "bg-indigo-300 cursor-not-allowed"
                       : "bg-indigo-500 hover:bg-indigo-600"
@@ -255,6 +276,7 @@ const NewNews = () => {
                 >
                   {loading ? (
                     <div className="flex items-center justify-center">
+                      {/* Spinner SVG */}
                       <svg
                         className="animate-spin h-5 w-5 mr-2 text-white"
                         xmlns="http://www.w3.org/2000/svg"
@@ -282,10 +304,35 @@ const NewNews = () => {
                   )}
                 </button>
               </div>
-            </form>
-          </div>
+            )}
+          </form>
         </div>
       </div>
+
+      {/* Styles personnalisés */}
+      <style jsx global>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes bounceSlow {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-5px); }
+        }
+        @keyframes progress {
+          0% { width: 0%; }
+          100% { width: 100%; }
+        }
+        .animate-fade-in {
+          animation: fadeIn 0.5s ease-in;
+        }
+        .animate-bounce-slow {
+          animation: bounceSlow 2s infinite;
+        }
+        .animate-progress {
+          animation: progress 2s infinite ease-in-out;
+        }
+      `}</style>
     </div>
   );
 };
