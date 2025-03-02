@@ -71,9 +71,9 @@ function App() {
         {
             path: "/admin",
             element: (
-                    <ProtectedRoute>
+                    // <ProtectedRoute>
                         <Layout />
-                    </ProtectedRoute>
+                    // </ProtectedRoute> 
                     
                
             ),

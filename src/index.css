@@ -111,3 +111,49 @@
   .animate-progress {
     animation: progress 2s infinite ease-in-out;
   }
+  /* Styles pour TipTap */
+  .ProseMirror {
+    min-height: 200px;
+    padding: 0.75rem;
+    outline: none;
+  }
+  .ProseMirror:focus {
+    outline: none;
+  }
+  /* Ajouter une barre d'outils stylée */
+ 
+  .ProseMirror {
+    min-height: 200px;
+    padding: 0.75rem;
+    outline: none;
+  }
+  .ProseMirror:focus {
+    outline: none;
+  }
+  .tiptap.ProseMirror p.is-empty::before {
+    content: "Détails de l'actualité...";
+    color: #9ca3af; /* gray-400 */
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+  .tiptap.ProseMirror img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .min-h-screen {
+
+  }
+  .shadow-xl {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05), 0 2px 8px rgba(0, 0, 0, 0.03);
+  }
+  .hover\\:shadow-md:hover {
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
+  }
+  input:focus, select:focus {
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+  }
+  .bg-gray-50 {
+    background-color: #fafafa;
+  }
