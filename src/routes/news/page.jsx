@@ -96,10 +96,29 @@ export default function NewsTable() {
   };
 
   // Gérer la suppression d'une actualité
-  const handleDelete = () => {
-    const updatedNewsList = news.filter((item) => item.id !== selectedNews.id);
-    setNews(updatedNewsList);
-    closeModals();
+  const handleDelete = async() => {
+    try {
+      closeModals();
+      const response = await fetch(`${API_URL}/deleteActualite/${selectedNews.id}`,{
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+      const data = await response.json()
+      if (response.status === 200) {
+        toast.success(data.message)
+        fetchActuListe()
+      }else{
+        toast.error(data.message)
+      }
+    } catch (error) {
+      closeModals();
+      toast.error("Erreur lors de la suppression")
+      console.log(error)
+    }
+    
   };
 
   return (

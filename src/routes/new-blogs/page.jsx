@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Upload, X, Heading, Heading2 } from "lucide-react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { API_URL } from "../../../config/ApiUrl";
 
 const NewBlog = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +14,7 @@ const NewBlog = () => {
   });
 
   const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -37,13 +41,57 @@ const NewBlog = () => {
     }
   };
 
+  const resetFormData = () => {
+    setFormData({
+      titre: "",
+      sous_titre: "",
+      details: "",
+      imageCover: null,
+      enabled: false,
+    });
+    setPreview(null);
+  };
+
   const handleDragOver = (e) => {
     e.preventDefault();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    console.log("Données soumises:", formData);
+    setLoading(true);
+      
+    try {
+      const formValues = new FormData();
+      formValues.append("titre", formData.titre);
+      formValues.append("sous_titre", formData.sous_titre);
+      formValues.append("details", formData.details);
+      formValues.append("image", formData.imageCover);
+      formValues.append("enabled", formData.enabled);
+
+      const response = await fetch(`${API_URL}/createBlog`, {
+        method: "POST",
+        headers:{
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: formValues,
+      });
+      const data = await response.json()
+      if (response.status === 200) {
+        toast.success(data.message, { autoClose: 3000 });
+        resetFormData();
+      }else if (response.status === 400) {
+        toast.error(data.message, { autoClose: 3000 });
+      }
+      console.log(data)
+
+    } catch (error) {
+      toast.error("Erreur lors de la création de l'actualité", {
+        autoClose: 3000,
+      });
+      console.log(error)
+    }finally{
+      setLoading(false);
+    }
   };
 
   return (
@@ -177,15 +225,51 @@ const NewBlog = () => {
               </div>
               <button
                 type="submit"
-                className="w-full md:w-auto bg-gradient-to-r from-gray-700 to-yellow-500 text-white py-3 px-8 rounded-xl font-semibold shadow-md hover:from-gray-800 hover:to-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transform transition-all duration-300 hover:scale-105"
+                disabled={loading}
+                className={`relative w-full md:w-1/3 bg-gradient-to-r from-yellow-500 to-gray-800 text-white py-3 px-6 rounded-xl font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transform transition-all duration-300 ${
+                  loading ? "opacity-70 cursor-not-allowed" : "hover:from-yellow-600 hover:to-gray-900 hover:scale-105"
+                }`}
               >
-                Publier le Blog
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <svg
+                      className="animate-spin h-5 w-5 mr-2 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      />
+                    </svg>
+                    Publication en cours...
+                  </div>
+                ) : (
+                  "Publier le Blog"
+                )}
               </button>
             </div>
+
+             {/* Barre de progression si loading */}
+             {loading && (
+              <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-full bg-yellow-500 animate-progress"></div>
+              </div>
+            )}
           </form>
         </div>
       </div>
-
+      <ToastContainer position="top-right" />
       
     </div>
   );
