@@ -1,48 +1,61 @@
 import { useState } from "react";
-import { User, Mail, Lock, UploadCloud } from "lucide-react"; // Import des icônes Lucide
+import { User, Mail, Lock } from "lucide-react"; // Import des icônes Lucide
 import draw from "../../assets/register.svg";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { API_URL } from "../../../config/ApiUrl";
 
 const NewAdmin = () => {
   const [formData, setFormData] = useState({
-    nom: "",
-    prenom: "",
+    Name: "",
+    lastName: "",
     email: "",
-    photo: null,
     password: "",
   });
 
-  const [preview, setPreview] = useState(null);
+ 
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData({ ...formData, photo: file });
-      setPreview(URL.createObjectURL(file));
+
+  const resetFormData = () => {
+    setFormData({
+      Name: "",
+      lastName: "",
+      email: "",
+      password: "",
+    });
+  };
+
+  
+
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`${API_URL}/createAdmin`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      if (response.status === 200) {
+        toast.success(data.message, { autoClose: 3000 });
+        resetFormData();
+      }else if (response.status === 400) {
+        toast.error(data.message, { autoClose: 3000 });
+      }
+    } catch (error) {
+      toast.error("Erreur lors de la création de l'administrateur", {
+        autoClose: 3000,
+      });
+      console.log(error);
     }
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      setFormData({ ...formData, photo: file });
-      setPreview(URL.createObjectURL(file));
-    }
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Données soumises:", formData);
-    // Ajouter ici la logique pour envoyer les données au serveur
   };
 
   return (
@@ -57,38 +70,8 @@ const NewAdmin = () => {
             </div>
             <form onSubmit={handleSubmit}>
               {/* Champ Photo avec Drag and Drop */}
-              <div className="mb-4"> {/* Réduction de la marge */}
-                <label className="text-xs font-semibold px-1">Photo</label>
-                <div
-                  className="flex flex-col items-center justify-center p-6 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-indigo-500 transition-colors"
-                  onDrop={handleDrop}
-                  onDragOver={handleDragOver}
-                >
-                  {preview ? (
-                    <img
-                      src={preview}
-                      alt="Aperçu"
-                      className="w-24 h-24 object-cover rounded-lg"
-                    />
-                  ) : (
-                    <div className="text-center">
-                      <UploadCloud className="w-6 h-6 text-gray-400 mx-auto" /> {/* Icône Lucide */}
-                      <p className="text-gray-400 text-sm mt-2"> {/* Réduction de la taille du texte */}
-                        Glissez-déposez une image ici ou{" "}
-                        <label className="text-indigo-500 cursor-pointer hover:underline">
-                          parcourez
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            className="hidden"
-                          />
-                        </label>
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
+              
+             
 
               {/* Champs Nom et Prénom sur la même ligne */}
               <div className="flex -mx-3">
@@ -100,8 +83,8 @@ const NewAdmin = () => {
                     </div>
                     <input
                       type="text"
-                      name="nom"
-                      value={formData.nom}
+                      name="Name"
+                      value={formData.Name}
                       onChange={handleChange}
                       className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
                       placeholder="Entrer le nom"
@@ -117,8 +100,8 @@ const NewAdmin = () => {
                     </div>
                     <input
                       type="text"
-                      name="prenom"
-                      value={formData.prenom}
+                      name="lastName"
+                      value={formData.lastName}
                       onChange={handleChange}
                       className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
                       placeholder="Entrer le prénom"
@@ -192,6 +175,7 @@ const NewAdmin = () => {
             />
           </div>
         </div>
+        <ToastContainer position="top-right" />
       </div>
     </div>
   )
