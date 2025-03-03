@@ -168,6 +168,7 @@ const NewBlog = () => {
       enabled: false,
     });
     setPreview(null);
+    if (editor) editor.commands.setContent("");
   };
 
   const handleDragOver = (e) => {

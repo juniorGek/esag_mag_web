@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { PencilLine, Trash, Eye } from "lucide-react";
-import EditModal from "../../components/EditNewsModal";
 import DeleteModal from "../../components/DeleteNewsModal";
 import { tr } from "framer-motion/m";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Loader from "../../components/Laoder";
 import { API_URL, ImageApi } from "../../../config/ApiUrl";
+import { useNavigate } from "react-router-dom";
 
 
 // Données de démonstration pour les actualités
@@ -18,9 +18,10 @@ export default function NewsTable() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedNews, setSelectedNews] = useState(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(tr);
+
+  const navigate = useNavigate();
 
   const fetchActuListe = async () => {
     try {
@@ -68,9 +69,8 @@ export default function NewsTable() {
   const currentNews = filteredNews.slice(offset, offset + rowsPerPage);
 
   // Ouvrir la modale d'édition
-  const openEditModal = (item) => {
-    setSelectedNews(item);
-    setIsEditModalOpen(true);
+  const openEdit = (item) => {
+    navigate(`/admin/new-edit/${item.id}`);
   };
 
   // Ouvrir la modale de suppression
@@ -81,19 +81,12 @@ export default function NewsTable() {
 
   // Fermer les modales
   const closeModals = () => {
-    setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
     setSelectedNews(null);
   };
 
   // Gérer la modification d'une actualité
-  const handleEdit = (updatedNews) => {
-    const updatedNewsList = news.map((item) =>
-      item.id === updatedNews.id ? updatedNews : item
-    );
-    setNews(updatedNewsList);
-    closeModals();
-  };
+ 
 
   // Gérer la suppression d'une actualité
   const handleDelete = async() => {
@@ -223,7 +216,7 @@ export default function NewsTable() {
                             <Eye size={18} />
                           </button>
                           <button
-                            onClick={() => openEditModal(item)}
+                            onClick={() => openEdit(item)}
                             className="text-green-500 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
                           >
                             <PencilLine size={18} />
@@ -262,13 +255,7 @@ export default function NewsTable() {
             />
           </div>
 
-          {/* Modale d'édition */}
-          <EditModal
-            isOpen={isEditModalOpen}
-            onClose={closeModals}
-            news={selectedNews}
-            onSave={handleEdit}
-          />
+          
 
           {/* Modale de suppression */}
           <DeleteModal
