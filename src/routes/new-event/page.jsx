@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Upload, X, Heading, Heading2 } from "lucide-react";
+import { Upload, X, Heading, Heading2, Plus } from "lucide-react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Color from "@tiptap/extension-color";
@@ -94,12 +94,8 @@ const NewEvent = () => {
     sous_titre: "",
     dateEvenement: "",
     lieu: "",
-    isPayant: false, // Remplace "prix" par un booléen
-    ticketTypes: {
-      standard: { quantite: "", prix: "" },
-      vip: { quantite: "", prix: "" },
-      premium: { quantite: "", prix: "" },
-    },
+    isPayant: false,
+    ticketTypes: [{ type: "", quantite: "", prix: "" }], // Liste dynamique avec un objet par ligne
     dateDebutVente: "",
     dateFinVente: "",
     description: "",
@@ -132,27 +128,37 @@ const NewEvent = () => {
     },
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e, index) => {
     const { name, value, type, checked } = e.target;
     if (type === "checkbox") {
       setFormData({ ...formData, [name]: checked });
     } else if (name === "isPayant") {
       setFormData({ ...formData, isPayant: value === "payant" });
-    } else if (name.startsWith("ticketTypes.")) {
-      const [ ticketType, field] = name.split(".");
-      setFormData({
-        ...formData,
-        ticketTypes: {
-          ...formData.ticketTypes,
-          [ticketType]: {
-            ...formData.ticketTypes[ticketType],
-            [field]: value,
-          },
-        },
-      });
+    } else if (name.startsWith("ticketTypes")) {
+      const [ field] = name.split(".");
+      const updatedTickets = formData.ticketTypes.map((ticket, i) =>
+        i === index ? { ...ticket, [field]: value } : ticket
+      );
+      setFormData({ ...formData, ticketTypes: updatedTickets });
     } else {
       setFormData({ ...formData, [name]: value });
     }
+  };
+
+  const addTicketType = () => {
+    if (formData.ticketTypes.length < 4) {
+      setFormData({
+        ...formData,
+        ticketTypes: [...formData.ticketTypes, { type: "", quantite: "", prix: "" }],
+      });
+    }
+  };
+
+  const removeTicketType = (index) => {
+    setFormData({
+      ...formData,
+      ticketTypes: formData.ticketTypes.filter((_, i) => i !== index),
+    });
   };
 
   const handleFileChange = (e) => {
@@ -217,8 +223,7 @@ const NewEvent = () => {
     { name: "Vert", value: "#00ff00" },
     { name: "Bleu", value: "#0000ff" },
     { name: "Jaune", value: "#ffff00" },
-    { name: "violet", value: "#FF00F7FF" },
-
+    { name: "Violet", value: "#FF00F7" },
   ];
 
   const fontSizes = [12, 14, 16, 18, 20, 24, 32];
@@ -226,13 +231,13 @@ const NewEvent = () => {
   const fontFamilies = ["Arial", "Times New Roman", "Courier New", "Georgia", "Verdana"];
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <div className=" rounded-2xl shadow-xl w-full max-w-4xl overflow-hidden border border-gray-200/30">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 sm:p-6">
+      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden transform transition-all hover:shadow-3xl">
         {/* Section Image */}
-        <div className="relative w-full h-60 bg-gradient-to-r from-gray-800 to-green-600">
+        <div className="relative w-full h-48 bg-gradient-to-r from-green-600 to-gray-800">
           <div
-            className={`absolute inset-0 flex items-center justify-center p-6 transition-all duration-300 ${
-              preview ? "bg-black/20" : "border-2 border-dashed border-white/70 hover:border-white"
+            className={`absolute inset-0 flex items-center justify-center p-4 transition-all duration-300 ${
+              preview ? "bg-black/30" : "border-2 border-dashed border-white/60 hover:border-white"
             }`}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
@@ -242,119 +247,124 @@ const NewEvent = () => {
                 <img
                   src={preview}
                   alt="Aperçu de l'événement"
-                  className="w-full h-full object-cover rounded-t-2xl transform transition-transform duration-500 group-hover:scale-105"
+                  className="w-full h-full object-cover rounded-t-3xl transition-transform duration-500 group-hover:scale-105"
                 />
                 <button
                   onClick={() => {
                     setPreview(null);
                     setFormData({ ...formData, imageCover: null });
                   }}
-                  className="absolute top-4 right-4 bg-white/90 rounded-full p-2 shadow-lg hover:bg-green-100 transition-all duration-300 hover:scale-110"
+                  className="absolute top-3 right-3 bg-white/90 rounded-full p-1.5 shadow-md hover:bg-green-100 transition-all duration-300 hover:scale-110"
                 >
-                  <X className="w-5 h-5 text-gray-700 hover:text-green-600" />
+                  <X className="w-4 h-4 text-gray-700 hover:text-green-600" />
                 </button>
               </div>
             ) : (
-              <div className="text-center space-y-4 animate-fade-in">
-                <Upload className="w-14 h-14 mx-auto text-white animate-pulse" />
-                <p className="text-white text-lg font-semibold">
-                  Ajoutez une image d&apos;événement{" "}
+              <div className="text-center space-y-2">
+                <Upload className="w-10 h-10 mx-auto text-white animate-pulse" />
+                <p className="text-white text-base font-medium">
+                  Glissez ou{" "}
                   <label className="underline cursor-pointer hover:text-green-200 transition-colors">
-                    en cliquant ici
+                    téléchargez une image
                     <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
                   </label>
                 </p>
-                <p className="text-sm text-white/80">JPEG, PNG (max 5Mo)</p>
+                <p className="text-xs text-white/70">JPEG, PNG (max 5Mo)</p>
               </div>
             )}
           </div>
         </div>
 
         {/* Section Formulaire */}
-        <div className="p-8 bg-white">
-          <h2 className="text-3xl font-extrabold text-center text-gray-900 mb-8 bg-gradient-to-r from-gray-800 to-green-600 bg-clip-text text-transparent">
-            Créer un Événement
+        <div className="p-6 sm:p-8 bg-white">
+          <h2 className="text-2xl font-bold text-center text-gray-900 mb-6 bg-gradient-to-r from-green-600 to-gray-800 bg-clip-text text-transparent">
+            Créer un nouvel événement
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-10">
-            {/* Section Informations de base */}
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Informations essentielles */}
             <div className="space-y-6">
-              {/* <h3 className="text-xl font-semibold text-gray-800">Informations principales</h3> */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="group">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Titre</label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="relative group">
+                  <label className="absolute top-[-1.25rem] left-3 px-1 text-xs font-medium text-gray-600 bg-white transition-all duration-300 group-focus-within:text-green-600">
+                    Titre
+                  </label>
                   <div className="relative">
                     <input
                       type="text"
                       name="titre"
                       value={formData.titre}
-                      onChange={handleChange}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-gray-50"
+                      onChange={(e) => handleChange(e)}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white text-gray-800 placeholder-gray-400"
                       placeholder="Nom de l'événement"
                       required
                     />
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                      <Heading className="w-5 h-5 text-green-500 group-hover:text-green-600 transition-colors" />
+                      <Heading className="w-4 h-4 text-gray-500 group-focus-within:text-green-600 transition-colors" />
                     </span>
                   </div>
                 </div>
-                <div className="group">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Sous-titre</label>
+                <div className="relative group">
+                  <label className="absolute top-[-1.25rem] left-3 px-1 text-xs font-medium text-gray-600 bg-white transition-all duration-300 group-focus-within:text-green-600">
+                    Sous-titre
+                  </label>
                   <div className="relative">
                     <input
                       type="text"
                       name="sous_titre"
                       value={formData.sous_titre}
-                      onChange={handleChange}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-gray-50"
+                      onChange={(e) => handleChange(e)}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white text-gray-800 placeholder-gray-400"
                       placeholder="Accroche ou thème"
                       required
                     />
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                      <Heading2 className="w-5 h-5 text-green-500 group-hover:text-green-600 transition-colors" />
+                      <Heading2 className="w-4 h-4 text-gray-500 group-focus-within:text-green-600 transition-colors" />
                     </span>
                   </div>
                 </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="group">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                <div className="relative group">
+                  <label className="absolute top-[-1.25rem] left-3 px-1 text-xs font-medium text-gray-600 bg-white transition-all duration-300 group-focus-within:text-green-600">
+                    Date
+                  </label>
                   <div className="relative">
                     <input
                       type="date"
                       name="dateEvenement"
                       value={formData.dateEvenement}
-                      onChange={handleChange}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-gray-50"
+                      onChange={(e) => handleChange(e)}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white text-gray-800"
                       required
                     />
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                      <Heading2 className="w-5 h-5 text-green-500 group-hover:text-green-600 transition-colors" />
+                      <Heading2 className="w-4 h-4 text-gray-500 group-focus-within:text-green-600 transition-colors" />
                     </span>
                   </div>
                 </div>
-                <div className="group">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Lieu</label>
+                <div className="relative group">
+                  <label className="absolute top-[-1.25rem] left-3 px-1 text-xs font-medium text-gray-600 bg-white transition-all duration-300 group-focus-within:text-green-600">
+                    Lieu
+                  </label>
                   <div className="relative">
                     <input
                       type="text"
                       name="lieu"
                       value={formData.lieu}
-                      onChange={handleChange}
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-gray-50"
+                      onChange={(e) => handleChange(e)}
+                      className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white text-gray-800 placeholder-gray-400"
                       placeholder="Lieu de l'événement"
                     />
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                      <Heading2 className="w-5 h-5 text-green-500 group-hover:text-green-600 transition-colors" />
+                      <Heading2 className="w-4 h-4 text-gray-500 group-focus-within:text-green-600 transition-colors" />
                     </span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Section Tarification */}
-            <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-gray-800">Tarification</h3>
-              <div className="flex space-x-6">
+            {/* Tarification */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800">Tarification</h3>
+              <div className="flex items-center space-x-6">
                 <label className="flex items-center space-x-2 cursor-pointer">
                   <input
                     type="radio"
@@ -362,9 +372,9 @@ const NewEvent = () => {
                     value="gratuit"
                     checked={!formData.isPayant}
                     onChange={handleChange}
-                    className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
+                    className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 transition-all duration-200"
                   />
-                  <span className="text-sm font-medium text-gray-700">Gratuit</span>
+                  <span className="text-sm font-medium text-gray-700 hover:text-green-600 transition-colors">Gratuit</span>
                 </label>
                 <label className="flex items-center space-x-2 cursor-pointer">
                   <input
@@ -373,143 +383,107 @@ const NewEvent = () => {
                     value="payant"
                     checked={formData.isPayant}
                     onChange={handleChange}
-                    className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
+                    className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 transition-all duration-200"
                   />
-                  <span className="text-sm font-medium text-gray-700">Payant</span>
+                  <span className="text-sm font-medium text-gray-700 hover:text-green-600 transition-colors">Payant</span>
                 </label>
               </div>
 
-              {/* Champs conditionnels pour événement payant */}
-              {formData.isPayant && (
-                <div className="space-y-6 animate-fade-in">
-                  {/* Types de tickets */}
-                  <div className="space-y-6 bg-gray-50 p-6 rounded-xl shadow-sm">
-                    <h4 className="text-lg font-semibold text-gray-800">Types de tickets</h4>
-                    {/* Standard */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="group">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Quantité (Standard)
-                        </label>
-                        <input
-                          type="number"
-                          name="ticketTypes.standard.quantite"
-                          value={formData.ticketTypes.standard.quantite}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white"
-                          placeholder="Ex: 100"
-                          min="0"
-                        />
+            {/* Champs conditionnels pour événement payant */}
+            {formData.isPayant && (
+                <div className="mt-6 space-y-6 bg-gray-50 p-6 rounded-xl shadow-inner animate-fade-in">
+                  <h4 className="text-md font-semibold text-gray-700">Types de tickets</h4>
+                  {formData.ticketTypes.map((ticket, index) => (
+                    <div key={index} className="flex items-center space-x-6">
+                      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="relative group">
+                          <label className="block text-xs font-medium text-gray-600 mb-2">Type de ticket</label>
+                          <input
+                            type="text"
+                            name={`ticketTypes.type`}
+                            value={ticket.type}
+                            onChange={(e) => handleChange(e, index)}
+                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white text-gray-800 placeholder-gray-400"
+                            placeholder="Ex: Standard"
+                          />
+                        </div>
+                        <div className="relative group">
+                          <label className="block text-xs font-medium text-gray-600 mb-2">Quantité</label>
+                          <input
+                            type="number"
+                            name={`ticketTypes.quantite`}
+                            value={ticket.quantite}
+                            onChange={(e) => handleChange(e, index)}
+                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white text-gray-800 placeholder-gray-400"
+                            placeholder="Ex: 100"
+                            min="0"
+                          />
+                        </div>
+                        <div className="relative group">
+                          <label className="block text-xs font-medium text-gray-600 mb-2">Prix</label>
+                          <input
+                            type="text"
+                            name={`ticketTypes.prix`}
+                            value={ticket.prix}
+                            onChange={(e) => handleChange(e, index)}
+                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white text-gray-800 placeholder-gray-400"
+                            placeholder="Ex: 10€"
+                          />
+                        </div>
                       </div>
-                      <div className="group">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Prix (Standard)
-                        </label>
-                        <input
-                          type="text"
-                          name="ticketTypes.standard.prix"
-                          value={formData.ticketTypes.standard.prix}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white"
-                          placeholder="Ex: 10€"
-                        />
-                      </div>
-                    </div>
-                    {/* VIP */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="group">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Quantité (VIP)
-                        </label>
-                        <input
-                          type="number"
-                          name="ticketTypes.vip.quantite"
-                          value={formData.ticketTypes.vip.quantite}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white"
-                          placeholder="Ex: 50"
-                          min="0"
-                        />
-                      </div>
-                      <div className="group">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Prix (VIP)
-                        </label>
-                        <input
-                          type="text"
-                          name="ticketTypes.vip.prix"
-                          value={formData.ticketTypes.vip.prix}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white"
-                          placeholder="Ex: 20€"
-                        />
+                      <div className="flex space-x-3">
+                        {formData.ticketTypes.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeTicketType(index)}
+                            className="p-2 bg-red-100 rounded-full hover:bg-red-200 transition-all duration-300"
+                          >
+                            <X className="w-4 h-4 text-red-600" />
+                          </button>
+                        )}
+                        {index === formData.ticketTypes.length - 1 && formData.ticketTypes.length < 4 && (
+                          <button
+                            type="button"
+                            onClick={addTicketType}
+                            className="p-2 bg-green-100 rounded-full hover:bg-green-200 transition-all duration-300"
+                          >
+                            <Plus className="w-4 h-4 text-green-600" />
+                          </button>
+                        )}
                       </div>
                     </div>
-                    {/* Premium */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="group">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Quantité (Premium)
-                        </label>
-                        <input
-                          type="number"
-                          name="ticketTypes.premium.quantite"
-                          value={formData.ticketTypes.premium.quantite}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white"
-                          placeholder="Ex: 20"
-                          min="0"
-                        />
-                      </div>
-                      <div className="group">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Prix (Premium)
-                        </label>
-                        <input
-                          type="text"
-                          name="ticketTypes.premium.prix"
-                          value={formData.ticketTypes.premium.prix}
-                          onChange={handleChange}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white"
-                          placeholder="Ex: 50€"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Dates de vente */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="group">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Début de la vente
-                      </label>
+                  ))}
+                  {formData.ticketTypes.length >= 4 && (
+                    <p className="text-sm text-gray-500">Maximum de 4 types de tickets atteint.</p>
+                  )}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div className="relative group">
+                      <label className="block text-xs font-medium text-gray-600 mb-2">Début de la vente</label>
                       <div className="relative">
                         <input
                           type="date"
                           name="dateDebutVente"
                           value={formData.dateDebutVente}
-                          onChange={handleChange}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-gray-50"
+                          onChange={(e) => handleChange(e)}
+                          className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white text-gray-800"
                         />
                         <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                          <Heading2 className="w-5 h-5 text-green-500 group-hover:text-green-600 transition-colors" />
+                          <Heading2 className="w-4 h-4 text-gray-500 group-focus-within:text-green-600 transition-colors" />
                         </span>
                       </div>
                     </div>
-                    <div className="group">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Fin de la vente
-                      </label>
+                    <div className="relative group">
+                      <label className="block text-xs font-medium text-gray-600 mb-2">Fin de la vente</label>
                       <div className="relative">
                         <input
                           type="date"
                           name="dateFinVente"
                           value={formData.dateFinVente}
-                          onChange={handleChange}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-gray-50"
+                          onChange={(e) => handleChange(e)}
+                          className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white text-gray-800"
                         />
                         <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                          <Heading2 className="w-5 h-5 text-green-500 group-hover:text-green-600 transition-colors" />
+                          <Heading2 className="w-4 h-4 text-gray-500 group-focus-within:text-green-600 transition-colors" />
                         </span>
                       </div>
                     </div>
@@ -518,11 +492,11 @@ const NewEvent = () => {
               )}
             </div>
 
-            {/* Section Description */}
-            <div className="space-y-6">
-              <h3 className="text-xl font-semibold text-gray-800">Description</h3>
-              <div className="border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-                <div className="flex flex-wrap gap-2 p-2 bg-gray-100 border-b border-gray-200 rounded-t-xl">
+            {/* Description */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-gray-800">Description</h3>
+              <div className="border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
+                <div className="flex flex-wrap gap-2 p-2 bg-gray-100 border-b border-gray-200 rounded-t-lg">
                   <button
                     type="button"
                     onClick={toggleBold}
@@ -609,7 +583,7 @@ const NewEvent = () => {
                     className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("codeBlock") ? "bg-green-300" : ""}`}
                     title="Bloc de code"
                   >
-                    &lt;/&gt;
+                  &lt;/&gt;
                   </button>
                   <button
                     type="button"
@@ -621,8 +595,8 @@ const NewEvent = () => {
                   </button>
                   <select
                     onChange={(e) => setTextColor(e.target.value)}
-                    className="p-1 rounded bg-white border border-gray-300 hover:bg-green-200"
-                    title="Couleur de police"
+                    className="p-1 rounded bg-white border border-gray-300 hover:bg-green-200 text-sm"
+                    title="Couleur"
                   >
                     <option value="">Couleur</option>
                     {colors.map((color) => (
@@ -633,8 +607,8 @@ const NewEvent = () => {
                   </select>
                   <select
                     onChange={(e) => setFontSize(e.target.value)}
-                    className="p-1 rounded bg-white border border-gray-300 hover:bg-green-200"
-                    title="Taille de police"
+                    className="p-1 rounded bg-white border border-gray-300 hover:bg-green-200 text-sm"
+                    title="Taille"
                   >
                     <option value="">Taille</option>
                     {fontSizes.map((size) => (
@@ -647,13 +621,13 @@ const NewEvent = () => {
                     type="button"
                     onClick={unsetFontSize}
                     className="p-1 rounded hover:bg-green-200"
-                    title="Effacer taille police"
+                    title="Effacer taille"
                   >
-                    T<span style={{ fontSize: "12px" }}>x</span>
+                    T<span style={{ fontSize: "10px" }}>x</span>
                   </button>
                   <select
                     onChange={(e) => setFontFamily(e.target.value)}
-                    className="p-1 rounded bg-white border border-gray-300 hover:bg-green-200"
+                    className="p-1 rounded bg-white border border-gray-300 hover:bg-green-200 text-sm"
                     title="Police"
                   >
                     <option value="">Police</option>
@@ -667,7 +641,7 @@ const NewEvent = () => {
                     type="button"
                     onClick={addImage}
                     className="p-1 rounded hover:bg-green-200"
-                    title="Insérer une image"
+                    title="Image"
                   >
                     🖼️
                   </button>
@@ -675,7 +649,7 @@ const NewEvent = () => {
                     type="button"
                     onClick={setLink}
                     className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("link") ? "bg-green-300" : ""}`}
-                    title="Insérer un lien"
+                    title="Lien"
                   >
                     🔗
                   </button>
@@ -683,7 +657,7 @@ const NewEvent = () => {
                     type="button"
                     onClick={unsetLink}
                     className="p-1 rounded hover:bg-green-200"
-                    title="Supprimer le lien"
+                    title="Supprimer lien"
                     disabled={!editor?.isActive("link")}
                   >
                     ⛓️‍💥
@@ -692,7 +666,7 @@ const NewEvent = () => {
                     type="button"
                     onClick={() => setTextAlign("left")}
                     className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("textAlign", { align: "left" }) ? "bg-green-300" : ""}`}
-                    title="Aligner à gauche"
+                    title="Gauche"
                   >
                     ←
                   </button>
@@ -723,36 +697,37 @@ const NewEvent = () => {
                 </div>
                 <EditorContent
                   editor={editor}
-                  className="p-4 min-h-[250px] focus:outline-none focus:ring-2 focus:ring-green-500 rounded-b-xl bg-gray-50 text-gray-800"
+                  className="p-3 min-h-[200px] focus:outline-none focus:ring-2 focus:ring-green-500 rounded-b-lg bg-white text-gray-800 border-t border-gray-200"
                   placeholder="Détails et informations clés..."
                 />
               </div>
             </div>
 
-            {/* Section Actions */}
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6 pt-6 border-t border-gray-200">
-              <div className="flex items-center group">
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-200">
+              <label className="flex items-center space-x-2 cursor-pointer">
                 <input
                   type="checkbox"
                   name="enabled"
                   checked={formData.enabled}
                   onChange={handleChange}
-                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500 cursor-pointer transition-all duration-300"
+                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500 transition-all duration-200"
                 />
-                <label className="ml-2 text-sm font-medium text-gray-700 group-hover:text-green-600 transition-colors">
+                <span className="text-sm font-medium text-gray-700 hover:text-green-600 transition-colors">
                   Activer immédiatement
-                </label>
-              </div>
+                </span>
+              </label>
               <button
                 type="submit"
-                className="w-full md:w-auto bg-gradient-to-r from-gray-700 to-green-500 text-white py-3 px-8 rounded-xl font-semibold shadow-md hover:from-gray-800 hover:to-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transform transition-all duration-300 hover:scale-105"
+                className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-gray-800 text-white py-2.5 px-6 rounded-lg font-semibold shadow-md hover:from-green-700 hover:to-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transform transition-all duration-300 hover:scale-105"
               >
-                Ajouter l&apos;Événement
+                Créer l&apos;événement
               </button>
             </div>
           </form>
         </div>
       </div>
+
     </div>
   );
 };
