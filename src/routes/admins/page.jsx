@@ -6,6 +6,7 @@ import DeleteModal from "../../components/DeleteModal";
 import { API_URL } from "../../../config/ApiUrl";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { useMessage } from "../../utils/messageContext";
 
 export default function AdminsTable() {
   const [students, setStudents] = useState([]);
@@ -16,12 +17,25 @@ export default function AdminsTable() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const {message, setMessage} = useMessage();
 
   const filteredStudents = students.filter(
     (student) =>
       student.Name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.lastName.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  useEffect(() => {
+    if (message) {
+      if (message.type === "success") {
+        toast.success(message.text, { position: "top-right", autoClose: 5000 });
+      } else if (message.type === "error") {
+        toast.error(message.text, { position: "top-right", autoClose: 5000 });
+      }
+      // Réinitialiser le message une fois affiché
+      setMessage(null);
+    }
+  }, [message, setMessage]);
 
   const fetchAdminList = async () => {
     try {

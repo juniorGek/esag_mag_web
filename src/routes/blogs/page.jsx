@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { PencilLine, Trash, Eye } from "lucide-react";
 import { API_URL, ImageApi } from "../../../config/ApiUrl";
+import { useNavigate } from "react-router-dom";
 
 // Données de démonstration pour les blogs
 
@@ -12,7 +13,7 @@ export default function BlogTable() {
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedBlogs, setSelectedBlogs] = useState(null); // Pour stocker le blog sélectionnée
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // Pour gérer l'ouverture de la modale de suppression
-
+  const navigate = useNavigate();
   // Filtrage des blogs en fonction de la recherche
   const filteredBlogs = blogs.filter(
     (item) =>
@@ -24,6 +25,11 @@ export default function BlogTable() {
   const pageCount = Math.ceil(filteredBlogs.length / rowsPerPage);
   const offset = currentPage * rowsPerPage;
   const currentBlogs = filteredBlogs.slice(offset, offset + rowsPerPage);
+
+  // Ouvrir la modale d'édition
+const openEdit = (item) => {
+  navigate(`/admin/new-edit/${item.id}`);
+};
 
 
 
@@ -166,6 +172,7 @@ export default function BlogTable() {
                         <Eye size={18} />
                       </button>
                       <button
+                       onClick={() => openEdit(item)}
                         className="text-green-500 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
                       >
                         <PencilLine size={18} />
