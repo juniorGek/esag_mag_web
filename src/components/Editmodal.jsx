@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 export default function EditModal({ isOpen, onClose, student, onSave }) {
   // Initialisez editedStudent avec un objet vide si student est null
-  const [editedStudent, setEditedStudent] = useState(student || { nom: '', prenom: '', etat: '' });
+  const [editedStudent, setEditedStudent] = useState(student || { Name: '', lastName: '', enabled: '', email:'' });
 
   // Mettez à jour editedStudent lorsque student change
   useEffect(() => {
@@ -38,8 +38,8 @@ export default function EditModal({ isOpen, onClose, student, onSave }) {
               </label>
               <input
                 type="text"
-                name="nom"
-                value={editedStudent.nom || ''}
+                name="Name"
+                value={editedStudent.Name || ''}
                 onChange={handleChange}
                 className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-50 dark:border-slate-600"
                 required
@@ -51,27 +51,43 @@ export default function EditModal({ isOpen, onClose, student, onSave }) {
               </label>
               <input
                 type="text"
-                name="prenom"
-                value={editedStudent.prenom || ''}
+                name="lastName"
+                value={editedStudent.lastName || ''}
                 onChange={handleChange}
                 className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-50 dark:border-slate-600"
                 required
               />
             </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={editedStudent.email || ''}
+                onChange={handleChange}
+                className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-50 dark:border-slate-600"
+                required
+              />
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                 État
               </label>
               <select
-                name="etat"
-                value={editedStudent.etat || ''}
+                name="enabled"
+                value={editedStudent.enabled || ''}
                 onChange={handleChange}
                 className="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-slate-700 dark:text-slate-50 dark:border-slate-600"
               >
-                <option value="Actif">Actif</option>
-                <option value="Inactif">Inactif</option>
+                <option value="true">Actif</option>
+                <option value="false">Inactif</option>
               </select>
             </div>
+
           </div>
           <div className="mt-6 flex justify-end gap-4">
             <button

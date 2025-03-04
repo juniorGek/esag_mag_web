@@ -4,7 +4,8 @@ import { PencilLine, Trash } from "lucide-react";
 import EditModal from "../../components/Editmodal";
 import DeleteModal from "../../components/DeleteModal";
 import { API_URL } from "../../../config/ApiUrl";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function AdminsTable() {
   const [students, setStudents] = useState([]);
@@ -75,19 +76,40 @@ export default function AdminsTable() {
     setSelectedStudent(null);
   };
 
-  const handleEdit = (updatedStudent) => {
-    const updatedStudents = students.map((student) =>
-      student.id === updatedStudent.id ? updatedStudent : student
-    );
-    setStudents(updatedStudents);
+  const handleEdit =async (updatedStudent) => {
+    console.log(updatedStudent);
     closeModals();
   };
 
-  const handleDelete = () => {
-    const updatedStudents = students.filter(
-      (student) => student.id !== selectedStudent.id
-    );
-    setStudents(updatedStudents);
+  const handleDelete = async() => {
+    try {
+      const response = await fetch(`${API_URL}/deleteAdmin/${selectedStudent.id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      if (response.status === 200) {
+        toast.success("L'administrateur a été supprimé avec succès", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+        fetchAdminList();
+      } else {
+        toast.error("Erreur lors de la suppression de l'administrateur", {
+          position: "top-right",
+          autoClose: 5000,
+        });
+       
+      }
+    } catch (error) {
+      toast.error("Erreur lors de la suppression de l'administrateur", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      console.error(error);
+    }
     closeModals();
   };
 
@@ -167,7 +189,7 @@ export default function AdminsTable() {
                       </td>
                       <td
                         className={`px-4 py-3 text-sm font-medium ${
-                          student.enabled === "Actif"
+                          student.enabled === "true"
                             ? "text-green-600 dark:text-green-400"
                             : "text-red-600 dark:text-red-400"
                         }`}
@@ -230,7 +252,9 @@ export default function AdminsTable() {
             onClose={closeModals}
             onConfirm={handleDelete}
           />
+          <ToastContainer />
         </div>
+        
       )}
     </>
   );
