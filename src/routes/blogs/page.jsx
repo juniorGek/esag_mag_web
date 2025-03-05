@@ -4,16 +4,15 @@ import { PencilLine, Trash, Eye } from "lucide-react";
 import { API_URL, ImageApi } from "../../../config/ApiUrl";
 import { useNavigate } from "react-router-dom";
 
-// Données de démonstration pour les blogs
-
 export default function BlogTable() {
   const [blogs, setBlogs] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(0);
-  const [selectedBlogs, setSelectedBlogs] = useState(null); // Pour stocker le blog sélectionnée
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // Pour gérer l'ouverture de la modale de suppression
+  const [selectedBlogs, setSelectedBlogs] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const navigate = useNavigate();
+
   // Filtrage des blogs en fonction de la recherche
   const filteredBlogs = blogs.filter(
     (item) =>
@@ -27,11 +26,9 @@ export default function BlogTable() {
   const currentBlogs = filteredBlogs.slice(offset, offset + rowsPerPage);
 
   // Ouvrir la modale d'édition
-const openEdit = (item) => {
-  navigate(`/admin/new-edit/${item.id}`);
-};
-
-
+  const openEdit = (item) => {
+    navigate(`/admin/new-blogs/${item.id}`);
+  };
 
   // Ouvrir la modale de suppression
   const openDeleteModal = (item) => {
@@ -41,7 +38,6 @@ const openEdit = (item) => {
 
   // Fermer les modales
   const closeModals = () => {
-    
     setIsDeleteModalOpen(false);
     setSelectedBlogs(null);
   };
@@ -62,19 +58,40 @@ const openEdit = (item) => {
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   useEffect(() => {
     fetchBlogList();
-  },[])
+  }, []);
 
-  
+  // Gérer la suppression d'un blog
+  const handleDelete = async () => {
+    try {
+      closeModals();
+      const response = await fetch(`${API_URL}/deleteBlog/${selectedBlogs.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const data = await response.json();
+      if (response.status === 200) {
+        toast.success(data.message);
+        fetchBlogList();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      closeModals();
+      toast.error("Erreur lors de la suppression");
+      console.log(error);
+    }
+  };
 
-  // Gérer la suppression d'un blog
-  const handleDelete = () => {
-    const updatedBlogs = blogs.filter((item) => item.id !== selectedBlogs.id);
-    setBlogs(updatedBlogs);
-    closeModals();
+  // Ouvrir la page de détails du blog
+  const openView = (item) => {
+    navigate(`/blog/${item.id}`);
   };
 
   return (
@@ -155,7 +172,7 @@ const openEdit = (item) => {
                     {item.titre}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 dark:text-slate-50">
-                    {item.sous_titre}
+                    {item.auteur}
                   </td>
                   <td
                     className={`px-4 py-3 text-sm font-medium ${
@@ -164,15 +181,18 @@ const openEdit = (item) => {
                         : "text-red-600 dark:text-red-400"
                     }`}
                   >
-                    {item.enabled ? "Activé" : "Désactivé"}
+                    {item.enabled ? "Activé" : "Désactivé"}
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <div className="flex items-center gap-x-4">
-                      <button className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                      <button
+                        onClick={() => openView(item)}
+                        className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                      >
                         <Eye size={18} />
                       </button>
                       <button
-                       onClick={() => openEdit(item)}
+                        onClick={() => openEdit(item)}
                         className="text-green-500 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
                       >
                         <PencilLine size={18} />
@@ -195,7 +215,7 @@ const openEdit = (item) => {
       {/* Pagination */}
       <div className="mt-6 flex justify-center">
         <ReactPaginate
-          previousLabel={"← Précédent"}
+          previousLabel={"← Précédent"}
           nextLabel={"Suivant →"}
           breakLabel={"..."}
           pageCount={pageCount}
@@ -211,8 +231,6 @@ const openEdit = (item) => {
         />
       </div>
 
-     
-
       {/* Modale de suppression */}
       {isDeleteModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
@@ -221,7 +239,7 @@ const openEdit = (item) => {
               Supprimer le blog
             </h2>
             <p className="text-gray-700 dark:text-slate-300 mb-6">
-              Êtes-vous sûr de vouloir supprimer ce blog ?
+              Êtes-vous sûr de vouloir supprimer ce blog ?
             </p>
             <div className="flex justify-end gap-4">
               <button

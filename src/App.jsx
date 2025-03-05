@@ -35,6 +35,7 @@ import SettingsPage from "./routes/settings/page";
 import ProfilePage from "./routes/profile/page";
 import BlogDetail from "./Pages/BlogDetail";
 import EditNews from "./routes/new-news/EditPage";
+import EditBlog from "./routes/new-blogs/EditPage";
 function App() {
     const router = createBrowserRouter([
         {
@@ -119,6 +120,10 @@ function App() {
                 {
                     path: "new-blogs",
                     element: <NewBlog />, // Page pour ajouter un nouveau blog
+                },
+                {
+                    path: "new-blogs/:id",
+                    element: <EditBlog />,
                 },
                 {
                     path: "polls",
