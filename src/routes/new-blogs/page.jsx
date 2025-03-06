@@ -227,8 +227,8 @@ const NewBlog = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className={`relative w-full md:w-1/3 bg-gradient-to-r from-yellow-500 to-gray-800 text-white py-3 px-6 rounded-xl font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2 transform transition-all duration-300 ${
-                  loading ? "opacity-70 cursor-not-allowed" : "hover:from-yellow-600 hover:to-gray-900 hover:scale-105"
+                className={`relative w-full md:w-1/3 bg-gradient-to-r from-green-500 to-gray-800 text-white py-3 px-6 rounded-xl font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transform transition-all duration-300 ${
+                  loading ? "opacity-70 cursor-not-allowed" : "hover:from-green-600 hover:to-gray-900 hover:scale-105"
                 }`}
               >
                 {loading ? (
@@ -264,7 +264,7 @@ const NewBlog = () => {
              {/* Barre de progression si loading */}
              {loading && (
               <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
-                <div className="h-full bg-yellow-500 animate-progress"></div>
+                <div className="h-full bg-green-500 animate-progress"></div>
               </div>
             )}
           </form>
