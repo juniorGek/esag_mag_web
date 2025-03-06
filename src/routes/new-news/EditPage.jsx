@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { useMessage } from "../../utils/messageContext";
+import { details } from "framer-motion/m";
 
 function EditNews() {
   const { id } = useParams();
@@ -28,6 +29,8 @@ function EditNews() {
     imageFile: null,
     enabled: false,
   });
+
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;

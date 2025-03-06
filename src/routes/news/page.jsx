@@ -9,9 +9,6 @@ import Loader from "../../components/Laoder";
 import { API_URL, ImageApi } from "../../../config/ApiUrl";
 import { useNavigate } from "react-router-dom";
 
-
-// Données de démonstration pour les actualités
-
 export default function NewsTable() {
   const [news, setNews] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -73,6 +70,11 @@ export default function NewsTable() {
     navigate(`/admin/new-edit/${item.id}`);
   };
 
+  // Ouvrir la page de visualisation
+  const openView = (item) => {
+    window.open(`/actualite/${item.id}`, "_blank");
+  };
+
   // Ouvrir la modale de suppression
   const openDeleteModal = (item) => {
     setSelectedNews(item);
@@ -85,33 +87,38 @@ export default function NewsTable() {
     setSelectedNews(null);
   };
 
-  // Gérer la modification d'une actualité
- 
-
   // Gérer la suppression d'une actualité
-  const handleDelete = async() => {
+  const handleDelete = async () => {
     try {
       closeModals();
-      const response = await fetch(`${API_URL}/deleteActualite/${selectedNews.id}`,{
+      const response = await fetch(`${API_URL}/deleteActualite/${selectedNews.id}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
-      })
-      const data = await response.json()
+      });
+      const data = await response.json();
       if (response.status === 200) {
-        toast.success(data.message)
-        fetchActuListe()
-      }else{
-        toast.error(data.message)
+        toast.success(data.message, {
+          position: "top-right",
+          autoClose: 3000
+        });
+        setNews(news.filter(item => item.id !== selectedNews.id));
+      } else {
+        toast.error(data.message, {
+          position: "top-right",
+          autoClose: 3000
+        });
       }
     } catch (error) {
       closeModals();
-      toast.error("Erreur lors de la suppression")
-      console.log(error)
+      toast.error("Erreur lors de la suppression", {
+        position: "top-right",
+        autoClose: 3000
+      });
+      console.log(error);
     }
-    
   };
 
   return (
@@ -119,7 +126,7 @@ export default function NewsTable() {
       {isLoading ? (
         <div>
           <Loader />
-        </div> 
+        </div>
       ) : (
         <div className="p-4 bg-gray-50 dark:bg-slate-900 min-h-screen">
           {/* Barre de recherche et filtre de lignes */}
@@ -212,7 +219,10 @@ export default function NewsTable() {
                       </td>
                       <td className="px-4 py-3 text-sm">
                         <div className="flex items-center gap-x-4">
-                          <button className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                          <button
+                            onClick={() => openView(item)}
+                            className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                          >
                             <Eye size={18} />
                           </button>
                           <button
@@ -254,8 +264,6 @@ export default function NewsTable() {
               disabledClassName="opacity-50 cursor-not-allowed"
             />
           </div>
-
-          
 
           {/* Modale de suppression */}
           <DeleteModal
