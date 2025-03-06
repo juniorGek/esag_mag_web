@@ -1,132 +1,27 @@
 import { useState } from "react";
-import { Upload, X, Heading, Heading2, Plus } from "lucide-react";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Color from "@tiptap/extension-color";
-import TextStyle from "@tiptap/extension-text-style";
-import Image from "@tiptap/extension-image";
-import Link from "@tiptap/extension-link";
-import Underline from "@tiptap/extension-underline";
-import Strike from "@tiptap/extension-strike";
-import Blockquote from "@tiptap/extension-blockquote";
-import Code from "@tiptap/extension-code";
-import CodeBlock from "@tiptap/extension-code-block";
-import HorizontalRule from "@tiptap/extension-horizontal-rule";
-import TextAlign from "@tiptap/extension-text-align";
-import { Extension } from "@tiptap/core";
-
-// Extensions personnalisées
-const FontFamily = Extension.create({
-  name: "fontFamily",
-  addOptions() {
-    return { types: ["textStyle"] };
-  },
-  addGlobalAttributes() {
-    return [
-      {
-        types: ["textStyle"],
-        attributes: {
-          fontFamily: {
-            default: null,
-            parseHTML: (element) => element.style.fontFamily?.replace(/['"]/g, ""),
-            renderHTML: (attributes) => {
-              if (!attributes.fontFamily) return {};
-              return { style: `font-family: ${attributes.fontFamily}` };
-            },
-          },
-        },
-      },
-    ];
-  },
-  addCommands() {
-    return {
-      setFontFamily:
-        (fontFamily) =>
-        ({ chain }) =>
-          chain().setMark("textStyle", { fontFamily }).run(),
-      unsetFontFamily:
-        () =>
-        ({ chain }) =>
-          chain().unsetMark("textStyle", { fontFamily: null }).run(),
-    };
-  },
-});
-
-const FontSize = Extension.create({
-  name: "fontSize",
-  addOptions() {
-    return { types: ["textStyle"] };
-  },
-  addGlobalAttributes() {
-    return [
-      {
-        types: ["textStyle"],
-        attributes: {
-          fontSize: {
-            default: null,
-            parseHTML: (element) => element.style.fontSize,
-            renderHTML: (attributes) => {
-              if (!attributes.fontSize) return {};
-              return { style: `font-size: ${attributes.fontSize}` };
-            },
-          },
-        },
-      },
-    ];
-  },
-  addCommands() {
-    return {
-      setFontSize:
-        (fontSize) =>
-        ({ chain }) =>
-          chain().setMark("textStyle", { fontSize }).run(),
-      unsetFontSize:
-        () =>
-        ({ chain }) =>
-          chain().unsetMark("textStyle", { fontSize: null }).run(),
-    };
-  },
-});
+import { Upload, X, Heading, Heading2 } from "lucide-react";
+import DescriptionEditor from "../../components/DescriptionEditor";
+import TarificationForm from "../../components/TarificationForm";
+import { API_URL } from "../../../config/ApiUrl";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const NewEvent = () => {
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     titre: "",
     sous_titre: "",
-    dateEvenement: "",
+    date: "",
     lieu: "",
-    isPayant: false,
-    ticketTypes: [{ type: "", quantite: "", prix: "" }], // Liste dynamique avec un objet par ligne
-    dateDebutVente: "",
-    dateFinVente: "",
-    description: "",
+    isPaid: false,
+    tickets: [{ typeTicket: "", qte: "", price: "" }], // Liste dynamique avec un objet par ligne
+    saleStartDate: "",
+    saleEndDate: "",
+    details: "",
     imageCover: null,
-    enabled: false,
   });
 
-  const [preview, setPreview] = useState(null);
-
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Color.configure({ types: ["textStyle"] }),
-      TextStyle,
-      Image.configure({ inline: true }),
-      Link.configure({ openOnClick: false }),
-      Underline,
-      Strike,
-      Blockquote,
-      Code,
-      CodeBlock,
-      HorizontalRule,
-      TextAlign.configure({ types: ["heading", "paragraph"], alignments: ["left", "center", "right", "justify"] }),
-      FontFamily,
-      FontSize,
-    ],
-    content: formData.description,
-    onUpdate: ({ editor }) => {
-      setFormData({ ...formData, description: editor.getHTML() });
-    },
-  });
 
   const handleChange = (e, index) => {
     const { name, value, type, checked } = e.target;
@@ -135,7 +30,7 @@ const NewEvent = () => {
     } else if (name === "isPayant") {
       setFormData({ ...formData, isPayant: value === "payant" });
     } else if (name.startsWith("ticketTypes")) {
-      const [ field] = name.split(".");
+      const [, field] = name.split(".");
       const updatedTickets = formData.ticketTypes.map((ticket, i) =>
         i === index ? { ...ticket, [field]: value } : ticket
       );
@@ -143,22 +38,6 @@ const NewEvent = () => {
     } else {
       setFormData({ ...formData, [name]: value });
     }
-  };
-
-  const addTicketType = () => {
-    if (formData.ticketTypes.length < 4) {
-      setFormData({
-        ...formData,
-        ticketTypes: [...formData.ticketTypes, { type: "", quantite: "", prix: "" }],
-      });
-    }
-  };
-
-  const removeTicketType = (index) => {
-    setFormData({
-      ...formData,
-      ticketTypes: formData.ticketTypes.filter((_, i) => i !== index),
-    });
   };
 
   const handleFileChange = (e) => {
@@ -178,60 +57,89 @@ const NewEvent = () => {
     }
   };
 
+  const resetFormData = () => {
+    setFormData({
+      imageCover: null,
+      titre: "",
+      sous_titre:"",
+      details:"",
+      tickets: [{ typeTicket: "", qte: "", price: "" }],
+      isPaid:false,
+      saleEndDate:'',
+      saleStartDate:'',
+      lieu:'',
+      date:'',
+    })
+    setPreview(null)
+  }
+
   const handleDragOver = (e) => {
     e.preventDefault();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    console.log("Données soumises:", formData);
+    try {
+      setLoading(true)
+      const tickets = formData.tickets.map(ticket => {
+        const qte = Number(ticket.qte);
+        const price = Number(ticket.price);
+        return {
+          ...ticket,
+          qte,
+          price,
+          available: qte, // Le champ "available" est égal à "qte"
+        };
+      });
+      
+      const formValues = new FormData();
+      formValues.append("titre", formData.titre);
+      formValues.append("sous_titre", formData.sous_titre);
+      formValues.append("date", formData.date);
+      formValues.append("lieu", formData.lieu);
+      formValues.append("isPaid", formData.isPaid);
+      if(formData.isPaid){
+        formValues.append("tickets", JSON.stringify(tickets));
+        formValues.append("saleStartDate", formData.saleStartDate);
+        formValues.append("saleEndDate", formData.saleEndDate);
+      }
+      
+      formValues.append("details", formData.details);
+      formValues.append("image", formData.imageCover);
+
+      const response = await fetch(`${API_URL}/createEvent`,{
+        method: "POST",
+        headers:{
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: formValues,
+      })
+      const data = await response.json()
+      if (response.status === 200) {
+        toast.success(data.message)
+        resetFormData()
+      } else if (response.status === 400) {
+        toast.warning(data.message)
+      }else{
+        toast.error("Erreur lors de la création de l'événement, verifier les champs et réessayer", {
+          autoClose: 8000,
+        });
+        console.log(data)
+      }
+    } catch (error) {
+      toast.error("Erreur lors de la création de l'événement, verifier les champs et réessayer", {
+        autoClose: 8000,
+      });
+      console.log(error)
+    }finally{
+      setLoading(false)
+    }
   };
 
-  // Fonctions pour la barre d'outils TipTap
-  const toggleBold = () => editor?.chain().focus().toggleBold().run();
-  const toggleItalic = () => editor?.chain().focus().toggleItalic().run();
-  const toggleUnderline = () => editor?.chain().focus().toggleUnderline().run();
-  const toggleStrike = () => editor?.chain().focus().toggleStrike().run();
-  const toggleHeading1 = () => editor?.chain().focus().toggleHeading({ level: 1 }).setFontSize("32px").run();
-  const toggleHeading2 = () => editor?.chain().focus().toggleHeading({ level: 2 }).setFontSize("24px").run();
-  const toggleBulletList = () => editor?.chain().focus().toggleBulletList().run();
-  const toggleOrderedList = () => editor?.chain().focus().toggleOrderedList().run();
-  const toggleBlockquote = () => editor?.chain().focus().toggleBlockquote().run();
-  const toggleCode = () => editor?.chain().focus().toggleCode().run();
-  const toggleCodeBlock = () => editor?.chain().focus().toggleCodeBlock().run();
-  const addHorizontalRule = () => editor?.chain().focus().setHorizontalRule().run();
-  const setTextColor = (color) => editor?.chain().focus().setColor(color).run();
-  const setFontSize = (size) => editor?.chain().focus().setFontSize(`${size}px`).run();
-  const unsetFontSize = () => editor?.chain().focus().unsetFontSize().run();
-  const setFontFamily = (font) => editor?.chain().focus().setFontFamily(font).run();
-  const addImage = () => {
-    const url = prompt("Entrez l'URL de l'image");
-    if (url) editor?.chain().focus().setImage({ src: url }).run();
-  };
-  const setLink = () => {
-    const url = prompt("Entrez l'URL du lien");
-    if (url) editor?.chain().focus().setLink({ href: url }).run();
-  };
-  const unsetLink = () => editor?.chain().focus().unsetLink().run();
-  const setTextAlign = (align) => editor?.chain().focus().setTextAlign(align).run();
-  const undo = () => editor?.chain().focus().undo().run();
-  const redo = () => editor?.chain().focus().redo().run();
-
-  const colors = [
-    { name: "Noir", value: "#000000" },
-    { name: "Rouge", value: "#ff0000" },
-    { name: "Vert", value: "#00ff00" },
-    { name: "Bleu", value: "#0000ff" },
-    { name: "Jaune", value: "#ffff00" },
-    { name: "Violet", value: "#FF00F7" },
-  ];
-
-  const fontSizes = [12, 14, 16, 18, 20, 24, 32];
-
-  const fontFamilies = ["Arial", "Times New Roman", "Courier New", "Georgia", "Verdana"];
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 sm:p-6">
+      <ToastContainer position="top-right" />
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden transform transition-all hover:shadow-3xl">
         {/* Section Image */}
         <div className="relative w-full h-48 bg-gradient-to-r from-green-600 to-gray-800">
@@ -329,8 +237,8 @@ const NewEvent = () => {
                   <div className="relative">
                     <input
                       type="date"
-                      name="dateEvenement"
-                      value={formData.dateEvenement}
+                      name="date"
+                      value={formData.date}
                       onChange={(e) => handleChange(e)}
                       className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white text-gray-800"
                       required
@@ -362,368 +270,55 @@ const NewEvent = () => {
             </div>
 
             {/* Tarification */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-gray-800">Tarification</h3>
-              <div className="flex items-center space-x-6">
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="isPayant"
-                    value="gratuit"
-                    checked={!formData.isPayant}
-                    onChange={handleChange}
-                    className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 transition-all duration-200"
-                  />
-                  <span className="text-sm font-medium text-gray-700 hover:text-green-600 transition-colors">Gratuit</span>
-                </label>
-                <label className="flex items-center space-x-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="isPayant"
-                    value="payant"
-                    checked={formData.isPayant}
-                    onChange={handleChange}
-                    className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500 transition-all duration-200"
-                  />
-                  <span className="text-sm font-medium text-gray-700 hover:text-green-600 transition-colors">Payant</span>
-                </label>
-              </div>
+            <TarificationForm formData={formData} setFormData={setFormData} />
 
-            {/* Champs conditionnels pour événement payant */}
-            {formData.isPayant && (
-                <div className="mt-6 space-y-6 bg-gray-50 p-6 rounded-xl shadow-inner animate-fade-in">
-                  <h4 className="text-md font-semibold text-gray-700">Types de tickets</h4>
-                  {formData.ticketTypes.map((ticket, index) => (
-                    <div key={index} className="flex items-center space-x-6">
-                      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <div className="relative group">
-                          <label className="block text-xs font-medium text-gray-600 mb-2">Type de ticket</label>
-                          <input
-                            type="text"
-                            name={`ticketTypes.type`}
-                            value={ticket.type}
-                            onChange={(e) => handleChange(e, index)}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white text-gray-800 placeholder-gray-400"
-                            placeholder="Ex: Standard"
-                          />
-                        </div>
-                        <div className="relative group">
-                          <label className="block text-xs font-medium text-gray-600 mb-2">Quantité</label>
-                          <input
-                            type="number"
-                            name={`ticketTypes.quantite`}
-                            value={ticket.quantite}
-                            onChange={(e) => handleChange(e, index)}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white text-gray-800 placeholder-gray-400"
-                            placeholder="Ex: 100"
-                            min="0"
-                          />
-                        </div>
-                        <div className="relative group">
-                          <label className="block text-xs font-medium text-gray-600 mb-2">Prix</label>
-                          <input
-                            type="text"
-                            name={`ticketTypes.prix`}
-                            value={ticket.prix}
-                            onChange={(e) => handleChange(e, index)}
-                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white text-gray-800 placeholder-gray-400"
-                            placeholder="Ex: 10€"
-                          />
-                        </div>
-                      </div>
-                      <div className="flex space-x-3">
-                        {formData.ticketTypes.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removeTicketType(index)}
-                            className="p-2 bg-red-100 rounded-full hover:bg-red-200 transition-all duration-300"
-                          >
-                            <X className="w-4 h-4 text-red-600" />
-                          </button>
-                        )}
-                        {index === formData.ticketTypes.length - 1 && formData.ticketTypes.length < 4 && (
-                          <button
-                            type="button"
-                            onClick={addTicketType}
-                            className="p-2 bg-green-100 rounded-full hover:bg-green-200 transition-all duration-300"
-                          >
-                            <Plus className="w-4 h-4 text-green-600" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                  {formData.ticketTypes.length >= 4 && (
-                    <p className="text-sm text-gray-500">Maximum de 4 types de tickets atteint.</p>
-                  )}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                    <div className="relative group">
-                      <label className="block text-xs font-medium text-gray-600 mb-2">Début de la vente</label>
-                      <div className="relative">
-                        <input
-                          type="date"
-                          name="dateDebutVente"
-                          value={formData.dateDebutVente}
-                          onChange={(e) => handleChange(e)}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white text-gray-800"
-                        />
-                        <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                          <Heading2 className="w-4 h-4 text-gray-500 group-focus-within:text-green-600 transition-colors" />
-                        </span>
-                      </div>
-                    </div>
-                    <div className="relative group">
-                      <label className="block text-xs font-medium text-gray-600 mb-2">Fin de la vente</label>
-                      <div className="relative">
-                        <input
-                          type="date"
-                          name="dateFinVente"
-                          value={formData.dateFinVente}
-                          onChange={(e) => handleChange(e)}
-                          className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent shadow-sm transition-all duration-300 hover:shadow-md bg-white text-gray-800"
-                        />
-                        <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                          <Heading2 className="w-4 h-4 text-gray-500 group-focus-within:text-green-600 transition-colors" />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Description */}
-            <div className="space-y-4">
+           {/* Section Description */}
+           <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-800">Description</h3>
               <div className="border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
-                <div className="flex flex-wrap gap-2 p-2 bg-gray-100 border-b border-gray-200 rounded-t-lg">
-                  <button
-                    type="button"
-                    onClick={toggleBold}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("bold") ? "bg-green-300" : ""}`}
-                    title="Gras"
-                  >
-                    <strong>B</strong>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleItalic}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("italic") ? "bg-green-300" : ""}`}
-                    title="Italique"
-                  >
-                    <em>I</em>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleUnderline}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("underline") ? "bg-green-300" : ""}`}
-                    title="Souligner"
-                  >
-                    <u>U</u>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleStrike}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("strike") ? "bg-green-300" : ""}`}
-                    title="Barré"
-                  >
-                    <s>S</s>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleHeading1}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("heading", { level: 1 }) ? "bg-green-300" : ""}`}
-                    title="Titre 1 (32px)"
-                  >
-                    H1
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleHeading2}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("heading", { level: 2 }) ? "bg-green-300" : ""}`}
-                    title="Titre 2 (24px)"
-                  >
-                    H2
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleBulletList}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("bulletList") ? "bg-green-300" : ""}`}
-                    title="Liste à puces"
-                  >
-                    •
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleOrderedList}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("orderedList") ? "bg-green-300" : ""}`}
-                    title="Liste numérotée"
-                  >
-                    1.
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleBlockquote}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("blockquote") ? "bg-green-300" : ""}`}
-                    title="Citation"
-                  >
-                    &quot;
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleCode}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("code") ? "bg-green-300" : ""}`}
-                    title="Code inline"
-                  >
-                    <code>`</code>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleCodeBlock}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("codeBlock") ? "bg-green-300" : ""}`}
-                    title="Bloc de code"
-                  >
-                  &lt;/&gt;
-                  </button>
-                  <button
-                    type="button"
-                    onClick={addHorizontalRule}
-                    className="p-1 rounded hover:bg-green-200"
-                    title="Ligne horizontale"
-                  >
-                    —
-                  </button>
-                  <select
-                    onChange={(e) => setTextColor(e.target.value)}
-                    className="p-1 rounded bg-white border border-gray-300 hover:bg-green-200 text-sm"
-                    title="Couleur"
-                  >
-                    <option value="">Couleur</option>
-                    {colors.map((color) => (
-                      <option key={color.value} value={color.value}>
-                        {color.name}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    onChange={(e) => setFontSize(e.target.value)}
-                    className="p-1 rounded bg-white border border-gray-300 hover:bg-green-200 text-sm"
-                    title="Taille"
-                  >
-                    <option value="">Taille</option>
-                    {fontSizes.map((size) => (
-                      <option key={size} value={size}>
-                        {size}px
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    type="button"
-                    onClick={unsetFontSize}
-                    className="p-1 rounded hover:bg-green-200"
-                    title="Effacer taille"
-                  >
-                    T<span style={{ fontSize: "10px" }}>x</span>
-                  </button>
-                  <select
-                    onChange={(e) => setFontFamily(e.target.value)}
-                    className="p-1 rounded bg-white border border-gray-300 hover:bg-green-200 text-sm"
-                    title="Police"
-                  >
-                    <option value="">Police</option>
-                    {fontFamilies.map((font) => (
-                      <option key={font} value={font}>
-                        {font}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    type="button"
-                    onClick={addImage}
-                    className="p-1 rounded hover:bg-green-200"
-                    title="Image"
-                  >
-                    🖼️
-                  </button>
-                  <button
-                    type="button"
-                    onClick={setLink}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("link") ? "bg-green-300" : ""}`}
-                    title="Lien"
-                  >
-                    🔗
-                  </button>
-                  <button
-                    type="button"
-                    onClick={unsetLink}
-                    className="p-1 rounded hover:bg-green-200"
-                    title="Supprimer lien"
-                    disabled={!editor?.isActive("link")}
-                  >
-                    ⛓️‍💥
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setTextAlign("left")}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("textAlign", { align: "left" }) ? "bg-green-300" : ""}`}
-                    title="Gauche"
-                  >
-                    ←
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setTextAlign("center")}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("textAlign", { align: "center" }) ? "bg-green-300" : ""}`}
-                    title="Centrer"
-                  >
-                    ↔
-                  </button>
-                  <button
-                    type="button"
-                    onClick={undo}
-                    className="p-1 rounded hover:bg-green-200"
-                    title="Annuler"
-                  >
-                    ↺
-                  </button>
-                  <button
-                    type="button"
-                    onClick={redo}
-                    className="p-1 rounded hover:bg-green-200"
-                    title="Rétablir"
-                  >
-                    ↻
-                  </button>
-                </div>
-                <EditorContent
-                  editor={editor}
-                  className="p-3 min-h-[200px] focus:outline-none focus:ring-2 focus:ring-green-500 rounded-b-lg bg-white text-gray-800 border-t border-gray-200"
-                  placeholder="Détails et informations clés..."
+                <DescriptionEditor
+                  value={formData.details}
+                  onChange={(html) =>
+                    setFormData({ ...formData, details: html })
+                  }
                 />
               </div>
             </div>
 
             {/* Actions */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-200">
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="enabled"
-                  checked={formData.enabled}
-                  onChange={handleChange}
-                  className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500 transition-all duration-200"
-                />
-                <span className="text-sm font-medium text-gray-700 hover:text-green-600 transition-colors">
-                  Activer immédiatement
-                </span>
-              </label>
               <button
                 type="submit"
-                className="w-full sm:w-auto bg-gradient-to-r from-green-600 to-gray-800 text-white py-2.5 px-6 rounded-lg font-semibold shadow-md hover:from-green-700 hover:to-gray-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transform transition-all duration-300 hover:scale-105"
+                disabled={loading}
+                className={`relative w-full md:w-1/3 bg-gradient-to-r from-green-500 to-gray-800 text-white py-3 px-6 rounded-xl font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transform transition-all duration-300 ${
+                  loading ? "opacity-70 cursor-not-allowed" : "hover:from-green-600 hover:to-gray-900 hover:scale-105"
+                }`}
               >
-                Créer l&apos;événement
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <svg
+                      className="animate-spin h-5 w-5 mr-2 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                    </svg>
+                    En cours...
+                  </div>
+                ) : (
+                  "Creer un evenement"
+                )}
               </button>
             </div>
+
+            {loading && (
+              <div className="w-full h-1 bg-gray-200 rounded-full overflow-hidden">
+                <div className="h-full bg-green-500 animate-progress"></div>
+              </div>
+            )}
+
           </form>
         </div>
       </div>

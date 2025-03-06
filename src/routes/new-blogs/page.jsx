@@ -1,103 +1,11 @@
 import { useState } from "react";
 import { Upload, X, Heading, Heading2 } from "lucide-react";
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Color from "@tiptap/extension-color";
-import TextStyle from "@tiptap/extension-text-style";
-import Image from "@tiptap/extension-image";
-import Link from "@tiptap/extension-link";
-import Underline from "@tiptap/extension-underline";
-import Strike from "@tiptap/extension-strike";
-import Blockquote from "@tiptap/extension-blockquote";
-import Code from "@tiptap/extension-code";
-import CodeBlock from "@tiptap/extension-code-block";
-import HorizontalRule from "@tiptap/extension-horizontal-rule";
-import TextAlign from "@tiptap/extension-text-align";
-import { Extension } from "@tiptap/core";
+
 import { toast, ToastContainer } from "react-toastify";
 import { API_URL } from "../../../config/ApiUrl";
+import DescriptionEditor from "../../components/DescriptionEditor";
 
-// Extension personnalisée pour FontFamily
-const FontFamily = Extension.create({
-  name: "fontFamily",
-  addOptions() {
-    return {
-      types: ["textStyle"],
-    };
-  },
-  addGlobalAttributes() {
-    return [
-      {
-        types: ["textStyle"],
-        attributes: {
-          fontFamily: {
-            default: null,
-            parseHTML: (element) => element.style.fontFamily?.replace(/['"]/g, ""),
-            renderHTML: (attributes) => {
-              if (!attributes.fontFamily) return {};
-              return { style: `font-family: ${attributes.fontFamily}` };
-            },
-          },
-        },
-      },
-    ];
-  },
-  addCommands() {
-    return {
-      setFontFamily:
-        (fontFamily) =>
-        ({ chain }) => {
-          return chain().setMark("textStyle", { fontFamily }).run();
-        },
-      unsetFontFamily:
-        () =>
-        ({ chain }) => {
-          return chain().unsetMark("textStyle", { fontFamily: null }).run();
-        },
-    };
-  },
-});
 
-// Extension personnalisée pour FontSize
-const FontSize = Extension.create({
-  name: "fontSize",
-  addOptions() {
-    return {
-      types: ["textStyle"],
-    };
-  },
-  addGlobalAttributes() {
-    return [
-      {
-        types: ["textStyle"],
-        attributes: {
-          fontSize: {
-            default: null,
-            parseHTML: (element) => element.style.fontSize,
-            renderHTML: (attributes) => {
-              if (!attributes.fontSize) return {};
-              return { style: `font-size: ${attributes.fontSize}` };
-            },
-          },
-        },
-      },
-    ];
-  },
-  addCommands() {
-    return {
-      setFontSize:
-        (fontSize) =>
-        ({ chain }) => {
-          return chain().setMark("textStyle", { fontSize }).run();
-        },
-      unsetFontSize:
-        () =>
-        ({ chain }) => {
-          return chain().unsetMark("textStyle", { fontSize: null }).run();
-        },
-    };
-  },
-});
 
 const NewBlog = () => {
   const [formData, setFormData] = useState({
@@ -111,29 +19,7 @@ const NewBlog = () => {
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Color.configure({ types: ["textStyle"] }),
-      TextStyle,
-      Image.configure({ inline: true }),
-      Link.configure({ openOnClick: false }),
-      Underline,
-      Strike,
-      Blockquote,
-      Code,
-      CodeBlock,
-      HorizontalRule,
-      TextAlign.configure({ types: ["heading", "paragraph"], alignments: ["left", "center", "right", "justify"] }),
-      FontFamily,
-      FontSize,
-    ],
-    content: formData.details,
-    onUpdate: ({ editor }) => {
-      setFormData({ ...formData, details: editor.getHTML() });
-    },
-  });
-
+  
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData({
@@ -163,12 +49,12 @@ const NewBlog = () => {
     setFormData({
       titre: "",
       sous_titre: "",
-      details: "",
+      description: "",
       imageCover: null,
       enabled: false,
     });
     setPreview(null);
-    if (editor) editor.commands.setContent("");
+    
   };
 
   const handleDragOver = (e) => {
@@ -213,49 +99,7 @@ const NewBlog = () => {
     }
   };
 
-  // Fonctions pour la barre d'outils
-  const toggleBold = () => editor?.chain().focus().toggleBold().run();
-  const toggleItalic = () => editor?.chain().focus().toggleItalic().run();
-  const toggleUnderline = () => editor?.chain().focus().toggleUnderline().run();
-  const toggleStrike = () => editor?.chain().focus().toggleStrike().run();
-  const toggleHeading1 = () =>
-    editor?.chain().focus().toggleHeading({ level: 1 }).setFontSize("32px").run();
-  const toggleHeading2 = () =>
-    editor?.chain().focus().toggleHeading({ level: 2 }).setFontSize("24px").run();
-  const toggleBulletList = () => editor?.chain().focus().toggleBulletList().run();
-  const toggleOrderedList = () => editor?.chain().focus().toggleOrderedList().run();
-  const toggleBlockquote = () => editor?.chain().focus().toggleBlockquote().run();
-  const toggleCode = () => editor?.chain().focus().toggleCode().run();
-  const toggleCodeBlock = () => editor?.chain().focus().toggleCodeBlock().run();
-  const addHorizontalRule = () => editor?.chain().focus().setHorizontalRule().run();
-  const setTextColor = (color) => editor?.chain().focus().setColor(color).run();
-  const setFontSize = (size) => editor?.chain().focus().setFontSize(`${size}px`).run();
-  const unsetFontSize = () => editor?.chain().focus().unsetFontSize().run();
-  const setFontFamily = (font) => editor?.chain().focus().setFontFamily(font).run();
-  const addImage = () => {
-    const url = prompt("Entrez l'URL de l'image");
-    if (url) editor?.chain().focus().setImage({ src: url }).run();
-  };
-  const setLink = () => {
-    const url = prompt("Entrez l'URL du lien");
-    if (url) editor?.chain().focus().setLink({ href: url }).run();
-  };
-  const unsetLink = () => editor?.chain().focus().unsetLink().run();
-  const setTextAlign = (align) => editor?.chain().focus().setTextAlign(align).run();
-  const undo = () => editor?.chain().focus().undo().run();
-  const redo = () => editor?.chain().focus().redo().run();
 
-  const colors = [
-    { name: "Noir", value: "#000000" },
-    { name: "Rouge", value: "#ff0000" },
-    { name: "Vert", value: "#00ff00" },
-    { name: "Bleu", value: "#0000ff" },
-    { name: "Jaune", value: "#ffff00" },
-  ];
-
-  const fontSizes = [12, 14, 16, 18, 20, 24, 32];
-
-  const fontFamilies = ["Arial", "Times New Roman", "Courier New", "Georgia", "Verdana"];
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
@@ -356,210 +200,12 @@ const NewBlog = () => {
               <label className="block text-sm font-medium text-gray-700 mb-2 transition-colors group-hover:text-green-600">
                 Contenu
               </label>
-              <div className="border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-                <div className="flex flex-wrap gap-2 p-2 bg-gray-100 border-b border-gray-200 rounded-t-xl">
-                  <button
-                    type="button"
-                    onClick={toggleBold}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("bold") ? "bg-green-300" : ""}`}
-                    title="Gras"
-                  >
-                    <strong>B</strong>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleItalic}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("italic") ? "bg-green-300" : ""}`}
-                    title="Italique"
-                  >
-                    <em>I</em>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleUnderline}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("underline") ? "bg-green-300" : ""}`}
-                    title="Souligner"
-                  >
-                    <u>U</u>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleStrike}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("strike") ? "bg-green-300" : ""}`}
-                    title="Barré"
-                  >
-                    <s>S</s>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleHeading1}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("heading", { level: 1 }) ? "bg-green-300" : ""}`}
-                    title="Titre 1 (32px)"
-                  >
-                    H1
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleHeading2}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("heading", { level: 2 }) ? "bg-green-300" : ""}`}
-                    title="Titre 2 (24px)"
-                  >
-                    H2
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleBulletList}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("bulletList") ? "bg-green-300" : ""}`}
-                    title="Liste à puces"
-                  >
-                    •
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleOrderedList}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("orderedList") ? "bg-green-300" : ""}`}
-                    title="Liste numérotée"
-                  >
-                    1.
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleBlockquote}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("blockquote") ? "bg-green-300" : ""}`}
-                    title="Citation"
-                  >
-                    &quot;
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleCode}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("code") ? "bg-green-300" : ""}`}
-                    title="Code inline"
-                  >
-                    <code>`</code>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={toggleCodeBlock}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("codeBlock") ? "bg-green-300" : ""}`}
-                    title="Bloc de code"
-                  >
-                    &lt;/&gt;
-                  </button>
-                  <button
-                    type="button"
-                    onClick={addHorizontalRule}
-                    className="p-1 rounded hover:bg-green-200"
-                    title="Ligne horizontale"
-                  >
-                    —
-                  </button>
-                  <select
-                    onChange={(e) => setTextColor(e.target.value)}
-                    className="p-1 rounded bg-white border border-gray-300 hover:bg-green-200"
-                    title="Couleur de police"
-                  >
-                    <option value="">Couleur</option>
-                    {colors.map((color) => (
-                      <option key={color.value} value={color.value}>
-                        {color.name}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    onChange={(e) => setFontSize(e.target.value)}
-                    className="p-1 rounded bg-white border border-gray-300 hover:bg-green-200"
-                    title="Taille de police"
-                  >
-                    <option value="">Taille</option>
-                    {fontSizes.map((size) => (
-                      <option key={size} value={size}>
-                        {size}px
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    type="button"
-                    onClick={unsetFontSize}
-                    className="p-1 rounded hover:bg-green-200"
-                    title="Effacer taille police"
-                  >
-                    T<span style={{ fontSize: "12px" }}>x</span>
-                  </button>
-                  <select
-                    onChange={(e) => setFontFamily(e.target.value)}
-                    className="p-1 rounded bg-white border border-gray-300 hover:bg-green-200"
-                    title="Police"
-                  >
-                    <option value="">Police</option>
-                    {fontFamilies.map((font) => (
-                      <option key={font} value={font}>
-                        {font}
-                      </option>
-                    ))}
-                  </select>
-                  <button
-                    type="button"
-                    onClick={addImage}
-                    className="p-1 rounded hover:bg-green-200"
-                    title="Insérer une image"
-                  >
-                    🖼️
-                  </button>
-                  <button
-                    type="button"
-                    onClick={setLink}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("link") ? "bg-green-300" : ""}`}
-                    title="Insérer un lien"
-                  >
-                    🔗
-                  </button>
-                  <button
-                    type="button"
-                    onClick={unsetLink}
-                    className="p-1 rounded hover:bg-green-200"
-                    title="Supprimer le lien"
-                    disabled={!editor?.isActive("link")}
-                  >
-                    ⛓️‍💥
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setTextAlign("left")}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("textAlign", { align: "left" }) ? "bg-green-300" : ""}`}
-                    title="Aligner à gauche"
-                  >
-                    ←
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setTextAlign("center")}
-                    className={`p-1 rounded hover:bg-green-200 ${editor?.isActive("textAlign", { align: "center" }) ? "bg-green-300" : ""}`}
-                    title="Centrer"
-                  >
-                    ↔
-                  </button>
-                  <button
-                    type="button"
-                    onClick={undo}
-                    className="p-1 rounded hover:bg-green-200"
-                    title="Annuler"
-                  >
-                    ↺
-                  </button>
-                  <button
-                    type="button"
-                    onClick={redo}
-                    className="p-1 rounded hover:bg-green-200"
-                    title="Rétablir"
-                  >
-                    ↻
-                  </button>
-                </div>
-                <EditorContent
-                  editor={editor}
-                  className="p-3 min-h-[200px] focus:outline-none focus:ring-2 focus:ring-green-500 rounded-b-xl"
-                  placeholder="Votre histoire commence ici..."
+              <div className="border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
+                <DescriptionEditor
+                  value={formData.details}
+                  onChange={(html) =>
+                    setFormData({ ...formData, details: html })
+                  }
                 />
               </div>
             </div>

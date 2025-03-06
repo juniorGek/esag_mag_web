@@ -1,25 +1,27 @@
 import { useEffect, useState } from "react";
 import { API_URL, ImageApi } from "../../../config/ApiUrl";
-import { useNavigate, useParams } from "react-router-dom";
+import {  useParams } from "react-router-dom";
 import {
   Loader2,
+  X,
+  Upload,
   Type,
   FileText,
   Image as ImageIcon,
+  Text,
   ToggleLeft,
-  X,
   Save,
-  Newspaper,
+  XCircle,
 } from "lucide-react";
-import { toast } from "react-toastify";
-import { useMessage } from "../../utils/messageContext";
+import DescriptionEditor from "../../components/DescriptionEditor";
+
+
 
 function EditNews() {
   const { id } = useParams();
   const [news, setNews] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-  const {setMessage} = useMessage();
+
   const [editedNews, setEditedNews] = useState({
     titre: "",
     sous_titre: "",
@@ -29,51 +31,7 @@ function EditNews() {
     enabled: false,
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setEditedNews({ ...editedNews, [name]: value });
-  };
-
-  const handleSubmit = async(e) => {
-    e.preventDefault();
-
-    console.log(editedNews.enabled);
-    
-    const formValues = new FormData();
-    formValues.append("titre", editedNews.titre);
-    formValues.append("sous_titre", editedNews.sous_titre);
-    formValues.append("description", editedNews.description);
-    formValues.append("image", editedNews.imageFile);
-    /* formValues.append("enabled", editedNews.enabled); */
-   
-
-    try {
-      const response = await fetch(`${API_URL}/updateActualite/${id}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: formValues,
-      });
-      const data = await response.json();
-      console.log(data);
-      if (response.status === 200) {
-        setMessage({ type: "success", text: data.message });
-        navigate("/admin/news");
-      }else{
-        toast.error(data.message, {
-          position: "top-right",
-          autoClose: 5000,
-        });
-      }
-    } catch (error) {
-      toast.error("Erreur lors de la modification de l'actualité", {
-        position: "top-right",
-        autoClose: 5000,
-      });
-      console.log(error);
-    }
-  };
+  
 
   const fetchDetailsActualite = async () => {
     try {
@@ -108,169 +66,190 @@ function EditNews() {
         imageCover: news.imageCover || "",
         enabled: news.enabled || false,
       });
+      
     }
   }, [news]);
 
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    if (type === "checkbox") {
+      setEditedNews({ ...editedNews, [name]: checked });
+    } else {
+      setEditedNews({ ...editedNews, [name]: value });
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setEditedNews({ ...editedNews, imageCover: URL.createObjectURL(file) });
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      setEditedNews({ ...editedNews, imageCover: URL.createObjectURL(file) });
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Données soumises:", editedNews);
+    // Ajoutez ici la logique pour envoyer les modifications à l'API
+  };
+
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800">
-        <Loader2 className="h-12 w-12 text-indigo-600 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <Loader2 className="h-8 w-8 text-blue-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
-      <div className="max-w-2xl mx-auto">
-        <div className="bg-white dark:bg-gray-850 rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl">
-          <div className="px-8 pt-8 pb-6 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-gray-800 dark:to-gray-750">
-            <div className="flex items-center gap-3">
-              <Newspaper className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
-                Modifier l&apos;actualité
-              </h2>
-            </div>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-              Ajustez les informations de cette actualité
-            </p>
+    <div className="min-h-screen bg-gray-50 flex justify-center py-12 px-4">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all hover:shadow-xl">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-5 border-b border-blue-900">
+          <h2 className="text-xl font-semibold text-white tracking-tight">Modification d&apos;actualité</h2>
+        </div>
+
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Titre */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <Type className="w-5 h-5 text-blue-600" /> Titre
+            </label>
+            <input
+              type="text"
+              name="titre"
+              value={editedNews.titre}
+              onChange={handleChange}
+              className="w-full py-2.5 px-4 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:border-blue-400"
+              placeholder="Titre de l'actualité"
+              required
+            />
           </div>
 
-          <form onSubmit={handleSubmit} className="p-8 space-y-6">
-            <div className="grid grid-cols-1 gap-6">
-              {/* Titre */}
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                  <Type className="h-4 w-4 text-indigo-500" />
-                  Titre
-                </label>
-                <input
-                  type="text"
-                  name="titre"
-                  value={editedNews.titre}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-                  required
-                />
-              </div>
+          {/* Sous-titre */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <FileText className="w-5 h-5 text-blue-600" /> Sous-titre
+            </label>
+            <input
+              type="text"
+              name="sous_titre"
+              value={editedNews.sous_titre}
+              onChange={handleChange}
+              className="w-full py-2.5 px-4 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:border-blue-400"
+              placeholder="Sous-titre"
+              required
+            />
+          </div>
 
-              {/* Sous-titre */}
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                  <FileText className="h-4 w-4 text-indigo-500" />
-                  Sous-titre
-                </label>
-                <input
-                  type="text"
-                  name="sous_titre"
-                  value={editedNews.sous_titre}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-                  required
-                />
-              </div>
-
-              {/* Description */}
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                  <FileText className="h-4 w-4 text-indigo-500" />
-                  Description
-                </label>
-                <textarea
-                  name="description"
-                  value={editedNews.description}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200 resize-y min-h-[120px]"
-                  required
-                />
-              </div>
-
-              {/* Image */}
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                  <ImageIcon className="h-4 w-4 text-indigo-500" />
-                  Image de couverture
-                </label>
-                <div className="flex items-center gap-4">
-                  {editedNews.imageCover && (
-                    <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm">
-                      <img
-                        src={
-                          editedNews.imageCover.startsWith("blob:")
-                            ? editedNews.imageCover
-                            : `${ImageApi}/${editedNews.imageCover}`
-                        }
-                        alt="Aperçu"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  <label className="cursor-pointer">
-                    <span className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200">
-                      <ImageIcon className="h-4 w-4" />
-                      Changer l&apos;image
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={(e) => {
-                          const file = e.target.files[0];
-                          if (file) {
-                            setEditedNews({
-                              ...editedNews,
-                              imageCover: URL.createObjectURL(file), // pour la prévisualisation
-                              imageFile: file, // pour l'envoi à l'API
-                            });
-                          }
-                        }}
-                        className="hidden"
-                      />
-
-                    </span>
-                  </label>
+          {/* Image de couverture */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <ImageIcon className="w-5 h-5 text-blue-600" /> Image de couverture
+            </label>
+            <div
+              className="w-full h-40 border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center relative rounded-lg transition-all duration-300 hover:border-blue-500 hover:bg-gray-100"
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+            >
+              {editedNews.imageCover ? (
+                <div className="relative w-full h-full group">
+                  <img
+                    src={
+                      editedNews.imageCover.startsWith("blob:")
+                        ? editedNews.imageCover
+                        : `${ImageApi}/${editedNews.imageCover}`
+                    }
+                    alt="Aperçu"
+                    className="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
+                  />
+                  <button
+                    onClick={() => setEditedNews({ ...editedNews, imageCover: "" })}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-80 hover:opacity-100 hover:bg-red-600 transition-all duration-300"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
-              </div>
-
-              {/* Statut */}
-              <div className="space-y-2">
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200">
-                  <ToggleLeft className="h-4 w-4 text-indigo-500" />
-                  Statut
+              ) : (
+                <label className="flex flex-col items-center justify-center h-full text-gray-500 cursor-pointer">
+                  <Upload className="w-8 h-8 mb-2 text-blue-500 animate-bounce" />
+                  <span className="text-sm font-medium">Déposez ou cliquez pour choisir une image</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
                 </label>
-                <select
-                  name="enabled"
-                  value={editedNews.enabled ? "Activé" : "Désactivé"}
-                  onChange={(e) =>
-                    setEditedNews({
-                      ...editedNews,
-                      enabled: e.target.value === "Activé",
-                    })
-                  }
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200"
-                >
-                  <option value="Activé">Activé</option>
-                  <option value="Désactivé">Désactivé</option>
-                </select>
-              </div>
+              )}
             </div>
+          </div>
 
-            {/* Actions */}
-            <div className="flex justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
-              <button
-                type="button"
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-200"
-              >
-                <X className="h-4 w-4" />
-                Annuler
-              </button>
-              <button
-                type="submit"
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200"
-              >
-                <Save className="h-4 w-4" />
-                Enregistrer
-              </button>
+          {/* Description */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <Text className="w-5 h-5 text-blue-600" /> Description
+            </label>
+            <div className="border border-gray-300 rounded-lg bg-white shadow-sm">
+                <DescriptionEditor
+                  value={editedNews.description}
+                  onChange={(html) =>
+                    setEditedNews({ ...editedNews, description: html })
+                  }
+                />
             </div>
-          </form>
-        </div>
+          </div>
+
+          {/* Statut */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
+              <ToggleLeft className="w-5 h-5 text-blue-600" /> Statut
+            </label>
+            <select
+              name="enabled"
+              value={editedNews.enabled ? "Activé" : "Désactivé"}
+              onChange={(e) =>
+                setEditedNews({
+                  ...editedNews,
+                  enabled: e.target.value === "Activé",
+                })
+              }
+              className="w-full py-2.5 px-4 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:border-blue-400"
+            >
+              <option value="Activé">Activé</option>
+              <option value="Désactivé">Désactivé</option>
+            </select>
+          </div>
+
+          {/* Actions */}
+          <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
+            <button
+              type="button"
+              className="px-5 py-2 bg-gray-200 text-gray-700 font-medium rounded-lg hover:bg-gray-300 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-400 transition-all duration-300 flex items-center gap-2"
+            >
+              <XCircle className="w-5 h-5" /> Annuler
+            </button>
+            <button
+              type="submit"
+              className="px-5 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-300 flex items-center gap-2"
+            >
+              <Save className="w-5 h-5" /> Enregistrer
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   );

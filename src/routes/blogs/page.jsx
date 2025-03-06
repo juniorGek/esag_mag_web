@@ -28,7 +28,7 @@ export default function BlogTable() {
 
   // Ouvrir la modale d'édition
 const openEdit = (item) => {
-  navigate(`/admin/new-edit/${item.id}`);
+  navigate(`/admin/blog-edit/${item.id}`);
 };
 
 
