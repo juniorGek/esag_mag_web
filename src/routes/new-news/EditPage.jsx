@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { API_URL, ImageApi } from "../../../config/ApiUrl";
-import {  useParams } from "react-router-dom";
+import {  useNavigate, useParams } from "react-router-dom";
 import {
   Loader2,
   X,
@@ -13,15 +13,14 @@ import {
   Save,
   XCircle,
 } from "lucide-react";
+import { toast } from "react-toastify";
 import DescriptionEditor from "../../components/DescriptionEditor";
-
-
 
 function EditNews() {
   const { id } = useParams();
   const [news, setNews] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const navigate = useNavigate();
   const [editedNews, setEditedNews] = useState({
     titre: "",
     sous_titre: "",
@@ -32,6 +31,51 @@ function EditNews() {
   });
 
   
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditedNews({ ...editedNews, [name]: value });
+  };
+
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+
+    console.log(editedNews.enabled);
+    
+    const formValues = new FormData();
+    formValues.append("titre", editedNews.titre);
+    formValues.append("sous_titre", editedNews.sous_titre);
+    formValues.append("description", editedNews.description);
+    formValues.append("image", editedNews.imageFile);
+    /* formValues.append("enabled", editedNews.enabled); */
+   
+
+    try {
+      const response = await fetch(`${API_URL}/updateActualite/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: formValues,
+      });
+      const data = await response.json();
+      console.log(data);
+      if (response.status === 200) {
+        navigate("/admin/news");
+      }else{
+        toast.error(data.message, {
+          position: "top-right",
+          autoClose: 5000,
+        });
+      }
+    } catch (error) {
+      toast.error("Erreur lors de la modification de l'actualité", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      console.log(error);
+    }
+  };
 
   const fetchDetailsActualite = async () => {
     try {
@@ -70,14 +114,14 @@ function EditNews() {
     }
   }, [news]);
 
-  const handleChange = (e) => {
+  /* const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     if (type === "checkbox") {
       setEditedNews({ ...editedNews, [name]: checked });
     } else {
       setEditedNews({ ...editedNews, [name]: value });
     }
-  };
+  }; */
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -96,12 +140,6 @@ function EditNews() {
 
   const handleDragOver = (e) => {
     e.preventDefault();
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Données soumises:", editedNews);
-    // Ajoutez ici la logique pour envoyer les modifications à l'API
   };
 
 

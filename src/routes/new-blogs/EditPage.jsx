@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { API_URL, ImageApi } from "../../../config/ApiUrl";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   Loader2,
   X,
@@ -12,22 +12,68 @@ import {
   XCircle,
 } from "lucide-react";
 import DescriptionEditor from "../../components/DescriptionEditor";
+import { useMessage } from "../../utils/messageContext";
+import { toast } from "react-toastify";
 
 
 function EditBlog() {
   const { id } = useParams();
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { setMessage } = useMessage();
   const [editedBlog, setEditedBlog] = useState({
     titre: "",
-    sous_titre:"",
-    contenu: "",
+    sous_titre: "",
+    details: "",
     imageCover: "",
+    imageFile: null,
+    enabled: false,
   });
 
- 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditedBlog({ ...editedBlog, [name]: value });
+  };
 
-  const fetchBlogDetails = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formValues = new FormData();
+    formValues.append("titre", editedBlog.titre);
+    formValues.append("sous_titre", editedBlog.sous_titre);
+    formValues.append("details", editedBlog.details);
+    formValues.append("image", editedBlog.imageFile);
+   /* formValues.append("enabled", editedBlog.enabled);*/
+
+    try {
+      const response = await fetch(`${API_URL}/updateBlog/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: formValues,
+      });
+      const data = await response.json();
+      if (response.status === 200) {
+        setMessage({ type: "success", text: data.message });
+        navigate("/admin/blogs");
+      } else {
+        toast.error(data.message, {
+          position: "top-right",
+          autoClose: 5000,
+        });
+      }
+    } catch (error) {
+      toast.error("Erreur lors de la modification du blog", {
+        position: "top-right",
+        autoClose: 5000,
+      });
+      console.log(error);
+    }
+  };
+
+  const fetchDetailsBlog = async () => {
     try {
       const response = await fetch(`${API_URL}/detailBlog/${id}`, {
         method: "GET",
@@ -48,7 +94,7 @@ function EditBlog() {
   };
 
   useEffect(() => {
-    fetchBlogDetails();
+    fetchDetailsBlog();
   }, []);
 
   useEffect(() => {
@@ -56,17 +102,12 @@ function EditBlog() {
       setEditedBlog({
         titre: blog.titre || "",
         sous_titre: blog.titre || "",
-        contenu: blog.details || "",
+        details: blog.details || "",
         imageCover: blog.imageCover || "",
       });
       
     }
   }, [blog]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setEditedBlog({ ...editedBlog, [name]: value });
-  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -85,12 +126,6 @@ function EditBlog() {
 
   const handleDragOver = (e) => {
     e.preventDefault();
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Données soumises:", editedBlog);
-    // Ajoutez ici la logique pour envoyer les modifications à l'API
   };
 
 
@@ -194,9 +229,9 @@ function EditBlog() {
             </label>
             <div className="border border-gray-300 rounded-lg bg-white shadow-sm">
             <DescriptionEditor
-                  value={editedBlog.contenu}
+                  value={editedBlog.details}
                   onChange={(html) =>
-                    setEditedBlog({ ...editedBlog, contenu: html })
+                    setEditedBlog({ ...editedBlog, details: html })
                   }
                 />
             </div>

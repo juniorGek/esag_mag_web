@@ -36,6 +36,10 @@ import ProfilePage from "./routes/profile/page";
 import BlogDetail from "./Pages/BlogDetail";
 import EditNews from "./routes/new-news/EditPage";
 import EditBlog from "./routes/new-blogs/EditPage";
+import AdminBlogDetail from "./routes/blog-detail/page";
+import AcheterTicket from './Pages/AcheterTicket';
+import MesTickets from './Pages/MesTickets';
+
 function App() {
     const router = createBrowserRouter([
         {
@@ -50,6 +54,8 @@ function App() {
                 { path: "blog/:id", element: <BlogDetail /> },
                 { path: "evenements", element: <Evenement /> },
                 { path: "evenement/:id", element: <EvenementDetail /> },
+                { path: "evenement/:id/acheter-ticket/:ticketId", element: <AcheterTicket /> },
+                { path: "evenement/:id/mes-tickets", element: <MesTickets /> },
                 { path: "sondages", element: <Sondage /> },
                 { path: "about", element: <About /> },
             ],
@@ -122,8 +128,16 @@ function App() {
                     element: <BlogTable />, // Page des Blogs
                 },
                 {
+                    path: "blog-detail/:id",
+                    element: <AdminBlogDetail />, // Page de détail du blog (admin)
+                },
+                {
                     path: "new-blogs",
                     element: <NewBlog />, // Page pour ajouter un nouveau blog
+                },
+                {
+                    path: "new-blogs/:id",
+                    element: <EditBlog />,
                 },
                 {
                     path: "polls",
