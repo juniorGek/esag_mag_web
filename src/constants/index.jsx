@@ -41,6 +41,21 @@ export const navbarLinks = [
         ],
     },
     {
+        title: "Agents",
+        links: [
+            {
+                label: "Nouvel Agent",
+                icon: UserPlus,
+                path: "/admin/new-agent",
+            },
+            {
+                label: "Liste des Agents",
+                icon: Users,
+                path: "/admin/agents",
+            },
+        ],
+    },
+    {
         title: "Contenus",
         links: [
             {
