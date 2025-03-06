@@ -5,6 +5,7 @@ import Layout from "./routes/layouts";
 import UsersTable from "./routes/users/page";
 import AdminsTable from "./routes/admins/page";
 import NewAdmin from "./routes/new-admin/page";
+import NewAgent from "./routes/new-agent/page";
 import Login from "./Pages/Auth/Login";
 import FrontLayout from "./routes/frontLayout";
 import Home from "./Pages/Home";
@@ -27,6 +28,7 @@ import NewsTable from "./routes/news/page";
 import ForgetPassPage from "./Pages/Auth/forgetPassPage";
 import BlogTable from "./routes/blogs/page";
 import NewBlog from "./routes/new-blogs/page";
+import Agents from "./routes/agents/page";
 import NewPoll from "./routes/new-poll/page";
 import PollsTable from "./routes/polls/page";
 import NewEvent from "./routes/new-event/page";
@@ -106,6 +108,14 @@ function App() {
                 {
                     path: "new-admin",
                     element: <NewAdmin />, // Page des utilisateurs vérifiés
+                },
+                {
+                    path: "agents",
+                    element: <Agents />, // Page des utilisateurs vérifiés
+                },
+                {
+                    path: "new-agent",
+                    element: <NewAgent/>, // Page des utilisateurs vérifiés
                 },
                 {
                     path: "news",
