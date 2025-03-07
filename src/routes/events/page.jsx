@@ -9,7 +9,9 @@ const eventsData = [
   {
     id: 1,
     titre: "Nouvelle fonctionnalité",
-    auteur: "Mario Sanchez",
+    sous_titre: "Sous-titre",
+    lieu: "2février",
+    prix: "2000",
     description: "Nous avons ajouté de nouvelles fonctionnalités pour améliorer votre expérience.",
     imageCover: "https://placehold.co/150",
     enabled: true,
@@ -17,7 +19,9 @@ const eventsData = [
   {
     id: 2,
     titre: "Maintenance prévue",
-    auteur: "Travor rose",
+    sous_titre: "Sous-titre",
+    lieu: "2février",
+    prix: "2000",
     description: "Une maintenance est prévue ce week-end. Veuillez planifier en conséquence.",
     imageCover: "https://placehold.co/150",
     enabled: false,
@@ -25,7 +29,9 @@ const eventsData = [
   {
     id: 3,
     titre: "Événement à venir",
-    auteur: "Allison bird",
+    sous_titre: "Sous-titre",
+    lieu: "2février",
+    prix: "2000",
     description: "Rejoignez-nous pour un événement passionnant avec des invités spéciaux.",
     imageCover: "https://placehold.co/150",
     enabled: true,
@@ -33,7 +39,9 @@ const eventsData = [
   {
     id: 4,
     titre: "Promotion spéciale",
-    auteur: "Joseph creman",
+    sous_titre: "Sous-titre",
+    lieu: "2février",
+    prix: "2000",
     description: "Des offres spéciales vous attendent. Ne manquez pas cette opportunité !",
     imageCover: "https://placehold.co/150",
     enabled: true,
@@ -53,7 +61,9 @@ export default function EventsTable() {
   const filteredEvents = events.filter(
     (item) =>
       item.titre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.auteur.toLowerCase().includes(searchTerm.toLowerCase())
+      item.sous_titre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.lieu.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.prix.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Calcul de la pagination
@@ -143,7 +153,13 @@ export default function EventsTable() {
                   Titre
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-slate-300">
-                  Auteur
+                  Sous-titre
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-slate-300">
+                  Lieu
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-slate-300">
+                  Prix
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-slate-300">
                   Statut
@@ -175,7 +191,13 @@ export default function EventsTable() {
                     {item.titre}
                   </td>
                   <td className="px-4 py-3 text-sm text-gray-900 dark:text-slate-50">
-                    {item.auteur}
+                    {item.sous_titre}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-slate-50">
+                    {item.lieu}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-slate-50">
+                    {item.prix}
                   </td>
                   <td
                     className={`px-4 py-3 text-sm font-medium ${
@@ -235,7 +257,7 @@ export default function EventsTable() {
   <div className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center mt-7 p-4">
     <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg w-full max-w-md p-6">
       <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50 mb-4">
-        Modifier l'évenement
+        Modifier l évenement
       </h2>
       <form onSubmit={handleEdit}>
         <div className="space-y-4">
@@ -255,16 +277,48 @@ export default function EventsTable() {
             />
           </div>
 
-          {/* Champ Auteur */}
+          {/* Champ Sous-titre */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
-              Auteur
+              Sous-titre
             </label>
             <input
               type="text"
-              value={selectedEvents.auteur}
+              value={selectedEvents.sous_titre}
               onChange={(e) =>
-                setSelectedEvents({ ...selectedEvents, auteur: e.target.value })
+                setSelectedEvents({ ...selectedEvents, sous_titre: e.target.value })
+              }
+              className="w-full p-2 border border-gray-300 rounded-lg dark:bg-slate-700 dark:text-slate-50"
+              required
+            />
+          </div>
+
+           {/* Champ Lieu */}
+           <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
+              Lieu
+            </label>
+            <input
+              type="text"
+              value={selectedEvents.lieu}
+              onChange={(e) =>
+                setSelectedEvents({ ...selectedEvents, lieu: e.target.value })
+              }
+              className="w-full p-2 border border-gray-300 rounded-lg dark:bg-slate-700 dark:text-slate-50"
+              required
+            />
+          </div>
+
+          {/* Champ Prix */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
+              Prix
+            </label>
+            <input
+              type="text"
+              value={selectedEvents.prix}
+              onChange={(e) =>
+                setSelectedEvents({ ...selectedEvents, prix: e.target.value })
               }
               className="w-full p-2 border border-gray-300 rounded-lg dark:bg-slate-700 dark:text-slate-50"
               required
@@ -373,7 +427,7 @@ export default function EventsTable() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg w-full max-w-md p-6">
             <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50 mb-4">
-              Supprimer l'événement
+              Supprimer l événement
             </h2>
             <p className="text-gray-700 dark:text-slate-300 mb-6">
               Êtes-vous sûr de vouloir supprimer cet événement ?

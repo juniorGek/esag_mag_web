@@ -5,7 +5,7 @@ const NewBlog = () => {
   const [formData, setFormData] = useState({
     titre: "",
     auteur: "",
-    description: "",
+    contenu: "",
     imageCover: null,
     enabled: false,
   });
@@ -145,18 +145,18 @@ const NewBlog = () => {
                 </div>
               </div>
 
-              {/* Champ Description */}
+              {/* Champ Contenu */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
+                  Contenu
                 </label>
                 <div className="relative">
                   <textarea
-                    name="description"
-                    value={formData.description}
+                    name="contenu"
+                    value={formData.contenu}
                     onChange={handleChange}
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Entrez la description"
+                    placeholder="Saisissez le contenu"
                     rows="4"
                   />
                  

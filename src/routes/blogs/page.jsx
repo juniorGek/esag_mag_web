@@ -8,7 +8,7 @@ const blogsData = [
     id: 1,
     titre: "Nouvelle fonctionnalité",
     auteur: "Mario Sanchez",
-    description: "Nous avons ajouté de nouvelles fonctionnalités pour améliorer votre expérience.",
+    contenue: "Nous avons ajouté de nouvelles fonctionnalités pour améliorer votre expérience.",
     imageCover: "https://placehold.co/150",
     enabled: true,
   },
@@ -16,7 +16,7 @@ const blogsData = [
     id: 2,
     titre: "Maintenance prévue",
     auteur: "Travor rose",
-    description: "Une maintenance est prévue ce week-end. Veuillez planifier en conséquence.",
+    contenue: "Une maintenance est prévue ce week-end. Veuillez planifier en conséquence.",
     imageCover: "https://placehold.co/150",
     enabled: false,
   },
@@ -24,7 +24,7 @@ const blogsData = [
     id: 3,
     titre: "Événement à venir",
     auteur: "Allison bird",
-    description: "Rejoignez-nous pour un événement passionnant avec des invités spéciaux.",
+    contenue: "Rejoignez-nous pour un événement passionnant avec des invités spéciaux.",
     imageCover: "https://placehold.co/150",
     enabled: true,
   },
@@ -32,7 +32,7 @@ const blogsData = [
     id: 4,
     titre: "Promotion spéciale",
     auteur: "Joseph creman",
-    description: "Des offres spéciales vous attendent. Ne manquez pas cette opportunité !",
+    contenue: "Des offres spéciales vous attendent. Ne manquez pas cette opportunité !",
     imageCover: "https://placehold.co/150",
     enabled: true,
   },
@@ -269,15 +269,15 @@ export default function BlogTable() {
             />
           </div>
 
-          {/* Champ Description */}
+          {/* Champ Contenue */}
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
-              Description
+              Contenue
             </label>
             <textarea
-              value={selectedBlogs.description}
+              value={selectedBlogs.contenue}
               onChange={(e) =>
-                setSelectedBlogs({ ...selectedBlogs, description: e.target.value })
+                setSelectedBlogs({ ...selectedBlogs, contenue: e.target.value })
               }
               className="w-full p-2 border border-gray-300 rounded-lg dark:bg-slate-700 dark:text-slate-50"
               rows="4"

@@ -106,6 +106,17 @@ export const navbarLinks = [
             },
         ],
     },
+     {
+         title: "Profile",
+    links: [
+             {
+                 label: "Profile",
+                 icon: Users,
+                 path: "/admin/profile",
+             },
+         ],
+     },
+    
     // {
     //     title: "Paramètres",
     //     links: [

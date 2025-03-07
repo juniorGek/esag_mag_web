@@ -4,7 +4,9 @@ import { Upload,  X,Heading, Heading2 } from "lucide-react";
 const NewEvent = () => {
   const [formData, setFormData] = useState({
     titre: "",
-    auteur: "",
+    sous_titre: "",
+    lieu: "",
+    prix: "",
     description: "",
     imageCover: null,
     enabled: false,
@@ -125,25 +127,67 @@ const NewEvent = () => {
                 </div>
               </div>
 
-              {/* Champ Auteur */}
-              <div>
+               {/* Champ Sous-titre */}
+               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Auteur
+                  Sous-titre
                 </label>
                 <div className="relative">
                   <input
                     type="text"
-                    name="auteur"
-                    value={formData.auteur}
+                    name="sous-titre"
+                    value={formData.sous_titre}
                     onChange={handleChange}
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Entrez l'auteur"
+                    placeholder="Entrez le sous-titre"
+                    required
+                  />
+                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <Heading className="w-5 h-5 text-gray-400" />
+                  </span>
+                </div>
+              </div>
+
+              {/* Champ Lieu */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Lieu
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="lieu"
+                    value={formData.lieu}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Entrez le lieu"
                   />
                    <span className="absolute inset-y-0 left-0 flex items-center pl-3">
                     <Heading2 className="w-5 h-5 text-gray-400" />
                   </span>
                 </div>
               </div>
+
+               {/* Champ du Prix */}
+               <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Prix
+                </label>
+                <div className="relative">
+                  <input
+                    type="text"
+                    name="prix"
+                    value={formData.prix}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    placeholder="Entrez le prix"
+                  />
+                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <Heading2 className="w-5 h-5 text-gray-400" />
+                  </span>
+                </div>
+              </div>
+
 
               {/* Champ Description */}
               <div>
@@ -183,7 +227,7 @@ const NewEvent = () => {
                   type="submit"
                   className="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
-                  Ajouter l'évenement
+                  Ajouter l évenement
                 </button>
               </div>
             </form>
