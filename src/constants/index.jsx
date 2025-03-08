@@ -120,6 +120,17 @@ export const navbarLinks = [
             },
         ],
     },
+     {
+         title: "Profil",
+    links: [
+             {
+                 label: "Profil",
+                 icon: Users,
+                 path: "/admin/profile",
+             },
+         ],
+     },
+    
     // {
     //     title: "Paramètres",
     //     links: [

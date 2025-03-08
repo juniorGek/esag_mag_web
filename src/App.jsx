@@ -35,6 +35,8 @@ import NewEvent from "./routes/new-event/page";
 import EventsTable from "./routes/events/page";
 import SettingsPage from "./routes/settings/page";
 import ProfilePage from "./routes/profile/page";
+import SuggestionsTable from "./routes/suggestions/page";
+
 import BlogDetail from "./Pages/BlogDetail";
 import EditNews from "./routes/new-news/EditPage";
 import EditBlog from "./routes/new-blogs/EditPage";
@@ -159,7 +161,7 @@ function App() {
                 },
                 {
                     path: "suggestions",
-                    element: <h1 className="title">Suggestions</h1>, // Page des Suggestions
+                    element: <SuggestionsTable />, // Page des Suggestions
                 },
                 {
                     path: "events",
