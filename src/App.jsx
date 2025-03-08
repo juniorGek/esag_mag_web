@@ -33,7 +33,10 @@ import NewEvent from "./routes/new-event/page";
 import EventsTable from "./routes/events/page";
 import SettingsPage from "./routes/settings/page";
 import ProfilePage from "./routes/profile/page";
+import SuggestionsTable from "./routes/suggestions/page";
+
 import BlogDetail from "./Pages/BlogDetail";
+
 function App() {
     const router = createBrowserRouter([
         {
@@ -125,7 +128,7 @@ function App() {
                 },
                 {
                     path: "suggestions",
-                    element: <h1 className="title">Suggestions</h1>, // Page des Suggestions
+                    element: <SuggestionsTable />, // Page des Suggestions
                 },
                 {
                     path: "events",

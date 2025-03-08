@@ -107,10 +107,10 @@ export const navbarLinks = [
         ],
     },
      {
-         title: "Profile",
+         title: "Profil",
     links: [
              {
-                 label: "Profile",
+                 label: "Profil",
                  icon: Users,
                  path: "/admin/profile",
              },

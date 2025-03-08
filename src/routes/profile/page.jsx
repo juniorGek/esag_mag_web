@@ -24,17 +24,24 @@ const ProfilePage = () => {
 
   const handleSave = () => {
     setIsEditing(false);
-    // Logique pour sauvegarder les modifications
     console.log('Informations sauvegardées :', user);
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center py-8">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-2xl">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">Modifier le Profil</h1>
+  const handleCancel = () => {
+    setIsEditing(false);
+  };
 
-        {/* Section Photo de profil */}
-        <div className="flex flex-col items-center mb-8">
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
+        <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600">
+            Modifier votre Profil
+          </span>
+        </h1>
+
+        <div className="flex flex-col items-center mb-6">
+          {/* Conteneur de la photo de profil */}
           <div className="relative w-32 h-32 mb-4">
             <img
               src={user.profilePicture}
@@ -43,7 +50,7 @@ const ProfilePage = () => {
             {isEditing && (
               <label
                 htmlFor="profile-picture"
-                className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full cursor-pointer hover:bg-blue-600"
+                className="absolute bottom-0 right-0 bg-blue-500 text-white p-2 rounded-full cursor-pointer hover:bg-blue-600 transition-all"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -64,85 +71,85 @@ const ProfilePage = () => {
               onChange={handleFileChange}
             />
           )}
-          <p className="text-sm text-gray-500">
-            Cliquez sur l'icône pour changer la photo de profil.
-          </p>
+          {isEditing && (
+            <p className="text-sm text-gray-500 text-center">
+              Cliquez sur l'icône pour changer la photo de profil.
+            </p>
+          )}
         </div>
 
-        {/* Section Informations du compte */}
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">Nom</label>
             {isEditing ? (
               <input
                 type="text"
                 value={user.name}
                 onChange={(e) => setUser({ ...user, name: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             ) : (
-              <p className="px-4 py-2 bg-gray-100 rounded-md">{user.name}</p>
+              <p className="px-4 py-2 bg-gray-50 rounded-lg text-gray-700">{user.name}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">Prénom</label>
             {isEditing ? (
               <input
                 type="text"
                 value={user.lastname}
                 onChange={(e) => setUser({ ...user, lastname: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             ) : (
-              <p className="px-4 py-2 bg-gray-100 rounded-md">{user.lastname}</p>
+              <p className="px-4 py-2 bg-gray-50 rounded-lg text-gray-700">{user.lastname}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
             {isEditing ? (
               <input
                 type="email"
                 value={user.email}
                 onChange={(e) => setUser({ ...user, email: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             ) : (
-              <p className="px-4 py-2 bg-gray-100 rounded-md">{user.email}</p>
+              <p className="px-4 py-2 bg-gray-50 rounded-lg text-gray-700">{user.email}</p>
             )}
           </div>
 
-          {/* Section Changer le mot de passe */}
           {isEditing && (
             <div>
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">Changer le mot de passe</h2>
+              <h2 className="text-lg font-semibold text-gray-800 mb-4">Changer le mot de passe</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
                     Ancien mot de passe
                   </label>
                   <input
                     type="password"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
                     Nouveau mot de passe
                   </label>
                   <input
                     type="password"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-600 mb-1">
                     Confirmer le nouveau mot de passe
                   </label>
                   <input
                     type="password"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -150,19 +157,26 @@ const ProfilePage = () => {
           )}
         </div>
 
-        {/* Boutons Modifier/Enregistrer */}
-        <div className="flex justify-end mt-8">
+        <div className="flex justify-end mt-6 space-x-4">
           {isEditing ? (
-            <button
-              onClick={handleSave}
-              className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
-            >
-              Enregistrer
-            </button>
+            <>
+              <button
+                onClick={handleCancel}
+                className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-all"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleSave}
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
+              >
+                Enregistrer
+              </button>
+            </>
           ) : (
             <button
               onClick={() => setIsEditing(true)}
-              className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-all"
             >
               Modifier
             </button>
