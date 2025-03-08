@@ -75,7 +75,7 @@ function EditBlog() {
 
   const fetchDetailsBlog = async () => {
     try {
-      const response = await fetch(`${API_URL}/detailBlog/${id}`, {
+      const response = await fetch(`${API_URL}/detailsBlog/${id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

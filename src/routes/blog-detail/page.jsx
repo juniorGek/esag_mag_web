@@ -17,7 +17,7 @@ const AdminBlogDetail = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const response = await fetch(`${API_URL}/detailBlog/${id}`, {
+        const response = await fetch(`${API_URL}/detailsBlog/${id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
