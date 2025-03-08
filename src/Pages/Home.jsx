@@ -7,18 +7,23 @@ import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { API_URL, ImageApi } from "../../config/ApiUrl";
 import { formatDate } from "../utils/formatDate";
+import { UserCircle, UserX, Send } from "lucide-react";
 
 const Home = () => {
   const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [dernierAcu, setDernierAcu] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const [suggestion, setSuggestion] = useState({
+    name: "",
+    email: "",
     title: "",
-    description: "",
     category: "general",
+    description: "",
+    isAnonymous: false
   });
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleSubscribe = (e) => {
     e.preventDefault();
@@ -26,11 +31,19 @@ const Home = () => {
     setEmail("");
   };
 
-  const handleSuggestionSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setShowSuccessMessage(true);
-    setSuggestion({ title: "", description: "", category: "general" });
-    setTimeout(() => setShowSuccessMessage(false), 3000);
+    setShowSuccess(true);
+    setSuggestion({
+      name: "",
+      email: "",
+      title: "",
+      category: "general",
+      description: "",
+      isAnonymous: false
+    });
+    setIsAnonymous(false);
+    setTimeout(() => setShowSuccess(false), 3000);
   };
 
   const handleEvent = (eventData) => {
@@ -383,66 +396,127 @@ const Home = () => {
             Donnez vos avis
           </h2>
 
-          {showSuccessMessage ? (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-6 animate-fade-in">
-              <p className="text-center">
-                Merci pour votre suggestion ! Nous l examinerons avec attention.
-              </p>
-            </div>
-          ) : null}
+          {showSuccess && (
+          <div className="mb-8 bg-green-100 border border-green-200 p-4 rounded-xl shadow-sm animate-fade-in">
+            <p className="text-green-700 text-center font-medium">
+              Merci pour votre suggestion ! Nous l'examinerons avec attention.
+            </p>
+          </div>
+        )}
 
-          <form onSubmit={handleSuggestionSubmit} className="space-y-6">
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                Titre de votre suggestion
+<form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8 space-y-6 backdrop-blur-sm bg-white/90">
+          {/* Toggle Anonyme/Public */}
+          <div className="flex justify-center space-x-4 mb-8">
+            <button
+              type="button"
+              onClick={() => setIsAnonymous(false)}
+              className={`flex items-center px-6 py-3 rounded-xl transition-all duration-300 ${
+                !isAnonymous
+                  ? "bg-blue-600 text-white shadow-lg shadow-blue-200 transform scale-105"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              <UserCircle className="w-5 h-5 mr-2" />
+              Public
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsAnonymous(true)}
+              className={`flex items-center px-6 py-3 rounded-xl transition-all duration-300 ${
+                isAnonymous
+                  ? "bg-purple-600 text-white shadow-lg shadow-purple-200 transform scale-105"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              <UserX className="w-5 h-5 mr-2" />
+              Anonyme
+            </button>
+          </div>
+
+          {/* Informations personnelles (conditionnelles) */}
+          {!isAnonymous && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
+              <div className="group">
+                <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
+                  Votre nom
+                </label>
+                <input
+                  type="text"
+                  value={suggestion.name}
+                  onChange={(e) => setSuggestion({...suggestion, name: e.target.value})}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
+                  required={!isAnonymous}
+                />
+              </div>
+              <div className="group">
+                <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
+                  Votre email
+                </label>
+                <input
+                  type="email"
+                  value={suggestion.email}
+                  onChange={(e) => setSuggestion({...suggestion, email: e.target.value})}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
+                  required={!isAnonymous}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Titre et Catégorie */}
+          <div className="space-y-6">
+            <div className="group">
+              <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
+                Objet de la suggestion
               </label>
               <input
                 type="text"
                 value={suggestion.title}
-                onChange={(e) =>
-                  setSuggestion({ ...suggestion, title: e.target.value })
-                }
-                className="w-full p-3 border border-gray-300 rounded-lg"
+                onChange={(e) => setSuggestion({...suggestion, title: e.target.value})}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
                 required
               />
             </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
+
+            <div className="group">
+              <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
                 Catégorie
               </label>
               <select
                 value={suggestion.category}
-                onChange={(e) =>
-                  setSuggestion({ ...suggestion, category: e.target.value })
-                }
-                className="w-full p-3 border border-gray-300 rounded-lg"
+                onChange={(e) => setSuggestion({...suggestion, category: e.target.value})}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
               >
                 <option value="general">Général</option>
                 <option value="academic">Académique</option>
                 <option value="events">Événements</option>
                 <option value="facilities">Infrastructures</option>
+                <option value="other">Autre</option>
               </select>
             </div>
-            <div>
-              <label className="block text-gray-700 font-medium mb-2">
+
+            <div className="group">
+              <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
                 Votre suggestion
               </label>
               <textarea
                 value={suggestion.description}
-                onChange={(e) =>
-                  setSuggestion({ ...suggestion, description: e.target.value })
-                }
-                className="w-full p-3 border border-gray-300 rounded-lg h-32"
+                onChange={(e) => setSuggestion({...suggestion, description: e.target.value})}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200 h-32 resize-none"
                 required
+                placeholder="Décrivez votre suggestion en détail..."
               ></textarea>
             </div>
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700"
-            >
-              Envoyer ma suggestion
-            </button>
-          </form>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02] shadow-lg flex items-center justify-center space-x-2"
+          >
+            <Send className="w-5 h-5" />
+            <span>Envoyer ma suggestion</span>
+          </button>
+        </form>
         </div>
       </section>
     </div>

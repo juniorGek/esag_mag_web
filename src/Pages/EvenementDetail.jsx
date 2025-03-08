@@ -92,7 +92,7 @@ const EvenementDetail = () => {
       <ToastContainer />
       {/* Hero Section */}
       <div className="relative h-[70vh] w-full overflow-hidden">
-        <img 
+        <img
           src={evenement.image}
           alt={evenement.title}
           className="w-full h-full object-cover"
@@ -149,11 +149,11 @@ const EvenementDetail = () => {
                     className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100 hover:shadow-lg transition-all duration-300"
                   >
                     <div className="flex justify-between items-start mb-4">
-                      <div>
+                      <div className="w-2/3"> {/* Largeur fixe pour le conteneur de texte */}
                         <h4 className="text-xl font-semibold text-gray-800">{ticket.typeTicket}</h4>
                         <p className="text-gray-600">{ticket.description}</p>
                       </div>
-                      <div className="text-right">
+                      <div className="text-right w-1/3"> {/* Largeur fixe pour le conteneur de prix */}
                         <p className="text-2xl font-bold text-blue-600">{ticket.prix} FCFA</p>
                         <p className="text-sm text-gray-500">{ticket.available} restants</p>
                       </div>
@@ -170,6 +170,7 @@ const EvenementDetail = () => {
                 ))}
               </div>
             </div>
+
           </div>
         </div>
       </div>

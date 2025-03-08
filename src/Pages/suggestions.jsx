@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { UserCircle, UserX, Send } from "lucide-react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+
 
 function Suggestions() {
   const [isAnonymous, setIsAnonymous] = useState(false);
