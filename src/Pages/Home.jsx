@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
@@ -13,6 +13,8 @@ const Home = () => {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [dernierAcu, setDernierAcu] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingRecentEvent, setLoadingRecentEvent] = useState(false);
+  const [event, setEvent] = useState([]);
   const [suggestion, setSuggestion] = useState({
     title: "",
     description: "",
@@ -49,8 +51,22 @@ const Home = () => {
     }
   }
 
+  const fetchEvent = async() =>{
+    try {
+      const response = await fetch(`${API_URL}/getRecentEvents`);
+      const data = await response.json();
+      
+      setEvent(data.events);
+    } catch (error) {
+      console.log(error);
+    }finally{
+      setLoadingRecentEvent(false);
+    }
+  }
+
   useEffect(() => {
     fetchDernierActu();
+    fetchEvent();
   }, []);
 
   const heroSlides = [
@@ -80,54 +96,6 @@ const Home = () => {
     },
   ];
 
-  const evenements = [
-    {
-      id: 1,
-      title: "Hackathon 2025",
-      date: "15 Avril 2025",
-      description: "Un challenge de programmation ouvert à tous les étudiants.",
-      image: "/images/event2.png",
-      location: "Campus Principal",
-      time: "09:00 - 18:00",
-    },
-    {
-      id: 2,
-      title: "Gala des 20 ans",
-      date: "30 Juin 2025",
-      description: "Célébration spéciale des 20 ans de ESAG-NDE.",
-      image: "/images/event1.jpg",
-      location: "Salle des fêtes",
-      time: "19:00 - 23:00",
-    },
-    {
-      id: 3,
-      title: "Forum Entreprises",
-      date: "10 Mai 2025",
-      description: "Rencontrez les plus grandes entreprises du secteur.",
-      image: "/images/event3.jpg",
-      location: "Hall des conférences",
-      time: "10:00 - 17:00",
-    },
-    {
-      id: 4,
-      title: "Conférence Tech",
-      date: "25 Mai 2025",
-      description:
-        "Les dernières innovations technologiques présentées par des experts.",
-      image: "/images/event4.jpg",
-      location: "Amphithéâtre A",
-      time: "14:00 - 16:00",
-    },
-    {
-      id: 5,
-      title: "Journée Culturelle",
-      date: "5 Juin 2025",
-      description: "Découvrez la diversité culturelle de notre école.",
-      image: "/images/event5.jpg",
-      location: "Esplanade",
-      time: "11:00 - 20:00",
-    },
-  ];
 
   return (
     <div className="gradient-background min-h-screen">
@@ -245,13 +213,13 @@ const Home = () => {
             autoplay={{ delay: 2000, disableOnInteraction: false, reverseDirection: true }}
             className="pb-8"
           >
-            {evenements.map((event) => (
+            {event.map((event) => (
               <SwiperSlide key={event.id}>
                 <div className="group mb-3 bg-white rounded-xl overflow-hidden  hover:transition-all duration-300 transform hover:-translate-y-2 h-[360px]">
                   <div className="relative overflow-hidden h-40">
                     <img
-                      src={event.image}
-                      alt={event.title}
+                      src={`${ImageApi}/${event.imageCover}`}
+                      alt={event.titre}
                       className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
@@ -271,14 +239,14 @@ const Home = () => {
                           />
                         </svg>
                         <span className="text-sm font-medium">
-                          {event.date}
+                          {formatDate(event.date)}
                         </span>
                       </div>
                     </div>
                   </div>
                   <div className="p-3">
                     <h3 className="text-lg font-bold mb-2 text-gray-800 line-clamp-1">
-                      {event.title}
+                      {event.titre}
                     </h3>
                     <div className="mb-2 text-xs text-gray-600">
                       <div className="flex items-center space-x-2 mb-1">
@@ -295,27 +263,12 @@ const Home = () => {
                             d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
                           />
                         </svg>
-                        <span>{event.location}</span>
+                        <span>{event.lieu}</span>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <svg
-                          className="w-3 h-3"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                          />
-                        </svg>
-                        <span>{event.time}</span>
-                      </div>
+                     
                     </div>
                     <p className="text-gray-600 mb-3 text-sm line-clamp-2">
-                      {event.description}
+                      {event.sous_titre}
                     </p>
                     <button
                       type="button"
