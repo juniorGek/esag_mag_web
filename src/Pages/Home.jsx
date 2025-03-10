@@ -8,6 +8,12 @@ import "swiper/css/navigation";
 import { API_URL, ImageApi } from "../../config/ApiUrl";
 import { formatDate } from "../utils/formatDate";
 import { UserCircle, UserX, Send } from "lucide-react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+
+
+
 
 const Home = () => {
   const [email, setEmail] = useState("");
@@ -16,12 +22,12 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [suggestion, setSuggestion] = useState({
-    name: "",
+    nom: "",
     email: "",
-    title: "",
-    category: "general",
-    description: "",
-    isAnonymous: false
+    object: "",
+    categorie: "general",
+    message: "",
+    type: "public",
   });
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -31,33 +37,71 @@ const Home = () => {
     setEmail("");
   };
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setSuggestion({ ...suggestion, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setShowSuccess(true);
-    setSuggestion({
-      name: "",
-      email: "",
-      title: "",
-      category: "general",
-      description: "",
-      isAnonymous: false
-    });
-    setIsAnonymous(false);
-    setTimeout(() => setShowSuccess(false), 3000);
+    try {
+      setLoading(true);
+
+      const formValues = {
+        nom: isAnonymous ? "" : suggestion.nom,
+        email: isAnonymous ? "" : suggestion.email,
+        object: suggestion.object,
+        categorie: suggestion.categorie,
+        message: suggestion.message,
+        type: isAnonymous ? "anonyme" : "public",
+      };
+
+      console.log("Données envoyées :", formValues);
+
+      const response = await fetch(`${API_URL}/createSuggestion`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formValues),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        toast.success("Suggestion envoyée avec succès", { autoClose: 3000 });
+        setSuggestion({
+          nom: "",
+          email: "",
+          object: "",
+          categorie: "general",
+          message: "",
+          type: "public",
+        });
+        setIsAnonymous(true);
+      } else {
+        const errorMessage = data.errors ? data.errors.map(err => err.message).join(", ") : "Erreur lors de l'envoi";
+        toast.error(errorMessage, { autoClose: 3000 });
+      }
+    } catch (error) {
+      toast.error("Erreur lors de l'envoi de la suggestion", { autoClose: 3000 });
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleEvent = (eventData) => {
     window.location.href = `/evenement/${eventData.id}`;
   };
 
-  const fetchDernierActu = async() =>{
+  const fetchDernierActu = async () => {
     try {
       const response = await fetch(`${API_URL}/listeDernierActu`);
       const data = await response.json();
       setDernierAcu(data.dernierActu);
     } catch (error) {
       console.log(error);
-    }finally{
+    } finally {
       setLoading(false);
     }
   }
@@ -175,70 +219,70 @@ const Home = () => {
 
       {/* Actualités Section - Style amélioré */}
       <section className="section-padding bg-white m-5 p-3">
-      <div className="container-width">
-        <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
-          Dernières Actualités
-        </h2>
+        <div className="container-width">
+          <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
+            Dernières Actualités
+          </h2>
 
-        {loading ? (
-          // 📌 Skeleton Loader
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {Array(4).fill(0).map((_, index) => (
-              <div key={index} className="bg-gray-200 rounded-lg animate-pulse h-[380px]" />
-            ))}
-          </div>
-        ) : (
-          // 📌 Swiper avec les données réelles
-          <Swiper
-            modules={[Autoplay]}
-            spaceBetween={24}
-            slidesPerView={1}
-            breakpoints={{
-              640: { slidesPerView: 2 },
-              768: { slidesPerView: 3 },
-              1024: { slidesPerView: 4 },
-            }}
-            autoplay={{ delay: 5000, disableOnInteraction: false }}
-            className="pb-8"
-          >
-            {dernierAcu.map((news) => (
-              <SwiperSlide key={news.id}>
-                <div className="bg-white rounded-lg overflow-hidden shadow-md min-h-[380px] flex flex-col">
-                  <div className="relative h-48 flex items-center justify-center bg-gray-200">
-                    {/* Loader pour l'image */}
-                    <img
-                      src={`${ImageApi}/${news.imageCover}`}
-                      alt={news.titre}
-                      className="w-full h-full object-cover transition-opacity duration-500"
-                      onLoad={(e) => e.currentTarget.classList.remove("opacity-0")}
-                    />
-                  </div>
-                  <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
-                    {formatDate(news.createdAt)}
+          {loading ? (
+            // 📌 Skeleton Loader
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+              {Array(4).fill(0).map((_, index) => (
+                <div key={index} className="bg-gray-200 rounded-lg animate-pulse h-[380px]" />
+              ))}
+            </div>
+          ) : (
+            // 📌 Swiper avec les données réelles
+            <Swiper
+              modules={[Autoplay]}
+              spaceBetween={24}
+              slidesPerView={1}
+              breakpoints={{
+                640: { slidesPerView: 2 },
+                768: { slidesPerView: 3 },
+                1024: { slidesPerView: 4 },
+              }}
+              autoplay={{ delay: 5000, disableOnInteraction: false }}
+              className="pb-8"
+            >
+              {dernierAcu.map((news) => (
+                <SwiperSlide key={news.id}>
+                  <div className="bg-white rounded-lg overflow-hidden shadow-md min-h-[380px] flex flex-col">
+                    <div className="relative h-48 flex items-center justify-center bg-gray-200">
+                      {/* Loader pour l'image */}
+                      <img
+                        src={`${ImageApi}/${news.imageCover}`}
+                        alt={news.titre}
+                        className="w-full h-full object-cover transition-opacity duration-500"
+                        onLoad={(e) => e.currentTarget.classList.remove("opacity-0")}
+                      />
                     </div>
-                  <div className="p-5 flex-1 flex flex-col">
-                    <h3 className="text-xl font-bold mb-2 text-gray-800 line-clamp-2">
-                      {news.titre}
-                    </h3>
-                    <p className="text-gray-600 mb-4 line-clamp-3">
-                      {news.sous_titre}
-                    </p>
-                    <div className="mt-auto">
-                      <Link
-                        to={`/actualite/${news.id}`}
-                        className="text-blue-600 font-medium hover:text-blue-700"
-                      >
-                        En savoir plus →
-                      </Link>
+                    <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
+                      {formatDate(news.createdAt)}
+                    </div>
+                    <div className="p-5 flex-1 flex flex-col">
+                      <h3 className="text-xl font-bold mb-2 text-gray-800 line-clamp-2">
+                        {news.titre}
+                      </h3>
+                      <p className="text-gray-600 mb-4 line-clamp-3">
+                        {news.sous_titre}
+                      </p>
+                      <div className="mt-auto">
+                        <Link
+                          to={`/actualite/${news.id}`}
+                          className="text-blue-600 font-medium hover:text-blue-700"
+                        >
+                          En savoir plus →
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </SwiperSlide>
-            ))}
-          </Swiper>
-        )}
-      </div>
-    </section>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          )}
+        </div>
+      </section>
 
       {/* Événements Section - Style amélioré */}
       <section className="section-padding bg-white m-5 p-3">
@@ -397,126 +441,131 @@ const Home = () => {
           </h2>
 
           {showSuccess && (
-          <div className="mb-8 bg-green-100 border border-green-200 p-4 rounded-xl shadow-sm animate-fade-in">
-            <p className="text-green-700 text-center font-medium">
-              Merci pour votre suggestion ! Nous l'examinerons avec attention.
-            </p>
-          </div>
-        )}
+            <div className="mb-8 bg-green-100 border border-green-200 p-4 rounded-xl shadow-sm animate-fade-in">
+              <p className="text-green-700 text-center font-medium">
+                Merci pour votre suggestion ! Nous l'examinerons avec attention.
+              </p>
+            </div>
+          )}
+          <ToastContainer />
 
-<form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8 space-y-6 backdrop-blur-sm bg-white/90">
-          {/* Toggle Anonyme/Public */}
-          <div className="flex justify-center space-x-4 mb-8">
-            <button
-              type="button"
-              onClick={() => setIsAnonymous(false)}
-              className={`flex items-center px-6 py-3 rounded-xl transition-all duration-300 ${
-                !isAnonymous
+          <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8 space-y-6 backdrop-blur-sm bg-white/90">
+            {/* Toggle Anonyme/Public */}
+            <div className="flex justify-center space-x-4 mb-8">
+              <button
+                type="button"
+                onClick={() => setIsAnonymous(false)}
+                className={`flex items-center px-6 py-3 rounded-xl transition-all duration-300 ${!isAnonymous
                   ? "bg-blue-600 text-white shadow-lg shadow-blue-200 transform scale-105"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              <UserCircle className="w-5 h-5 mr-2" />
-              Public
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsAnonymous(true)}
-              className={`flex items-center px-6 py-3 rounded-xl transition-all duration-300 ${
-                isAnonymous
+                  }`}
+              >
+                <UserCircle className="w-5 h-5 mr-2" />
+                Public
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsAnonymous(true)}
+                className={`flex items-center px-6 py-3 rounded-xl transition-all duration-300 ${isAnonymous
                   ? "bg-purple-600 text-white shadow-lg shadow-purple-200 transform scale-105"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              <UserX className="w-5 h-5 mr-2" />
-              Anonyme
-            </button>
-          </div>
+                  }`}
+              >
+                <UserX className="w-5 h-5 mr-2" />
+                Anonyme
+              </button>
+            </div>
 
-          {/* Informations personnelles (conditionnelles) */}
-          {!isAnonymous && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
+            {/* Informations personnelles (conditionnelles) */}
+            {!isAnonymous && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
+                <div className="group">
+                  <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
+                    Votre nom
+                  </label>
+                  <input
+                    type="text"
+                    name="nom"
+                    value={suggestion.nom}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
+                    required={!isAnonymous}
+                  />
+                </div>
+                <div className="group">
+                  <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
+                    Votre email
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={suggestion.email}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
+                    required={!isAnonymous}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Titre et Catégorie */}
+            <div className="space-y-6">
               <div className="group">
                 <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
-                  Votre nom
+                  Objet de la suggestion
                 </label>
                 <input
                   type="text"
-                  value={suggestion.name}
-                  onChange={(e) => setSuggestion({...suggestion, name: e.target.value})}
+                  name="object"
+                  value={suggestion.object}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
-                  required={!isAnonymous}
+                  required
                 />
               </div>
+
               <div className="group">
                 <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
-                  Votre email
+                  Catégorie
                 </label>
-                <input
-                  type="email"
-                  value={suggestion.email}
-                  onChange={(e) => setSuggestion({...suggestion, email: e.target.value})}
+                <select
+                  name="categorie"
+                  value={suggestion.categorie}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
-                  required={!isAnonymous}
-                />
+                >
+                  <option value="general">Général</option>
+                  <option value="academic">Académique</option>
+                  <option value="events">Événements</option>
+                  <option value="facilities">Infrastructures</option>
+                  <option value="other">Autre</option>
+                </select>
+              </div>
+
+              <div className="group">
+                <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
+                  Votre suggestion
+                </label>
+                <textarea
+                  name="message"
+                  value={suggestion.message}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200 h-32 resize-none"
+                  required
+                  placeholder="Décrivez votre suggestion en détail..."
+                ></textarea>
               </div>
             </div>
-          )}
 
-          {/* Titre et Catégorie */}
-          <div className="space-y-6">
-            <div className="group">
-              <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
-                Objet de la suggestion
-              </label>
-              <input
-                type="text"
-                value={suggestion.title}
-                onChange={(e) => setSuggestion({...suggestion, title: e.target.value})}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
-                required
-              />
-            </div>
+            <button
+              type="submit"
+              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02] shadow-lg flex items-center justify-center space-x-2"
+            >
+              <Send className="w-5 h-5" />
+              <span>Envoyer ma suggestion</span>
+            </button>
+          </form>
 
-            <div className="group">
-              <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
-                Catégorie
-              </label>
-              <select
-                value={suggestion.category}
-                onChange={(e) => setSuggestion({...suggestion, category: e.target.value})}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
-              >
-                <option value="general">Général</option>
-                <option value="academic">Académique</option>
-                <option value="events">Événements</option>
-                <option value="facilities">Infrastructures</option>
-                <option value="other">Autre</option>
-              </select>
-            </div>
-
-            <div className="group">
-              <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
-                Votre suggestion
-              </label>
-              <textarea
-                value={suggestion.description}
-                onChange={(e) => setSuggestion({...suggestion, description: e.target.value})}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200 h-32 resize-none"
-                required
-                placeholder="Décrivez votre suggestion en détail..."
-              ></textarea>
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02] shadow-lg flex items-center justify-center space-x-2"
-          >
-            <Send className="w-5 h-5" />
-            <span>Envoyer ma suggestion</span>
-          </button>
-        </form>
         </div>
       </section>
     </div>
