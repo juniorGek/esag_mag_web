@@ -40,6 +40,11 @@ export default function EventsTable() {
     fetchEvents();
   }, []);
 
+   // Ouvrir la page de détails du blog
+   const openView = (item) => {
+    window.open(`/evenement/${item.id}`, "_blank");
+  };
+
   // Filtrage des évenements en fonction de la recherche
   const filteredEvents = events.filter(
     (item) =>
@@ -187,7 +192,9 @@ export default function EventsTable() {
                       </td>
                       <td className="px-4 py-3 text-sm">
                         <div className="flex items-center gap-x-4">
-                          <button className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                          <button
+                          onClick = {()=> openView()}
+                          className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
                             <Eye size={18} />
                           </button>
                           <button
@@ -234,7 +241,7 @@ export default function EventsTable() {
             <div className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center mt-7 p-4">
               <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg w-full max-w-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50 mb-4">
-                  Modifier l'évenement
+                  Modifier l&apos;évenement
                 </h2>
                 <form onSubmit={handleEdit}>
                   <div className="space-y-4">
@@ -381,7 +388,7 @@ export default function EventsTable() {
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
               <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg w-full max-w-md p-6">
                 <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50 mb-4">
-                  Supprimer l'événement
+                  Supprimer l&apos;événement
                 </h2>
                 <p className="text-gray-700 dark:text-slate-300 mb-6">
                   Êtes-vous sûr de vouloir supprimer cet événement ?
