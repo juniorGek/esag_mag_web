@@ -8,6 +8,12 @@ import "swiper/css/navigation";
 import { API_URL, ImageApi } from "../../config/ApiUrl";
 import { formatDate } from "../utils/formatDate";
 import { UserCircle, UserX, Send } from "lucide-react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
+
+
+
 
 const Home = () => {
   const [email, setEmail] = useState("");
@@ -18,12 +24,12 @@ const Home = () => {
   const [event, setEvent] = useState([]);
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [suggestion, setSuggestion] = useState({
-    name: "",
+    nom: "",
     email: "",
-    title: "",
-    category: "general",
-    description: "",
-    isAnonymous: false,
+    object: "",
+    categorie: "general",
+    message: "",
+    type: "public",
   });
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -33,19 +39,57 @@ const Home = () => {
     setEmail("");
   };
 
-  const handleSubmit = (e) => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setSuggestion({ ...suggestion, [name]: value });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setShowSuccess(true);
-    setSuggestion({
-      name: "",
-      email: "",
-      title: "",
-      category: "general",
-      description: "",
-      isAnonymous: false,
-    });
-    setIsAnonymous(false);
-    setTimeout(() => setShowSuccess(false), 3000);
+    try {
+      setLoading(true);
+
+      const formValues = {
+        nom: isAnonymous ? "" : suggestion.nom,
+        email: isAnonymous ? "" : suggestion.email,
+        object: suggestion.object,
+        categorie: suggestion.categorie,
+        message: suggestion.message,
+        type: isAnonymous ? "anonyme" : "public",
+      };
+
+      console.log("Données envoyées :", formValues);
+
+      const response = await fetch(`${API_URL}/createSuggestion`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formValues),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        toast.success("Suggestion envoyée avec succès", { autoClose: 3000 });
+        setSuggestion({
+          nom: "",
+          email: "",
+          object: "",
+          categorie: "general",
+          message: "",
+          type: "public",
+        });
+        setIsAnonymous(true);
+      } else {
+        const errorMessage = data.errors ? data.errors.map(err => err.message).join(", ") : "Erreur lors de l'envoi";
+        toast.error(errorMessage, { autoClose: 3000 });
+      }
+    } catch (error) {
+      toast.error("Erreur lors de l'envoi de la suggestion", { autoClose: 3000 });
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleEvent = (eventData) => {
@@ -371,21 +415,18 @@ const Home = () => {
               </p>
             </div>
           )}
+          <ToastContainer />
 
-          <form
-            onSubmit={handleSubmit}
-            className="bg-white rounded-2xl shadow-xl p-8 space-y-6 backdrop-blur-sm bg-white/90"
-          >
+          <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8 space-y-6 backdrop-blur-sm bg-white/90">
             {/* Toggle Anonyme/Public */}
             <div className="flex justify-center space-x-4 mb-8">
               <button
                 type="button"
                 onClick={() => setIsAnonymous(false)}
-                className={`flex items-center px-6 py-3 rounded-xl transition-all duration-300 ${
-                  !isAnonymous
-                    ? "bg-blue-600 text-white shadow-lg shadow-blue-200 transform scale-105"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
+                className={`flex items-center px-6 py-3 rounded-xl transition-all duration-300 ${!isAnonymous
+                  ? "bg-blue-600 text-white shadow-lg shadow-blue-200 transform scale-105"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
               >
                 <UserCircle className="w-5 h-5 mr-2" />
                 Public
@@ -393,11 +434,10 @@ const Home = () => {
               <button
                 type="button"
                 onClick={() => setIsAnonymous(true)}
-                className={`flex items-center px-6 py-3 rounded-xl transition-all duration-300 ${
-                  isAnonymous
-                    ? "bg-purple-600 text-white shadow-lg shadow-purple-200 transform scale-105"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
+                className={`flex items-center px-6 py-3 rounded-xl transition-all duration-300 ${isAnonymous
+                  ? "bg-purple-600 text-white shadow-lg shadow-purple-200 transform scale-105"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
               >
                 <UserX className="w-5 h-5 mr-2" />
                 Anonyme
@@ -413,10 +453,9 @@ const Home = () => {
                   </label>
                   <input
                     type="text"
-                    value={suggestion.name}
-                    onChange={(e) =>
-                      setSuggestion({ ...suggestion, name: e.target.value })
-                    }
+                    name="nom"
+                    value={suggestion.nom}
+                    onChange={handleChange}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
                     required={!isAnonymous}
                   />
@@ -427,10 +466,9 @@ const Home = () => {
                   </label>
                   <input
                     type="email"
+                    name="email"
                     value={suggestion.email}
-                    onChange={(e) =>
-                      setSuggestion({ ...suggestion, email: e.target.value })
-                    }
+                    onChange={handleChange}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
                     required={!isAnonymous}
                   />
@@ -446,10 +484,9 @@ const Home = () => {
                 </label>
                 <input
                   type="text"
-                  value={suggestion.title}
-                  onChange={(e) =>
-                    setSuggestion({ ...suggestion, title: e.target.value })
-                  }
+                  name="object"
+                  value={suggestion.object}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
                   required
                 />
@@ -460,10 +497,9 @@ const Home = () => {
                   Catégorie
                 </label>
                 <select
-                  value={suggestion.category}
-                  onChange={(e) =>
-                    setSuggestion({ ...suggestion, category: e.target.value })
-                  }
+                  name="categorie"
+                  value={suggestion.categorie}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
                 >
                   <option value="general">Général</option>
@@ -479,13 +515,9 @@ const Home = () => {
                   Votre suggestion
                 </label>
                 <textarea
-                  value={suggestion.description}
-                  onChange={(e) =>
-                    setSuggestion({
-                      ...suggestion,
-                      description: e.target.value,
-                    })
-                  }
+                  name="message"
+                  value={suggestion.message}
+                  onChange={handleChange}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200 h-32 resize-none"
                   required
                   placeholder="Décrivez votre suggestion en détail..."
