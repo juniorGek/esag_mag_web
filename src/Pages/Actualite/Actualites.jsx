@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { API_URL, ImageApi } from "../../config/ApiUrl";
-import { ActualitesSkeleton } from "../components/ActualiteSkeleton";
-import { formatDate } from "../utils/formatDate";
+import { API_URL, ImageApi } from "../../../config/ApiUrl";
+import { ActualitesSkeleton } from "../../components/ActualiteSkeleton";
+import { formatDate } from "../../utils/formatDate";
 
 // Composant Skeleton pour afficher un indicateur de chargement
 

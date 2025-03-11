@@ -13,13 +13,13 @@ import NotFound from "./Pages/NotFound";
 import Suggestions from "./Pages/suggestions";
 import About from "./Pages/About";
 import Sondage from "./Pages/Sondage";
-import Evenement from "./Pages/Evenement";
-import Blog from "./Pages/Blog";
-import Actualites from "./Pages/Actualites";
+import Evenement from "./Pages/Evenement/Evenement";
+import Blog from "./Pages/Blog/Blog";
+import Actualites from "./Pages/Actualite/Actualites";
 import { PublicRoute } from "./hooks/PublicRoute";
 import { ProtectedRoute } from "./hooks/ProtectedRoute";
-import ActualiteDetail from './Pages/ActualiteDetail';
-import EvenementDetail from './Pages/EvenementDetail';
+import ActualiteDetail from './Pages/Actualite/ActualiteDetail';
+import EvenementDetail from './Pages/Evenement/EvenementDetail';
 import { MessageProvider } from "./utils/messageContext";
 
 import NewNews from "./routes/new-news/page";
@@ -37,12 +37,16 @@ import SettingsPage from "./routes/settings/page";
 import ProfilePage from "./routes/profile/page";
 import SuggestionsTable from "./routes/suggestions/page";
 
-import BlogDetail from "./Pages/BlogDetail";
+import BlogDetail from "./Pages/Blog/BlogDetail";
 import EditNews from "./routes/new-news/EditPage";
 import EditBlog from "./routes/new-blogs/EditPage";
 import AdminBlogDetail from "./routes/blog-detail/page";
 import AcheterTicket from './Pages/AcheterTicket';
 import MesTickets from './Pages/MesTickets';
+import AgentLogin from "./Pages/Agent/AgentLogin";
+import ScanCodePage from "./Pages/Agent/ScanCodePage";
+import MobileOnlyRoute from "./hooks/MobileOnlyRoute";
+import ScannerPage from "./Pages/Agent/ScanPage";
 
 function App() {
     const router = createBrowserRouter([
@@ -58,12 +62,41 @@ function App() {
                 { path: "blog/:id", element: <BlogDetail /> },
                 { path: "evenements", element: <Evenement /> },
                 { path: "evenement/:id", element: <EvenementDetail /> },
-                { path: "evenement/:id/acheter-ticket/:ticketId", element: <AcheterTicket /> },
+                { path: "evenement/acheter-ticket/:ticketId", element: <AcheterTicket /> },
                 { path: "evenement/:id/mes-tickets", element: <MesTickets /> },
                 { path: "sondages", element: <Sondage /> },
                 { path: "about", element: <About /> },
             ],
         },
+        {
+            path: "/ticket/code",
+            children: [
+              {
+                path: "options", // /ticket/code/options
+                element: (
+                    <MobileOnlyRoute>
+                        <ScanCodePage />
+                    </MobileOnlyRoute>
+                ),
+              },
+              {
+                path: "agentLogin", // /ticket/code/agentLogin
+                element: (
+                    <MobileOnlyRoute>
+                        <AgentLogin />
+                    </MobileOnlyRoute>
+                ),
+              },
+              {
+                path: "scanner", // /ticket/code/scanner
+                element: (
+                    <MobileOnlyRoute>
+                        <ScannerPage />
+                    </MobileOnlyRoute>
+                ),
+              }
+            ]
+          },
         {
             path: "/login",
             element: (

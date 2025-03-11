@@ -1,50 +1,39 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { CreditCard, ArrowLeft } from 'lucide-react';
-import { ToastContainer, toast } from 'react-toastify';
-import { evenements } from '../data';
-import 'react-toastify/dist/ReactToastify.css';
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { CreditCard, ArrowLeft } from "lucide-react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { API_URL } from "../../config/ApiUrl";
+import { generateTicketPDFs } from "../utils/GeneratePdf";
 
 const AcheterTicket = () => {
-  const { id, ticketId } = useParams();
+  const { ticketId } = useParams();
   const navigate = useNavigate();
   const [quantity, setQuantity] = useState(1);
-  const [paymentMethod, setPaymentMethod] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [evenement, setEvenement] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [ticket, setTicket] = useState("");
+
+  const fetchTicket = async () => {
+    try {
+      const response = await fetch(`${API_URL}/ticketDetail/${ticketId}`);
+      const data = await response.json();
+      if (response.status === 200) {
+        setTicket(data.ticket);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const event = evenements.find(e => e.id === parseInt(id));
-    if (event) {
-      // Ajouter les tickets pour la démo
-      const eventWithTickets = {
-        ...event,
-        Tickets: [
-          {
-            id: 1,
-            typeTicket: "VIP",
-            description: "Accès VIP avec cocktail et place réservée",
-            prix: 25000,
-            available: 20
-          },
-          {
-            id: 2,
-            typeTicket: "Standard",
-            description: "Place standard",
-            prix: 15000,
-            available: 100
-          }
-        ]
-      };
-      setEvenement(eventWithTickets);
-    } else {
-      toast.error("Événement non trouvé");
-      navigate('/evenements');
-    }
-  }, [id, navigate]);
+    fetchTicket();
+  }, []);
 
-  const handlePayment = (e) => {
+  const handlePayment = async (e) => {
     e.preventDefault();
     if (!paymentMethod) {
       toast.error("Veuillez sélectionner un mode de paiement");
@@ -55,40 +44,31 @@ const AcheterTicket = () => {
       return;
     }
 
-    // Simuler le paiement
-    setLoading(true);
-    setTimeout(() => {
-      // Générer les tickets
-      const selectedTicket = evenement.Tickets.find(t => t.id === parseInt(ticketId));
-      if (!selectedTicket) {
-        toast.error("Type de ticket non trouvé");
-        setLoading(false);
-        return;
+    try {
+      const response = await fetch(`${API_URL}/payTicket/${ticketId}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          quantity,
+        }),
+      });
+      const data = await response.json();
+      if (response.status === 200) {
+         await generateTicketPDFs(data.tickets, data.event);
+        
+        navigate(`/evenement/${data.event.id}`);
+      } else {
+        toast.error(data.message);
       }
-
-      const newTickets = Array.from({ length: quantity }, (_, i) => ({
-        eventId: evenement.id,
-        number: `TICKET-${selectedTicket.id}-${Date.now()}-${i + 1}`,
-        type: selectedTicket.typeTicket,
-        prix: selectedTicket.prix,
-        purchaseDate: new Date().toISOString(),
-        paymentMethod,
-        phoneNumber
-      }));
-
-      // Sauvegarder les tickets dans le localStorage
-      const storedTickets = localStorage.getItem('purchasedTickets');
-      const existingTickets = storedTickets ? JSON.parse(storedTickets) : [];
-      const updatedTickets = [...existingTickets, ...newTickets];
-      localStorage.setItem('purchasedTickets', JSON.stringify(updatedTickets));
-
-      setLoading(false);
-      toast.success("Paiement réussi !");
-      navigate(`/evenement/${id}/mes-tickets`);
-    }, 2000);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  if (!evenement) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
@@ -96,15 +76,15 @@ const AcheterTicket = () => {
     );
   }
 
-  const selectedTicket = evenement.Tickets.find(t => t.id === parseInt(ticketId));
-
-  if (!selectedTicket) {
+  if (!ticket) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-700 mb-4">Type de ticket non trouvé</h2>
+          <h2 className="text-2xl font-bold text-gray-700 mb-4">
+            Type de ticket non trouvé
+          </h2>
           <button
-            onClick={() => navigate(`/evenement/${id}`)}
+            onClick={() => navigate(`/evenement`)}
             className="inline-flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -120,7 +100,7 @@ const AcheterTicket = () => {
       <ToastContainer />
       <div className="container mx-auto px-4">
         <button
-          onClick={() => navigate(`/evenement/${id}`)}
+          onClick={() => navigate(`/evenement`)}
           className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 mb-8"
         >
           <ArrowLeft className="w-5 h-5" />
@@ -134,11 +114,14 @@ const AcheterTicket = () => {
             <div className="space-y-8">
               {/* Détails du ticket */}
               <div className="bg-gray-50 rounded-xl p-6">
-                <h2 className="text-xl font-semibold mb-2">{selectedTicket.typeTicket}</h2>
-                <p className="text-gray-600 mb-4">{selectedTicket.description}</p>
+                <h2 className="text-xl font-semibold mb-2">
+                  {ticket.typeTicket}
+                </h2>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Prix unitaire</span>
-                  <span className="text-xl font-bold text-blue-600">{selectedTicket.prix} FCFA</span>
+                  <span className="text-xl font-bold text-blue-600">
+                    {ticket.price} FCFA
+                  </span>
                 </div>
               </div>
 
@@ -153,7 +136,7 @@ const AcheterTicket = () => {
                     onChange={(e) => setQuantity(Number(e.target.value))}
                     className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    {[...Array(Math.min(selectedTicket.available, 10))].map((_, i) => (
+                    {[...Array(Math.min(ticket.available, 10))].map((_, i) => (
                       <option key={i + 1} value={i + 1}>
                         {i + 1}
                       </option>
@@ -168,26 +151,34 @@ const AcheterTicket = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <button
                       type="button"
-                      onClick={() => setPaymentMethod('mix-by-yas')}
+                      onClick={() => setPaymentMethod("mix-by-yas")}
                       className={`p-4 border rounded-lg flex flex-col items-center justify-center space-y-2 transition-colors ${
-                        paymentMethod === 'mix-by-yas'
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-blue-500'
+                        paymentMethod === "mix-by-yas"
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-200 hover:border-blue-500"
                       }`}
                     >
-                      <img src="/images/mix-by-yas.png" alt="Mix By YAS" className="h-12 w-auto" />
+                      <img
+                        src="/images/mix-by-yas.png"
+                        alt="Mix By YAS"
+                        className="h-12 w-auto"
+                      />
                       <span className="text-sm font-medium">Mix By YAS</span>
                     </button>
                     <button
                       type="button"
-                      onClick={() => setPaymentMethod('moov-flooz')}
+                      onClick={() => setPaymentMethod("moov-flooz")}
                       className={`p-4 border rounded-lg flex flex-col items-center justify-center space-y-2 transition-colors ${
-                        paymentMethod === 'moov-flooz'
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-blue-500'
+                        paymentMethod === "moov-flooz"
+                          ? "border-blue-500 bg-blue-50"
+                          : "border-gray-200 hover:border-blue-500"
                       }`}
                     >
-                      <img src="/images/moov-flooz.png" alt="Moov Flooz" className="h-12 w-auto" />
+                      <img
+                        src="/images/moov-flooz.png"
+                        alt="Moov Flooz"
+                        className="h-12 w-auto"
+                      />
                       <span className="text-sm font-medium">Moov Flooz</span>
                     </button>
                   </div>
@@ -209,16 +200,13 @@ const AcheterTicket = () => {
                 <div className="bg-gray-50 rounded-lg p-4">
                   <div className="flex justify-between mb-2">
                     <span>Sous-total</span>
-                    <span>{selectedTicket.prix * quantity} FCFA</span>
+                    <span>{ticket.price * quantity} FCFA</span>
                   </div>
-                  <div className="flex justify-between mb-2">
-                    <span>Frais de service</span>
-                    <span>500 FCFA</span>
-                  </div>
+
                   <div className="border-t border-gray-200 pt-2 mt-2">
                     <div className="flex justify-between font-bold">
                       <span>Total</span>
-                      <span>{selectedTicket.prix * quantity + 500} FCFA</span>
+                      <span>{ticket.price * quantity} FCFA</span>
                     </div>
                   </div>
                 </div>
@@ -246,4 +234,4 @@ const AcheterTicket = () => {
   );
 };
 
-export default AcheterTicket; 
+export default AcheterTicket;

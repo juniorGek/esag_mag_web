@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { API_URL, ImageApi } from "../../config/ApiUrl";
-import { formatDate } from "../utils/formatDate";
+import { API_URL, ImageApi } from "../../../config/ApiUrl";
+import { formatDate } from "../../utils/formatDate";
 
 const BlogDetail = () => {
   const { id } = useParams();

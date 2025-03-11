@@ -9,23 +9,16 @@ import {
   Loader2,
   Search,
 } from "lucide-react";
-
-const defaultEvents = [
-  { id: "1", nom: "Conférence Tech 2023" },
-  { id: "2", nom: "Salon de l'Innovation" },
-  { id: "3", nom: "Atelier de Formation" },
-  { id: "4", nom: "Réunion Annuelle" },
-  { id: "5", nom: "Hackathon 2023" },
-];
+import { toast,ToastContainer } from "react-toastify";
 
 const NewAgent = () => {
   const [formData, setFormData] = useState({
-    nomAgent: "",
+    name: "",
     evenementId: "",
     codeAgent: "",
   });
-  const [events, setEvents] = useState(defaultEvents); // Liste par défaut
-  const [filteredEvents, setFilteredEvents] = useState(defaultEvents);
+  const [events, setEvents] = useState([]); // Liste par défaut
+  const [filteredEvents, setFilteredEvents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -35,7 +28,7 @@ const NewAgent = () => {
     const fetchEvents = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_URL}/events`, {
+        const response = await fetch(`${API_URL}/eventListe`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -43,9 +36,9 @@ const NewAgent = () => {
           },
         });
         const data = await response.json();
-        if (response.ok && data.events && data.events.length > 0) {
-          setEvents(data.events);
-          setFilteredEvents(data.events);
+        if (response.status === 200) {
+          setEvents(data.event);
+          setFilteredEvents(data.event);
         }
       } catch (error) {
         console.log("Erreur lors de la récupération des événements, utilisation de la liste par défaut:", error);
@@ -59,7 +52,7 @@ const NewAgent = () => {
   // Filtrer les événements en fonction de la recherche
   useEffect(() => {
     const filtered = events.filter((event) =>
-      event.nom.toLowerCase().includes(searchTerm.toLowerCase())
+      event.titre.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredEvents(filtered);
   }, [searchTerm, events]);
@@ -83,9 +76,10 @@ const NewAgent = () => {
   // Soumettre le formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log(formData)
     try {
       setLoading(true);
-      const response = await fetch(`${API_URL}/agents`, {
+      const response = await fetch(`${API_URL}/createAgent/${formData.evenementId}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,15 +87,18 @@ const NewAgent = () => {
         },
         body: JSON.stringify(formData),
       });
-      if (response.ok) {
-        console.log("Agent créé avec succès:", formData);
+      const data = await response.json();
+      if (response.status === 200) {
+        
         setFormData({ nomAgent: "", evenementId: "", codeAgent: "" });
         setSearchTerm("");
         setIsDropdownOpen(false);
+        toast.success(data.message);
       } else {
-        console.log("Erreur lors de la création de l'agent");
+        toast.error(data.message);
       }
     } catch (error) {
+      toast.error("erreur lors de la création de l'agent");
       console.log("Erreur:", error);
     } finally {
       setLoading(false);
@@ -122,6 +119,7 @@ const NewAgent = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex justify-center py-12 px-4">
+      <ToastContainer />
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all hover:shadow-xl">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-5 border-b border-blue-900">
@@ -139,8 +137,8 @@ const NewAgent = () => {
             </label>
             <input
               type="text"
-              name="nomAgent"
-              value={formData.nomAgent}
+              name="name"
+              value={formData.name}
               onChange={handleChange}
               className="w-full py-2.5 px-4 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 hover:border-blue-400"
               placeholder="Entrez le nom de l'agent"
@@ -182,9 +180,9 @@ const NewAgent = () => {
                         <li
                           key={event.id}
                           className="px-4 py-2 text-gray-900 hover:bg-blue-100 cursor-pointer transition-colors duration-200"
-                          onClick={() => selectEvent(event.id, event.nom)}
+                          onClick={() => selectEvent(event.id, event.titre)}
                         >
-                          {event.nom}
+                          {event.titre}
                         </li>
                       ))
                     ) : (
