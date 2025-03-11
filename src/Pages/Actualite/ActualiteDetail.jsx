@@ -1,8 +1,8 @@
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { API_URL, ImageApi } from "../../config/ApiUrl";
+import { API_URL, ImageApi } from "../../../config/ApiUrl";
 import { useEffect, useState } from "react";
-import { formatDate } from "../utils/formatDate";
+import { formatDate } from "../../utils/formatDate";
 
 const ActualiteDetail = () => {
   const { id } = useParams();
@@ -121,7 +121,7 @@ const ActualiteDetail = () => {
           <span className="text-gray-400">•</span>
           <span className="text-gray-600">{formatDate(actu.createdAt)}</span>
           <span className="text-gray-400">•</span>
-          <span className="text-gray-600">8 min de lecture</span>
+         
         </motion.div>
       </div>
 
@@ -155,50 +155,7 @@ const ActualiteDetail = () => {
             dangerouslySetInnerHTML={{ __html: actu.description }}
           />
 
-          {/* Points clés en grille */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 my-12">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="bg-gray-50 rounded-2xl p-8 border border-gray-100"
-            >
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                Points essentiels
-              </h3>
-              <ul className="space-y-4">
-                <li className="flex items-start space-x-3">
-                  <svg
-                    className="w-6 h-6 text-blue-500 mt-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                  <span className="text-gray-700">
-                    Point important de l'actualité avec plus de détails et
-                    d'explications
-                  </span>
-                </li>
-                {/* Ajoutez d'autres points si nécessaire */}
-              </ul>
-            </motion.div>
-
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="bg-blue-600 rounded-2xl p-8 text-white"
-            >
-              <h3 className="text-xl font-semibold mb-4">Impact</h3>
-              <p className="opacity-90">
-                Analyse de l'impact et des conséquences de cette actualité sur
-                la communauté ESAG-NDE
-              </p>
-            </motion.div>
-          </div>
+         
         </motion.div>
 
         {/* Articles similaires */}

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { API_URL, ImageApi } from "../../config/ApiUrl";
-import { formatDate } from "../utils/formatDate";
+import { API_URL, ImageApi } from "../../../config/ApiUrl";
+import { formatDate } from "../../utils/formatDate";
 
 const Blog = () => {
   const [blogs, setBlogs] = useState([]);

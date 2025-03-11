@@ -1,195 +1,183 @@
-import { useState } from "react";
-import { Upload,  X,Heading, Heading2 } from "lucide-react";
+import { useFieldArray, useForm } from 'react-hook-form';
+import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 const NewPoll = () => {
-  const [formData, setFormData] = useState({
-    titre: "",
-    auteur: "",
-    description: "",
-    imageCover: null,
-    enabled: false,
+  const { control, register, handleSubmit } = useForm({
+    defaultValues: {
+      title: '',
+      description: '',
+      questions: [{
+        type: 'text',
+        text: '',
+        required: false,
+        options: []
+      }]
+    }
   });
 
-  const [preview, setPreview] = useState(null);
+  const { fields: questions, append, remove } = useFieldArray({
+    control,
+    name: 'questions'
+  });
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
+  const addQuestion = (type = 'text') => {
+    append({
+      type,
+      text: '',
+      required: false,
+      options: type !== 'text' ? [''] : []
     });
   };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData({ ...formData, imageCover: file });
-      setPreview(URL.createObjectURL(file));
-    }
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      setFormData({ ...formData, imageCover: file });
-      setPreview(URL.createObjectURL(file));
-    }
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Données soumises:", formData);
-    // Ajouter ici la logique pour envoyer les données au serveur
+  const onSubmit = (data) => {
+    console.log('Formulaire soumis:', data);
+    // Envoyer les données à votre API ici
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-4xl overflow-hidden">
-        <div className="md:flex">
-          {/* Section gauche pour l'upload d'image */}
-          <div className="w-full md:w-1/2 p-8 bg-gray-50">
-            <div
-              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer hover:border-indigo-500 transition-colors"
-              onDrop={handleDrop}
-              onDragOver={handleDragOver}
-            >
-              {preview ? (
-                <div className="relative">
-                  <img
-                    src={preview}
-                    alt="Aperçu de l'image"
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
-                  <button
-                    onClick={() => {
-                      setPreview(null);
-                      setFormData({ ...formData, imageCover: null });
-                    }}
-                    className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md hover:bg-gray-100"
-                  >
-                    <X className="w-5 h-5 text-gray-600" />
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <Upload className="w-10 h-10 mx-auto text-gray-400" />
-                  <p className="mt-4 text-gray-600">
-                    Glissez-déposez une image ou{" "}
-                    <label className="text-indigo-500 cursor-pointer hover:underline">
-                      parcourez
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="hidden"
-                      />
-                    </label>
-                  </p>
-                  <p className="text-sm text-gray-400 mt-2">
-                    Formats supportés : JPEG, PNG
-                  </p>
-                </>
-              )}
-            </div>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+          {/* En-tête du formulaire */}
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <input
+              {...register('title')}
+              placeholder="Titre de votre sondage"
+              className="text-3xl font-bold w-full p-2 mb-4 border-b-2 border-transparent focus:border-blue-500 focus:outline-none"
+            />
+            <textarea
+              {...register('description')}
+              placeholder="Description du sondage"
+              className="w-full p-2 text-gray-600 border-b-2 border-transparent focus:border-blue-500 focus:outline-none resize-none"
+              rows="2"
+            />
           </div>
 
-          {/* Section droite pour le formulaire */}
-          <div className="w-full md:w-1/2 p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">
-              Ajouter un Sondage
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Champ Titre */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Titre
-                </label>
-                <div className="relative">
+          {/* Liste des questions */}
+          {questions.map((question, qIndex) => (
+            <div key={question.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex-1">
                   <input
-                    type="text"
-                    name="titre"
-                    value={formData.titre}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Entrez le titre"
-                    required
+                    {...register(`questions.${qIndex}.text`)}
+                    placeholder="Question"
+                    className="w-full p-2 text-lg font-medium border-b-2 border-transparent focus:border-blue-500 focus:outline-none"
                   />
-                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <Heading className="w-5 h-5 text-gray-400" />
-                  </span>
                 </div>
-              </div>
-
-              {/* Champ Auteur */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Auteur
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    name="auteur"
-                    value={formData.auteur}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Entrez l'auteur"
-                  />
-                   <span className="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <Heading2 className="w-5 h-5 text-gray-400" />
-                  </span>
-                </div>
-              </div>
-
-              {/* Champ Description */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </label>
-                <div className="relative">
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                    placeholder="Entrez la description"
-                    rows="4"
-                  />
-                 
-                </div>
-              </div>
-
-              {/* Champ Activé/Désactivé */}
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="enabled"
-                  checked={formData.enabled}
-                  onChange={handleChange}
-                  className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
-                />
-                <label className="ml-2 text-sm text-gray-700">
-                  Activer ce sondage
-                </label>
-              </div>
-
-              {/* Bouton de soumission */}
-              <div>
                 <button
-                  type="submit"
-                  className="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  type="button"
+                  onClick={() => remove(qIndex)}
+                  className="ml-4 p-2 text-red-500 hover:bg-red-50 rounded-full"
                 >
-                  Ajouter le sondage
+                  <TrashIcon className="h-5 w-5" />
                 </button>
               </div>
-            </form>
+
+              <div className="flex items-center gap-4 mb-6">
+                <select
+                  {...register(`questions.${qIndex}.type`)}
+                  className="p-2 border rounded-md text-sm"
+                >
+                  <option value="text">Réponse courte</option>
+                  <option value="radio">Choix unique</option>
+                  <option value="checkbox">Choix multiple</option>
+                  <option value="dropdown">Liste déroulante</option>
+                </select>
+
+                <label className="flex items-center gap-2 text-sm text-gray-600">
+                  <input
+                    type="checkbox"
+                    {...register(`questions.${qIndex}.required`)}
+                    className="h-4 w-4 text-blue-500"
+                  />
+                  Requis
+                </label>
+              </div>
+
+              {['radio', 'checkbox', 'dropdown'].includes(question.type) && (
+                <OptionsField
+                  nestIndex={qIndex}
+                  control={control}
+                  register={register}
+                />
+              )}
+            </div>
+          ))}
+
+          {/* Boutons d'action */}
+          <div className="space-y-4">
+            <div className="flex flex-wrap gap-4">
+              <button
+                type="button"
+                onClick={() => addQuestion('text')}
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-gray-700 hover:bg-gray-50"
+              >
+                <PlusCircleIcon className="h-5 w-5" />
+                Ajouter une question
+              </button>
+              <button
+                type="button"
+                onClick={() => addQuestion('radio')}
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-gray-700 hover:bg-gray-50"
+              >
+                <PlusCircleIcon className="h-5 w-5" />
+                Ajouter un choix unique
+              </button>
+              <button
+                type="button"
+                onClick={() => addQuestion('checkbox')}
+                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-gray-700 hover:bg-gray-50"
+              >
+                <PlusCircleIcon className="h-5 w-5" />
+                Ajouter un choix multiple
+              </button>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full py-3 px-6 bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Publier le sondage
+            </button>
           </div>
-        </div>
+        </form>
       </div>
+    </div>
+  );
+};
+
+const OptionsField = ({ nestIndex, control, register }) => {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: `questions.${nestIndex}.options`
+  });
+
+  return (
+    <div className="space-y-2">
+      {fields.map((option, oIndex) => (
+        <div key={option.id} className="flex items-center gap-2">
+          <input
+            {...register(`questions.${nestIndex}.options.${oIndex}`)}
+            placeholder={`Option ${oIndex + 1}`}
+            className="flex-1 p-2 border-b-2 border-transparent focus:border-blue-500 focus:outline-none"
+          />
+          <button
+            type="button"
+            onClick={() => remove(oIndex)}
+            className="p-2 text-red-400 hover:text-red-600"
+          >
+            <TrashIcon className="h-4 w-4" />
+          </button>
+        </div>
+      ))}
+      <button
+        type="button"
+        onClick={() => append('')}
+        className="text-sm text-blue-500 hover:text-blue-600 flex items-center gap-1"
+      >
+        <PlusCircleIcon className="h-4 w-4" />
+        Ajouter une option
+      </button>
     </div>
   );
 };

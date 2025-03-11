@@ -6,5 +6,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 3000,
-  }
+    allowedHosts: [
+      '73fc-102-64-217-109.ngrok-free.app', 
+    ]
+  },
 })

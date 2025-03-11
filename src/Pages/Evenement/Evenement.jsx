@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { API_URL, ImageApi } from "../../config/ApiUrl";
+import { API_URL, ImageApi } from "../../../config/ApiUrl";
 import { useEffect, useState } from "react";
-import { formatDate } from "../utils/formatDate";
+import { formatDate } from "../../utils/formatDate";
 
 const Evenement = () => {
   const [evenements, setEvenements] = useState([]);
