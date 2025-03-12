@@ -1,3 +1,3 @@
-export const API_URL="http://10.10.3.70:8000/api"
+export const API_URL="http://172.24.240.1:8000/api"
 
-export const ImageApi = "http://10.10.3.70:8000/api/sendFile"
+export const ImageApi = "http://172.24.240.1:8000/api/sendFile"
