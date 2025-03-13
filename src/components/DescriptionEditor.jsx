@@ -90,6 +90,43 @@ const FontSize = Extension.create({
   },
 });
 
+const LineHeight = Extension.create({
+  name: "lineHeight",
+  addOptions() {
+    return { types: ["textStyle"] };
+  },
+  addGlobalAttributes() {
+    return [
+      {
+        types: ["textStyle"],
+        attributes: {
+          lineHeight: {
+            default: null,
+            parseHTML: (element) => element.style.lineHeight,
+            renderHTML: (attributes) => {
+              if (!attributes.lineHeight) return {};
+              return { style: `line-height: ${attributes.lineHeight}` };
+            },
+          },
+        },
+      },
+    ];
+  },
+  addCommands() {
+    return {
+      setLineHeight:
+        (lineHeight) =>
+        ({ chain }) =>
+          chain().setMark("textStyle", { lineHeight }).run(),
+      unsetLineHeight:
+        () =>
+        ({ chain }) =>
+          chain().unsetMark("textStyle", { lineHeight: null }).run(),
+    };
+  },
+});
+
+
 const DescriptionEditor = ({ value, onChange }) => {
   const editor = useEditor({
     extensions: [
@@ -110,6 +147,7 @@ const DescriptionEditor = ({ value, onChange }) => {
       }),
       FontFamily,
       FontSize,
+      LineHeight,
     ],
     content: value,
     onUpdate: ({ editor }) => {
@@ -167,6 +205,12 @@ const DescriptionEditor = ({ value, onChange }) => {
     editor?.chain().focus().setTextAlign(align).run();
   const undo = () => editor?.chain().focus().undo().run();
   const redo = () => editor?.chain().focus().redo().run();
+
+  // Fonction pour l'interligne
+  const setLineHeightHandler = (lineHeight) =>
+    editor?.chain().focus().setLineHeight(lineHeight).run();
+  const unsetLineHeightHandler = () =>
+    editor?.chain().focus().unsetLineHeight().run();
 
   // Options pour les dropdowns
   const colors = [
@@ -246,6 +290,17 @@ const DescriptionEditor = ({ value, onChange }) => {
             </option>
           ))}
         </select>
+        {/* Dropdown pour l'interligne */}
+        <select
+          onChange={(e) => setLineHeightHandler(e.target.value)}
+          className="p-1 rounded bg-white border border-gray-300 hover:bg-green-200 text-sm"
+          title="Interligne"
+        >
+          <option value="">Interligne</option>
+          <option value="1">1</option>
+          <option value="1.5">1.5</option>
+          <option value="2">2</option>
+        </select>
         <button type="button" onClick={addImage} className="p-1 rounded hover:bg-green-200" title="Ajouter image">
           🖼️
         </button>
@@ -263,6 +318,9 @@ const DescriptionEditor = ({ value, onChange }) => {
         </button>
         <button type="button" onClick={() => setTextAlign("right")} className="p-1 rounded hover:bg-green-200" title="Aligner à droite">
           →
+        </button>
+        <button type="button" onClick={() => setTextAlign("justify")} className="p-1 rounded hover:bg-green-200" title="Justifier">
+          J
         </button>
         <button type="button" onClick={undo} className="p-1 rounded hover:bg-green-200" title="Annuler">
           ↺
