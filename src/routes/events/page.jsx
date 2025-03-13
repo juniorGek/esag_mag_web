@@ -193,7 +193,7 @@ export default function EventsTable() {
                       <td className="px-4 py-3 text-sm">
                         <div className="flex items-center gap-x-4">
                           <button
-                          onClick = {()=> openView()}
+                          onClick = {()=> openView(item)}
                           className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
                             <Eye size={18} />
                           </button>
