@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
-import { PencilLine, Trash, Eye } from "lucide-react";
+import { Trash, Eye } from "lucide-react";
 import { API_URL, ImageApi } from "../../../config/ApiUrl";
 import { formatDate } from "../../utils/formatDate";
+import { toast, ToastContainer } from "react-toastify";
 
 
 
@@ -12,7 +13,6 @@ export default function EventsTable() {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedEvents, setSelectedEvents] = useState(null); // Pour stocker l' évenement sélectionnée
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false); // Pour gérer l'ouverture de la modale d'édition
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false); // Pour gérer l'ouverture de la modale de suppression
   const [loading, setLoading] = useState(true);
 
@@ -57,11 +57,7 @@ export default function EventsTable() {
   const offset = currentPage * rowsPerPage;
   const currentEvents = filteredEvents.slice(offset, offset + rowsPerPage);
 
-  // Ouvrir la modale d'édition
-  const openEditModal = (item) => {
-    setSelectedEvents(item);
-    setIsEditModalOpen(true);
-  };
+
 
   // Ouvrir la modale de suppression
   const openDeleteModal = (item) => {
@@ -71,27 +67,34 @@ export default function EventsTable() {
 
   // Fermer les modales
   const closeModals = () => {
-    setIsEditModalOpen(false);
     setIsDeleteModalOpen(false);
     setSelectedEvents(null);
   };
 
-  // Gérer la modification d'un événement
-  const handleEdit = (e) => {
-    e.preventDefault();
-    const updatedEvents = events.map((item) =>
-      item.id === selectedEvents.id ? { ...item, ...selectedEvents } : item
-    );
-    setEvents(updatedEvents);
-    closeModals();
-  };
+
 
   // Gérer la suppression d'un évenement
-  const handleDelete = () => {
-    const updatedEvents = events.filter(
-      (item) => item.id !== selectedEvents.id
-    );
-    setEvents(updatedEvents);
+  const handleDelete = async() => {
+    try {
+      const response = await fetch(`${API_URL}/deleteEvent/${selectedEvents.id}`,{
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+           Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+  
+      if (response.status === 200) {
+        toast.success("L'évènement a bien été supprimé");
+        setIsDeleteModalOpen(false);
+        setSelectedEvents(null);
+        fetchEvents();
+      } else {
+        toast.error("Une erreur est survenue lors de la suppression de l'évènement");
+      }
+    } catch (error) {
+      console.log(error);
+    }
     closeModals();
   };
 
@@ -103,6 +106,7 @@ export default function EventsTable() {
         </div>
       ) : (
         <div className="p-4 bg-gray-50 dark:bg-slate-900 min-h-screen">
+          <ToastContainer />
           {/* Barre de recherche et filtre de lignes */}
           <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
             <input
@@ -198,12 +202,6 @@ export default function EventsTable() {
                             <Eye size={18} />
                           </button>
                           <button
-                            onClick={() => openEditModal(item)}
-                            className="text-green-500 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
-                          >
-                            <PencilLine size={18} />
-                          </button>
-                          <button
                             onClick={() => openDeleteModal(item)}
                             className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
                           >
@@ -237,151 +235,7 @@ export default function EventsTable() {
             />
           </div>
 
-          {isEditModalOpen && (
-            <div className="fixed inset-0  bg-black bg-opacity-50 flex items-center justify-center mt-7 p-4">
-              <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg w-full max-w-md p-6">
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50 mb-4">
-                  Modifier l&apos;évenement
-                </h2>
-                <form onSubmit={handleEdit}>
-                  <div className="space-y-4">
-                    {/* Champ Titre */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
-                        Titre
-                      </label>
-                      <input
-                        type="text"
-                        value={selectedEvents.titre}
-                        onChange={(e) =>
-                          setSelectedEvents({
-                            ...selectedEvents,
-                            titre: e.target.value,
-                          })
-                        }
-                        className="w-full p-2 border border-gray-300 rounded-lg dark:bg-slate-700 dark:text-slate-50"
-                        required
-                      />
-                    </div>
-
-                    {/* Champ Auteur */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
-                        Auteur
-                      </label>
-                      <input
-                        type="text"
-                        value={selectedEvents.auteur}
-                        onChange={(e) =>
-                          setSelectedEvents({
-                            ...selectedEvents,
-                            auteur: e.target.value,
-                          })
-                        }
-                        className="w-full p-2 border border-gray-300 rounded-lg dark:bg-slate-700 dark:text-slate-50"
-                        required
-                      />
-                    </div>
-
-                    {/* Champ Description */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
-                        Description
-                      </label>
-                      <textarea
-                        value={selectedEvents.description}
-                        onChange={(e) =>
-                          setSelectedEvents({
-                            ...selectedEvents,
-                            description: e.target.value,
-                          })
-                        }
-                        className="w-full p-2 border border-gray-300 rounded-lg dark:bg-slate-700 dark:text-slate-50"
-                        rows="4"
-                        required
-                      />
-                    </div>
-
-                    {/* Champ Image */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
-                        Image
-                      </label>
-                      <div className="mt-2 flex items-center gap-4">
-                        {/* Aperçu de l'image actuelle */}
-                        {selectedEvents.imageCover && (
-                          <div className="w-16 h-16 rounded-lg overflow-hidden">
-                            <img
-                              src={selectedEvents.imageCover}
-                              alt="Aperçu de l'image"
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        )}
-                        {/* Bouton pour téléverser une nouvelle image */}
-                        <label className="cursor-pointer">
-                          <span className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600">
-                            Changer l image
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => {
-                                const file = e.target.files[0];
-                                if (file) {
-                                  setSelectedEvents({
-                                    ...selectedEvents,
-                                    imageCover: URL.createObjectURL(file),
-                                  });
-                                }
-                              }}
-                              className="hidden"
-                            />
-                          </span>
-                        </label>
-                      </div>
-                    </div>
-
-                    {/* Champ Statut */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-slate-300">
-                        Statut
-                      </label>
-                      <select
-                        value={selectedEvents.enabled ? "Activé" : "Désactivé"}
-                        onChange={(e) =>
-                          setSelectedEvents({
-                            ...selectedEvents,
-                            enabled: e.target.value === "Activé",
-                          })
-                        }
-                        className="w-full p-2 border border-gray-300 rounded-lg dark:bg-slate-700 dark:text-slate-50"
-                      >
-                        <option value="Activé">Activé</option>
-                        <option value="Désactivé">Désactivé</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Boutons de la modale */}
-                  <div className="mt-6 flex justify-end gap-4">
-                    <button
-                      type="button"
-                      onClick={closeModals}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 dark:bg-slate-700 dark:text-slate-50"
-                    >
-                      Annuler
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600"
-                    >
-                      Enregistrer
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          )}
+          
 
           {/* Modale de suppression */}
           {isDeleteModalOpen && (

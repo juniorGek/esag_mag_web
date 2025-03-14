@@ -18,8 +18,8 @@ import Blog from "./Pages/Blog/Blog";
 import Actualites from "./Pages/Actualite/Actualites";
 import { PublicRoute } from "./hooks/PublicRoute";
 import { ProtectedRoute } from "./hooks/ProtectedRoute";
-import ActualiteDetail from './Pages/Actualite/ActualiteDetail';
-import EvenementDetail from './Pages/Evenement/EvenementDetail';
+import ActualiteDetail from "./Pages/Actualite/ActualiteDetail";
+import EvenementDetail from "./Pages/Evenement/EvenementDetail";
 import { MessageProvider } from "./utils/messageContext";
 
 import NewNews from "./routes/new-news/page";
@@ -41,193 +41,209 @@ import BlogDetail from "./Pages/Blog/BlogDetail";
 import EditNews from "./routes/new-news/EditPage";
 import EditBlog from "./routes/new-blogs/EditPage";
 import AdminBlogDetail from "./routes/blog-detail/page";
-import AcheterTicket from './Pages/AcheterTicket';
-import MesTickets from './Pages/MesTickets';
+import AcheterTicket from "./Pages/AcheterTicket";
+import MesTickets from "./Pages/MesTickets";
 import AgentLogin from "./Pages/Agent/AgentLogin";
 import ScanCodePage from "./Pages/Agent/ScanCodePage";
 import MobileOnlyRoute from "./hooks/MobileOnlyRoute";
 import ScannerPage from "./Pages/Agent/ScanPage";
+import PublicAgentRoute from "./hooks/AgentPublicRoute";
+import ProtectedAgentRoute from "./hooks/AgentProtectedRoute";
+import { AuthProvider } from "./contexts/AgentAuthContext";
+import SondageSubmit from "./Pages/SondageSubmit";
 
 function App() {
-    const router = createBrowserRouter([
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <FrontLayout />, // Ce layout contient le Navbar, le Footer, etc.
+      children: [
+        { index: true, element: <Home /> },
+        { path: "suggestions", element: <Suggestions /> },
+        { path: "actualites", element: <Actualites /> },
+        { path: "actualite/:id", element: <ActualiteDetail /> },
+        { path: "blog", element: <Blog /> },
+        { path: "blog/:id", element: <BlogDetail /> },
+        { path: "evenements", element: <Evenement /> },
+        { path: "evenement/:id", element: <EvenementDetail /> },
         {
-            path: "/",
-            element: <FrontLayout />, // Ce layout contient le Navbar, le Footer, etc.
-            children: [
-                { index: true, element: <Home /> },
-                { path: "suggestions", element: <Suggestions /> },
-                { path: "actualites", element: <Actualites /> },
-                { path: "actualite/:id", element: <ActualiteDetail /> },
-                { path: "blog", element: <Blog /> },
-                { path: "blog/:id", element: <BlogDetail /> },
-                { path: "evenements", element: <Evenement /> },
-                { path: "evenement/:id", element: <EvenementDetail /> },
-                { path: "evenement/acheter-ticket/:ticketId", element: <AcheterTicket /> },
-                { path: "evenement/:id/mes-tickets", element: <MesTickets /> },
-                { path: "sondages", element: <Sondage /> },
-                { path: "about", element: <About /> },
-            ],
+          path: "evenement/acheter-ticket/:ticketId",
+          element: <AcheterTicket />,
+        },
+        { path: "evenement/:id/mes-tickets", element: <MesTickets /> },
+        { path: "sondages", element: <Sondage /> },
+        {path: "sondage_details/:id", element: <SondageSubmit /> },
+        { path: "about", element: <About /> },
+      ],
+    },
+    {
+      path: "/ticket/code",
+      children: [
+        {
+          path: "options", // /ticket/code/options
+          element: (
+            <MobileOnlyRoute>
+                <ProtectedAgentRoute>
+                    <ScanCodePage />
+                </ProtectedAgentRoute>
+            </MobileOnlyRoute>
+          ),
         },
         {
-            path: "/ticket/code",
-            children: [
-              {
-                path: "options", // /ticket/code/options
-                element: (
-                    <MobileOnlyRoute>
-                        <ScanCodePage />
-                    </MobileOnlyRoute>
-                ),
-              },
-              {
-                path: "agentLogin", // /ticket/code/agentLogin
-                element: (
-                    <MobileOnlyRoute>
-                        <AgentLogin />
-                    </MobileOnlyRoute>
-                ),
-              },
-              {
-                path: "scanner", // /ticket/code/scanner
-                element: (
-                    <MobileOnlyRoute>
-                        <ScannerPage />
-                    </MobileOnlyRoute>
-                ),
-              }
-            ]
-          },
-        {
-            path: "/login",
-            element: (
-                <PublicRoute>
-                    <Login />
-                </PublicRoute>
-            ), // Page d'accueil (Tableau de Bord)
+          path: "agentLogin", // /ticket/code/agentLogin
+          element: (
+            <MobileOnlyRoute>
+                <PublicAgentRoute>
+                    <AgentLogin />
+                </PublicAgentRoute>
+            </MobileOnlyRoute>
+                
+           
+          ),
         },
         {
-            path: "/login/forgetPassword",
-            element: (
-                <PublicRoute>
-                    <ForgetPassPage />
-                </PublicRoute>
-            ), // Page d'accueil (Tableau de Bord)
+          path: "scanner", // /ticket/code/scanner
+          element: (
+            <MobileOnlyRoute>
+                <ProtectedAgentRoute>
+                    <ScannerPage />
+                </ProtectedAgentRoute>
+            </MobileOnlyRoute>
+          ),
+        },
+      ],
+    },
+    {
+      path: "/login",
+      element: (
+        <PublicRoute>
+          <Login />
+        </PublicRoute>
+      ), // Page d'accueil (Tableau de Bord)
+    },
+    {
+      path: "/login/forgetPassword",
+      element: (
+        <PublicRoute>
+          <ForgetPassPage />
+        </PublicRoute>
+      ), // Page d'accueil (Tableau de Bord)
+    },
+    {
+      path: "/admin",
+      element: (
+        <ProtectedRoute>
+          <Layout />
+        </ProtectedRoute>
+      ),
+      children: [
+        {
+          index: true,
+          path: "dashboard",
+          element: <DashboardPage />, // Page d'accueil (Tableau de Bord)
         },
         {
-            path: "/admin",
-            element: (
-                     <ProtectedRoute>
-                        <Layout />
-                     </ProtectedRoute> 
-                    
-               
-            ),
-            children: [
-                {
-                    index: true,
-                    path: "dashboard",
-                    element: <DashboardPage />, // Page d'accueil (Tableau de Bord)
-                },
-                {
-                    path: "users",
-                    element: <UsersTable />, // Page des Utilisateurs
-                },
-                {
-                    path: "new-user",
-                    element: <h1 className="title">Nouvel utilisateur</h1>, // Page des utilisateurs vérifiés
-                },
-                {
-                    path: "admins",
-                    element: <AdminsTable /> // Page des Utilisateurs
-                },
-                {
-                    path: "new-admin",
-                    element: <NewAdmin />, // Page des utilisateurs vérifiés
-                },
-                {
-                    path: "agents",
-                    element: <Agents />, // Page des utilisateurs vérifiés
-                },
-                {
-                    path: "new-agent",
-                    element: <NewAgent/>, // Page des utilisateurs vérifiés
-                },
-                {
-                    path: "news",
-                    element: <NewsTable/>, // Page des Actualités
-                },
-                {
-                    path: "new-news",
-                    element: <NewNews/>, // Page pour ajouter une nouvelle actualité
-                },
-                {
-                    path: "new-edit/:id",
-                    element: <EditNews/>, // Page pour ajouter une nouvelle actualité
-                },
-                {
-                    path: "blog-edit/:id",
-                    element: <EditBlog/>, // Page pour ajouter une nouvelle actualité
-                },
-                {
-                    path: "blogs",
-                    element: <BlogTable />, // Page des Blogs
-                },
-                {
-                    path: "blog-detail/:id",
-                    element: <AdminBlogDetail />, // Page de détail du blog (admin)
-                },
-                {
-                    path: "new-blogs",
-                    element: <NewBlog />, // Page pour ajouter un nouveau blog
-                },
-                {
-                    path: "new-blogs/:id",
-                    element: <EditBlog />,
-                },
-                {
-                    path: "polls",
-                    element: <PollsTable />, // Page des Sondages
-                },
-                {
-                    path: "new-poll",
-                    element: <NewPoll />, // Page pour créer un nouveau sondage
-                },
-                {
-                    path: "suggestions",
-                    element: <SuggestionsTable />, // Page des Suggestions
-                },
-                {
-                    path: "events",
-                    element: <EventsTable />, // Page des Événements
-                },
-                {
-                    path: "new-event",
-                    element: <NewEvent />, // Page pour créer un nouvel événement
-                },
-                {
-                    path: "settings",
-                    element: <SettingsPage/>, // Page des Paramètres
-                },
-                {
-                    path: "Profile",
-                    element: <ProfilePage/>, // Page des Paramètres
-                },
-            ],
+          path: "users",
+          element: <UsersTable />, // Page des Utilisateurs
         },
         {
-            path: "*",
-            element: <NotFound />, // Page par défaut pour une URL invalide
-        }
-    ]);
+          path: "new-user",
+          element: <h1 className="title">Nouvel utilisateur</h1>, // Page des utilisateurs vérifiés
+        },
+        {
+          path: "admins",
+          element: <AdminsTable />, // Page des Utilisateurs
+        },
+        {
+          path: "new-admin",
+          element: <NewAdmin />, // Page des utilisateurs vérifiés
+        },
+        {
+          path: "agents",
+          element: <Agents />, // Page des utilisateurs vérifiés
+        },
+        {
+          path: "new-agent",
+          element: <NewAgent />, // Page des utilisateurs vérifiés
+        },
+        {
+          path: "news",
+          element: <NewsTable />, // Page des Actualités
+        },
+        {
+          path: "new-news",
+          element: <NewNews />, // Page pour ajouter une nouvelle actualité
+        },
+        {
+          path: "new-edit/:id",
+          element: <EditNews />, // Page pour ajouter une nouvelle actualité
+        },
+        {
+          path: "blog-edit/:id",
+          element: <EditBlog />, // Page pour ajouter une nouvelle actualité
+        },
+        {
+          path: "blogs",
+          element: <BlogTable />, // Page des Blogs
+        },
+        {
+          path: "blog-detail/:id",
+          element: <AdminBlogDetail />, // Page de détail du blog (admin)
+        },
+        {
+          path: "new-blogs",
+          element: <NewBlog />, // Page pour ajouter un nouveau blog
+        },
+        {
+          path: "new-blogs/:id",
+          element: <EditBlog />,
+        },
+        {
+          path: "polls",
+          element: <PollsTable />, // Page des Sondages
+        },
+        {
+          path: "new-poll",
+          element: <NewPoll />, // Page pour créer un nouveau sondage
+        },
+        {
+          path: "suggestions",
+          element: <SuggestionsTable />, // Page des Suggestions
+        },
+        {
+          path: "events",
+          element: <EventsTable />, // Page des Événements
+        },
+        {
+          path: "new-event",
+          element: <NewEvent />, // Page pour créer un nouvel événement
+        },
+        {
+          path: "settings",
+          element: <SettingsPage />, // Page des Paramètres
+        },
+        {
+          path: "Profile",
+          element: <ProfilePage />, // Page des Paramètres
+        },
+      ],
+    },
+    {
+      path: "*",
+      element: <NotFound />, // Page par défaut pour une URL invalide
+    },
+  ]);
 
-    return (
-        <ThemeProvider storageKey="theme">
-             <MessageProvider>
-             <RouterProvider router={router} />
-             </MessageProvider>
-            
-        </ThemeProvider>
-    );
+  return (
+    <ThemeProvider storageKey="theme">
+      <MessageProvider>
+        <AuthProvider>
+            <RouterProvider router={router} />
+        </AuthProvider>
+        
+      </MessageProvider>
+    </ThemeProvider>
+  );
 }
 
 export default App;

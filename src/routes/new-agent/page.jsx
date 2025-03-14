@@ -28,7 +28,7 @@ const NewAgent = () => {
     const fetchEvents = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_URL}/eventListe`, {
+        const response = await fetch(`${API_URL}/eventListeAgent`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
