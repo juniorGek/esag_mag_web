@@ -1,17 +1,17 @@
 import { useFieldArray, useForm } from 'react-hook-form';
 import { PlusCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { motion, AnimatePresence } from 'framer-motion';
+import { toast, ToastContainer } from 'react-toastify';
+import { API_URL } from '../../../config/ApiUrl';
 
 const NewPoll = () => {
-  const { control, register, handleSubmit } = useForm({
+  const { control, register, handleSubmit,reset  } = useForm({
     defaultValues: {
       title: '',
       description: '',
-      questions: [{
-        type: 'text',
-        text: '',
-        required: false,
-        options: []
-      }]
+      // Ajout du champ duration avec une valeur par défaut ("1j")
+      duration: '1j',
+      questions: [{ type: 'text', text: '', required: false, options: [] }]
     }
   });
 
@@ -29,66 +29,115 @@ const NewPoll = () => {
     });
   };
 
-  const onSubmit = (data) => {
-    console.log('Formulaire soumis:', data);
-    // Envoyer les données à votre API ici
+  const onSubmit = async (data) => {
+    // Envoi des données vers l'API (ici supposé accessible sur http://localhost:3000/api/polls)
+    try {
+      const response = await fetch(`${API_URL}/createPoll`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+      if(response.status === 201){
+        toast.success('Sondage créé avec succès!');
+        reset({
+          title: '',
+          description: '',
+          duration: '1j',
+          questions: [{ type: 'text', text: '', required: false, options: [] }]
+        });
+      }else if (response.status === 400){
+        toast.error('Erreur lors de la création du sondage!');
+      }
+      console.log('Sondage créé avec succès:', result);
+    } catch (error) {
+      console.error('Erreur lors de la création du sondage:', error);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-10 px-4 sm:px-6 lg:px-8">
+      <ToastContainer />
       <div className="max-w-3xl mx-auto">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-          {/* En-tête du formulaire */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <input
-              {...register('title')}
-              placeholder="Titre de votre sondage"
-              className="text-3xl font-bold w-full p-2 mb-4 border-b-2 border-transparent focus:border-blue-500 focus:outline-none"
-            />
-            <textarea
-              {...register('description')}
-              placeholder="Description du sondage"
-              className="w-full p-2 text-gray-600 border-b-2 border-transparent focus:border-blue-500 focus:outline-none resize-none"
-              rows="2"
-            />
+        {/* En-tête */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="bg-white p-6 rounded-xl shadow-lg border border-gray-100 mb-6"
+        >
+          <input
+            {...register('title')}
+            placeholder="Titre de votre sondage"
+            className="text-3xl font-extrabold w-full p-2 mb-3 border-b-2 border-transparent focus:border-blue-500 focus:outline-none bg-transparent"
+          />
+          <textarea
+            {...register('description')}
+            placeholder="Description du sondage"
+            className="w-full p-2 text-gray-600 border-b-2 border-transparent focus:border-blue-500 focus:outline-none resize-none bg-transparent text-sm mb-3"
+            rows="2"
+          />
+          {/* Champ pour la durée */}
+          <div className="mb-3">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Durée de validité
+            </label>
+            <select
+              {...register('duration')}
+              className="w-full p-2 border rounded-md focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="1j">1 jour</option>
+              <option value="2j">2 jours</option>
+              <option value="1 semaine">1 semaine</option>
+            </select>
           </div>
+        </motion.div>
 
-          {/* Liste des questions */}
+        {/* Liste des questions */}
+        <AnimatePresence>
           {questions.map((question, qIndex) => (
-            <div key={question.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex-1">
-                  <input
-                    {...register(`questions.${qIndex}.text`)}
-                    placeholder="Question"
-                    className="w-full p-2 text-lg font-medium border-b-2 border-transparent focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
+            <motion.div
+              key={question.id}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              transition={{ duration: 0.3 }}
+              className="bg-white p-4 rounded-xl shadow-md border border-gray-100 mb-4"
+            >
+              <div className="flex justify-between items-start mb-3">
+                <input
+                  {...register(`questions.${qIndex}.text`)}
+                  placeholder="Question"
+                  className="flex-1 p-2 text-lg font-semibold border-b-2 border-transparent focus:border-blue-500 focus:outline-none bg-transparent"
+                />
                 <button
                   type="button"
                   onClick={() => remove(qIndex)}
-                  className="ml-4 p-2 text-red-500 hover:bg-red-50 rounded-full"
+                  className="ml-3 p-1 text-red-500 hover:bg-red-50 rounded-full transition-colors"
                 >
-                  <TrashIcon className="h-5 w-5" />
+                  <TrashIcon className="h-4 w-4" />
                 </button>
               </div>
 
-              <div className="flex items-center gap-4 mb-6">
+              <div className="flex items-center gap-3 mb-4">
                 <select
                   {...register(`questions.${qIndex}.type`)}
-                  className="p-2 border rounded-md text-sm"
+                  className="p-1 border rounded-lg text-sm bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 >
                   <option value="text">Réponse courte</option>
                   <option value="radio">Choix unique</option>
                   <option value="checkbox">Choix multiple</option>
                   <option value="dropdown">Liste déroulante</option>
                 </select>
-
                 <label className="flex items-center gap-2 text-sm text-gray-600">
                   <input
                     type="checkbox"
                     {...register(`questions.${qIndex}.required`)}
-                    className="h-4 w-4 text-blue-500"
+                    className="h-3 w-3 text-blue-500 rounded focus:ring-blue-500"
                   />
                   Requis
                 </label>
@@ -101,46 +150,53 @@ const NewPoll = () => {
                   register={register}
                 />
               )}
-            </div>
+            </motion.div>
           ))}
+        </AnimatePresence>
 
-          {/* Boutons d'action */}
-          <div className="space-y-4">
-            <div className="flex flex-wrap gap-4">
-              <button
-                type="button"
-                onClick={() => addQuestion('text')}
-                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-gray-700 hover:bg-gray-50"
-              >
-                <PlusCircleIcon className="h-5 w-5" />
-                Ajouter une question
-              </button>
-              <button
-                type="button"
-                onClick={() => addQuestion('radio')}
-                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-gray-700 hover:bg-gray-50"
-              >
-                <PlusCircleIcon className="h-5 w-5" />
-                Ajouter un choix unique
-              </button>
-              <button
-                type="button"
-                onClick={() => addQuestion('checkbox')}
-                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm text-gray-700 hover:bg-gray-50"
-              >
-                <PlusCircleIcon className="h-5 w-5" />
-                Ajouter un choix multiple
-              </button>
-            </div>
+        {/* Barre d’outils flottante */}
+        <div className="fixed bottom-6 right-6 flex flex-col gap-3">
+          <button
+            type="button"
+            onClick={() => addQuestion('text')}
+            className="flex items-center gap-2 px-3 py-1.5 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-colors text-sm"
+          >
+            <PlusCircleIcon className="h-4 w-4" />
+            Question texte
+          </button>
+          <button
+            type="button"
+            onClick={() => addQuestion('radio')}
+            className="flex items-center gap-2 px-3 py-1.5 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 transition-colors text-sm"
+          >
+            <PlusCircleIcon className="h-4 w-4" />
+            Choix unique
+          </button>
+          <button
+            type="button"
+            onClick={() => addQuestion('checkbox')}
+            className="flex items-center gap-2 px-3 py-1.5 bg-purple-500 text-white rounded-full shadow-lg hover:bg-purple-600 transition-colors text-sm"
+          >
+            <PlusCircleIcon className="h-4 w-4" />
+            Choix multiple
+          </button>
+        </div>
 
-            <button
-              type="submit"
-              className="w-full py-3 px-6 bg-blue-500 text-white rounded-md shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-              Publier le sondage
-            </button>
-          </div>
-        </form>
+        {/* Bouton de soumission */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="mt-6"
+        >
+          <button
+            type="submit"
+            onClick={handleSubmit(onSubmit)}
+            className="w-full py-3 px-5 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl shadow-lg hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all text-base"
+          >
+            Publier le sondage
+          </button>
+        </motion.div>
       </div>
     </div>
   );
@@ -159,21 +215,21 @@ const OptionsField = ({ nestIndex, control, register }) => {
           <input
             {...register(`questions.${nestIndex}.options.${oIndex}`)}
             placeholder={`Option ${oIndex + 1}`}
-            className="flex-1 p-2 border-b-2 border-transparent focus:border-blue-500 focus:outline-none"
+            className="flex-1 p-2 border-b-2 border-gray-200 focus:border-blue-500 focus:outline-none transition-colors text-sm"
           />
           <button
             type="button"
             onClick={() => remove(oIndex)}
-            className="p-2 text-red-400 hover:text-red-600"
+            className="p-1 text-red-400 hover:text-red-600 transition-colors"
           >
-            <TrashIcon className="h-4 w-4" />
+            <TrashIcon className="h-3 w-3" />
           </button>
         </div>
       ))}
       <button
         type="button"
         onClick={() => append('')}
-        className="text-sm text-blue-500 hover:text-blue-600 flex items-center gap-1"
+        className="text-sm text-blue-500 hover:text-blue-600 flex items-center gap-1 mt-2"
       >
         <PlusCircleIcon className="h-4 w-4" />
         Ajouter une option

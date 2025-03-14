@@ -50,6 +50,7 @@ import ScannerPage from "./Pages/Agent/ScanPage";
 import PublicAgentRoute from "./hooks/AgentPublicRoute";
 import ProtectedAgentRoute from "./hooks/AgentProtectedRoute";
 import { AuthProvider } from "./contexts/AgentAuthContext";
+import SondageSubmit from "./Pages/SondageSubmit";
 
 function App() {
   const router = createBrowserRouter([
@@ -71,6 +72,7 @@ function App() {
         },
         { path: "evenement/:id/mes-tickets", element: <MesTickets /> },
         { path: "sondages", element: <Sondage /> },
+        {path: "sondage_details/:id", element: <SondageSubmit /> },
         { path: "about", element: <About /> },
       ],
     },
