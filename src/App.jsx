@@ -36,6 +36,7 @@ import EventsTable from "./routes/events/page";
 import SettingsPage from "./routes/settings/page";
 import ProfilePage from "./routes/profile/page";
 import SuggestionsTable from "./routes/suggestions/page";
+import SuggestionDetail from "./routes/suggestions/SuggestionDetail";
 
 import BlogDetail from "./Pages/Blog/BlogDetail";
 import EditNews from "./routes/new-news/EditPage";
@@ -210,6 +211,10 @@ function App() {
           path: "suggestions",
           element: <SuggestionsTable />, // Page des Suggestions
         },
+        {
+          path: "suggestions/:id",
+          element: <SuggestionDetail />, // Page des Suggestions
+      },
         {
           path: "events",
           element: <EventsTable />, // Page des Événements
