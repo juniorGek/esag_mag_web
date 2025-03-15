@@ -17,7 +17,7 @@ import Evenement from "./Pages/Evenement/Evenement";
 import Blog from "./Pages/Blog/Blog";
 import Actualites from "./Pages/Actualite/Actualites";
 import { PublicRoute } from "./hooks/PublicRoute";
-import { ProtectedRoute } from "./hooks/ProtectedRoute";
+// import { ProtectedRoute } from "./hooks/ProtectedRoute";
 import ActualiteDetail from './Pages/Actualite/ActualiteDetail';
 import EvenementDetail from './Pages/Evenement/EvenementDetail';
 import { MessageProvider } from "./utils/messageContext";
@@ -47,6 +47,7 @@ import AgentLogin from "./Pages/Agent/AgentLogin";
 import ScanCodePage from "./Pages/Agent/ScanCodePage";
 import MobileOnlyRoute from "./hooks/MobileOnlyRoute";
 import ScannerPage from "./Pages/Agent/ScanPage";
+
 
 function App() {
     const router = createBrowserRouter([
@@ -116,9 +117,9 @@ function App() {
         {
             path: "/admin",
             element: (
-                     <ProtectedRoute>
+                    //  <ProtectedRoute>
                         <Layout />
-                     </ProtectedRoute> 
+                    //  <ProtectedRoute> 
                     
                
             ),
