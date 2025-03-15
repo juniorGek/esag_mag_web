@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import navigation from './Menu';
+import logo from "../assets/im3.png";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,9 +18,13 @@ const Navbar = () => {
           {/* Logo */}
           <Link 
             to="/" 
-            className="flex items-center space-x-2 text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 hover-lift"
+            className="flex "
           >
-            ESAG MAG
+            <img
+                                src={logo}
+                                alt="Logoipsum"
+                                className="w-[90px] h-auto"
+                            />
           </Link>
 
           {/* Desktop Navigation */}
