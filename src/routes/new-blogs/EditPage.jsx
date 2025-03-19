@@ -112,15 +112,24 @@ function EditBlog() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setEditedBlog({ ...editedBlog, imageCover: URL.createObjectURL(file) });
+      setEditedBlog({
+        ...editedBlog,
+        imageCover: URL.createObjectURL(file), // pour l'affichage
+        imageFile: file, // le fichier réel pour l'upload
+      });
     }
   };
+  
 
   const handleDrop = (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file) {
-      setEditedBlog({ ...editedBlog, imageCover: URL.createObjectURL(file) });
+      setEditedBlog({
+        ...editedBlog,
+        imageCover: URL.createObjectURL(file),
+        imageFile: file,
+      });
     }
   };
 

@@ -126,15 +126,24 @@ function EditNews() {
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setEditedNews({ ...editedNews, imageCover: URL.createObjectURL(file) });
+      setEditedNews({
+        ...editedNews,
+        imageCover: URL.createObjectURL(file), // pour l'affichage
+        imageFile: file, // le fichier réel pour l'upload
+      });
     }
   };
+  
 
   const handleDrop = (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file) {
-      setEditedNews({ ...editedNews, imageCover: URL.createObjectURL(file) });
+      setEditedNews({
+        ...editedNews,
+        imageCover: URL.createObjectURL(file),
+        imageFile: file,
+      });
     }
   };
 
