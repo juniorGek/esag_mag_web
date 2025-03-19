@@ -93,6 +93,11 @@ export const navbarLinks = [
                 icon: PackagePlus,
                 path: "/admin/new-poll",
             },
+            {
+                label: "visualiser Sondages",
+                icon: PackagePlus,
+                path: "/admin/view-polls",
+            },
         ],
     },
     {
