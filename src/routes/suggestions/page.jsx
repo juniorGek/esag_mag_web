@@ -1,143 +1,70 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { API_URL } from "../../../config/ApiUrl";
+
 const SuggestionsTable = () => {
-  const Suggestions = [
-    {
-      id: 1,
-      title: 'Améliorer la page d\'accueil',
-      category: 'Général',
-      suggestion: 'La page d\'accueil pourrait être plus interactive et moderne.',
-      name: 'Jean Dupont',
-      email: 'jean.dupont@example.com',
-      date: '2023-10-15',
-    },
-    {
-      id: 2,
-      title: 'Ajouter un dark mode',
-      category: 'Design',
-      suggestion: 'Un mode sombre serait apprécié pour les utilisateurs nocturnes.',
-      name: null, // Suggestion anonyme
-      email: null,
-      date: '2023-10-14',
-    },
-    {
-      id: 3,
-      title: 'Optimiser les performances',
-      category: 'Technique',
-      suggestion: 'Le site pourrait être optimisé pour charger plus rapidement.',
-      name: 'Marie Curie',
-      email: 'marie.curie@example.com',
-      date: '2023-10-13',
-    },
-    {
-      id: 4,
-      title: 'Ajouter un chat en direct',
-      category: 'Fonctionnalité',
-      suggestion: 'Un chat en direct pour le support client serait très utile.',
-      name: 'Lucie Martin',
-      email: 'lucie.martin@example.com',
-      date: '2023-10-12',
-    },
-    {
-      id: 5,
-      title: 'Améliorer la recherche',
-      category: 'Général',
-      suggestion: 'La fonction de recherche pourrait être plus intuitive.',
-      name: null, // Suggestion anonyme
-      email: null,
-      date: '2023-10-11',
-    },
-    {
-      id: 6,
-      title: 'Ajouter des tutoriels',
-      category: 'Documentation',
-      suggestion: 'Des tutoriels vidéo aideraient les nouveaux utilisateurs.',
-      name: 'Paul Lefevre',
-      email: 'paul.lefevre@example.com',
-      date: '2023-10-10',
-    },
-    {
-      id: 7,
-      title: 'Créer une application mobile',
-      category: 'Mobile',
-      suggestion: 'Une application mobile serait un excellent ajout.',
-      name: 'Sophie Dubois',
-      email: 'sophie.dubois@example.com',
-      date: '2023-10-09',
-    },
-    {
-      id: 8,
-      title: 'Améliorer les notifications',
-      category: 'Général',
-      suggestion: 'Les notifications pourraient être plus personnalisées.',
-      name: null, // Suggestion anonyme
-      email: null,
-      date: '2023-10-08',
-    },
-  ];
+  const [suggestions, setSuggestions] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchSuggestions = async () => {
+    try {
+      const response = await fetch(`${API_URL}/getSuggestions`, {
+        method: "GET",
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+
+      const data = await response.json();
+      console.log("Réponse de l'API :", data);
+
+      if (response.status === 200) {
+        setSuggestions(data || []);
+      } else {
+        console.error("Erreur de l'API :", data.message || "Erreur inconnue");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des suggestions :", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchSuggestions();
+  }, []);
+
+  if (loading) {
+    return <div className="text-center text-gray-500 dark:text-slate-300 py-10">Chargement en cours...</div>;
+  }
 
   return (
-    <div className="p-6 min-h-screen">
-      {/* Titre stylisé */}
-      <h1 className="text-4xl font-extrabold mb-8 text-gray-800 text-center">
-        <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
-          Suggestions reçues
-        </span>
-        <div className="mt-2 w-20 h-1.5 bg-gradient-to-r from-indigo-600 to-purple-600 mx-auto rounded-full"></div>
-      </h1>
-
-      {/* Grille de cartes pour afficher les suggestions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {Suggestions.map((suggestion) => (
-          <div
-            key={suggestion.id}
-            className="bg-white shadow-lg rounded-lg overflow-hidden transform transition-transform hover:scale-105 flex flex-col min-h-[400px]"
-            // ^^ Conserve uniquement `transform` et `hover:scale-105`
-          >
-            <div className="p-6 flex flex-col flex-grow">
-              {/* Titre de la suggestion */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-500">Titre</label>
-                <h3 className="text-xl font-semibold text-gray-800">{suggestion.title}</h3>
+    <div className="p-4 bg-gray-50 dark:bg-slate-900 min-h-screen">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-10">
+        {Array.isArray(suggestions) && suggestions.length > 0 ? (
+          suggestions.map((suggestion) => (
+            <motion.div
+              key={suggestion.id}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              whileHover={{ scale: 1.05 }}
+              className="bg-white dark:bg-slate-800 shadow-lg rounded-2xl overflow-hidden transform transition-transform"
+            >
+              <div className="p-6">
+                <h2 className="text-2xl font-semibold text-gray-800 dark:text-slate-50 mb-3">{suggestion.object}</h2>
+                <p className="text-gray-600 dark:text-slate-300 mb-2">Catégorie: {suggestion.categorie}</p>
+                <Link
+                  to={`/admin/suggestions/${suggestion.id}`}
+                  className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium"
+                >
+                  Voir les détails
+                </Link>
               </div>
-
-              {/* Catégorie */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-500">Catégorie</label>
-                <p className="text-gray-600">{suggestion.category}</p>
-              </div>
-
-              {/* Suggestion */}
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-500">Suggestion</label>
-                <p className="text-gray-600">{suggestion.suggestion}</p>
-              </div>
-
-              {/* Informations utilisateur */}
-              <div className="text-sm text-gray-500">
-                <div className="mb-2">
-                  <label className="block text-sm font-medium text-gray-500">Nom</label>
-                  <p>{suggestion.name || 'Anonyme'}</p>
-                </div>
-                {suggestion.email && (
-                  <div className="mb-2">
-                    <label className="block text-sm font-medium text-gray-500">Email</label>
-                    <p>{suggestion.email}</p>
-                  </div>
-                )}
-                <div className="mb-2">
-                  <label className="block text-sm font-medium text-gray-500">Date</label>
-                  <p>{suggestion.date}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Bouton "Voir les détails" */}
-            <div className="px-6 py-4 mt-auto border-t border-gray-100">
-              <button className="text-indigo-600 hover:text-indigo-800 font-medium w-full text-left">
-                Voir les détails
-              </button>
-            </div>
-          </div>
-        ))}
+            </motion.div>
+          ))
+        ) : (
+          <div className="text-center text-gray-500 dark:text-slate-300">Aucune suggestion disponible</div>
+        )}
       </div>
     </div>
   );

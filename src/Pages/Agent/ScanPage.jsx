@@ -20,10 +20,7 @@ function ScanCodePage() {
     function onScanSuccess(decodedText, decodedResult) {
       alert(`Code scanné: ${decodedText}`);
       console.log(`Code scanné: ${decodedText}`, decodedResult);
-      // Arrêter le scanner après un scan réussi
-      html5Qrcode.stop().catch(error => {
-        console.error("Erreur lors de l'arrêt du scanner", error);
-      });
+      
     }
 
     function onScanFailure(error) {

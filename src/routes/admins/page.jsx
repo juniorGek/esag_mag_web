@@ -203,12 +203,12 @@ export default function AdminsTable() {
                       </td>
                       <td
                         className={`px-4 py-3 text-sm font-medium ${
-                          student.enabled === "true"
+                          student.enabled
                             ? "text-green-600 dark:text-green-400"
                             : "text-red-600 dark:text-red-400"
                         }`}
                       >
-                        {student.enabled}
+                        {student.enabled ? "Activé" : "Désactivé"}
                       </td>
                       <td className="px-4 py-3 text-sm">
                         <div className="flex items-center gap-x-4">

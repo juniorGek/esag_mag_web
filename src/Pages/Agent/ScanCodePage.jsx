@@ -1,7 +1,30 @@
+import { Button } from "@mui/material";
 import { FaQrcode, FaBarcode } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { API_URL } from "../../../config/ApiUrl";
+import { useContext } from "react";
+import { AuthAgentContext } from "../../contexts/AgentAuthContext";
 
 function ScanCodePage() {
+  const navigate = useNavigate();
+  const { setIsAuthenticated } = useContext(AuthAgentContext);
+  const handleLogout = async () => {
+    try {
+      const response = await fetch(`${API_URL}/logoutAgent`, {
+        method: "POST",
+        credentials: "include",
+
+      });
+      /* const data = await response.json(); */
+      if (response.status === 200) {
+        setIsAuthenticated(false);
+        navigate("/ticket/code/agentLogin");
+      }
+    } catch (error) {
+      console.log("Erreur lors de la déconnexion", error);
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 flex flex-col">
       {/* En-tête */}
@@ -11,6 +34,9 @@ function ScanCodePage() {
         </h1>
         <p className="text-gray-500">Choisissez votre méthode de validation</p>
       </div>
+      <Button onClick={handleLogout} variant="contained" color="primary" className="mb-4" >
+        Deconnecter
+      </Button>
 
       {/* Options principales */}
       <div className="flex flex-col md:flex-row gap-6 w-full max-w-2xl mx-auto">
