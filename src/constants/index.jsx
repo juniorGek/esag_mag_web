@@ -1,4 +1,4 @@
-import {  Home,  Package, PackagePlus, ShoppingBag, UserPlus, Users, ListChecks, MessageSquare, Calendar } from "lucide-react";
+import {  Home,  Package, PackagePlus, ShoppingBag, UserPlus, Users, ListChecks, MessageSquare, Calendar,ChartPie } from "lucide-react";
 import ProfileImage from "../assets/profile-image.jpg";
 
 export const navbarLinks = [
@@ -121,12 +121,12 @@ export const navbarLinks = [
         ],
     },
      {
-         title: "Profil",
+         title: "Rapports",
     links: [
              {
-                 label: "Profil",
-                 icon: Users,
-                 path: "/admin/profile",
+                 label: "Rapports",
+                 icon: ChartPie,
+                 path: "/admin/rapports",
              },
          ],
      },

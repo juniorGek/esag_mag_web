@@ -1,3 +1,3 @@
-export const API_URL="http://localhost:5000/api"
+export const API_URL="http://localhost:8000/api"
 
-export const ImageApi = "http://localhost:5000/api/sendFile"
+export const ImageApi = "http://localhost:8000/api/sendFile"
