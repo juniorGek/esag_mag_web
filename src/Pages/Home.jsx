@@ -2,18 +2,26 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination, Navigation } from "swiper/modules";
+import { motion } from "framer-motion";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { API_URL, ImageApi } from "../../config/ApiUrl";
 import { formatDate } from "../utils/formatDate";
-import { UserCircle, UserX, Send } from "lucide-react";
+import { UserCircle, UserX, Send, MapPin } from "lucide-react";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// Variants pour les animations
+const sectionVariants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
 
-
-
+const cardVariants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeOut" } },
+};
 
 const Home = () => {
   const [email, setEmail] = useState("");
@@ -31,7 +39,6 @@ const Home = () => {
     message: "",
     type: "public",
   });
-  const [showSuccess, setShowSuccess] = useState(false);
 
   const handleSubscribe = (e) => {
     e.preventDefault();
@@ -48,7 +55,6 @@ const Home = () => {
     e.preventDefault();
     try {
       setLoading(true);
-
       const formValues = {
         nom: isAnonymous ? "" : suggestion.nom,
         email: isAnonymous ? "" : suggestion.email,
@@ -58,13 +64,9 @@ const Home = () => {
         type: isAnonymous ? "anonyme" : "public",
       };
 
-      console.log("Données envoyées :", formValues);
-
       const response = await fetch(`${API_URL}/createSuggestion`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formValues),
       });
 
@@ -100,7 +102,7 @@ const Home = () => {
     try {
       const response = await fetch(`${API_URL}/listeDernierActu`);
       const data = await response.json();
-      setDernierAcu(data.dernierActu);
+      setDernierAcu(data.dernierActu || []);
     } catch (error) {
       console.log(error);
     } finally {
@@ -112,8 +114,7 @@ const Home = () => {
     try {
       const response = await fetch(`${API_URL}/getRecentEvents`);
       const data = await response.json();
-
-      setEvent(data.events);
+      setEvent(data.events || []);
     } catch (error) {
       console.log(error);
     } finally {
@@ -129,24 +130,21 @@ const Home = () => {
   const heroSlides = [
     {
       title: "Bienvenue sur ESAG MAG",
-      description:
-        "Votre plateforme interactive pour rester connecté avec la vie de l'école et participer activement à la communauté ESAG-nde.",
+      description: "Votre plateforme interactive pour rester connecté avec la vie de l'école et participer activement à la communauté ESAG-nde.",
       link: "/actualites",
       linkText: "Découvrir les actualités",
       image: "/images/1.jpg",
     },
     {
       title: "Participez aux événements",
-      description:
-        "Ne manquez aucun événement important de l'école, inscrivez-vous dès maintenant !",
+      description: "Ne manquez aucun événement important de l'école, inscrivez-vous dès maintenant !",
       link: "/evenements",
       linkText: "Voir les événements",
       image: "/images/2.jpg",
     },
     {
       title: "Exprimez-vous",
-      description:
-        "Donnez votre avis à travers nos sondages et contribuez à l'amélioration de la communauté.",
+      description: "Donnez votre avis à travers nos sondages et contribuez à l'amélioration de la communauté.",
       link: "/sondages",
       linkText: "Participer aux sondages",
       image: "/images/2.jpg",
@@ -154,353 +152,310 @@ const Home = () => {
   ];
 
   return (
-    <div className="gradient-background min-h-screen">
+    <div className="bg-gradient-to-b from-indigo-50 to-white">
       {/* Carousel Section */}
-      <Swiper
-        modules={[Autoplay, Pagination, Navigation]}
-        autoplay={{ delay: 5000, disableOnInteraction: false }}
-        pagination={{ clickable: true }}
-        navigation
-        className="w-full h-[600px]"
-      >
-        {heroSlides.map((slide, index) => (
-          <SwiperSlide key={index} className="relative">
-            <img
-              src={slide.image}
-              alt={slide.title}
-              className="w-full h-full object-cover brightness-50"
-            />
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-4">
-              <h1 className="text-5xl font-bold mb-4">{slide.title}</h1>
-              <p className="text-lg max-w-2xl mb-6">{slide.description}</p>
-              <Link
-                to={slide.link}
-                className="bg-white text-gray-900 px-6 py-3 rounded-full font-semibold hover:bg-gray-200 transition"
-              >
-                {slide.linkText}
-              </Link>
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-
-      {/* Actualités Section - Style amélioré */}
-      <section className="section-padding bg-white m-5 p-3">
-        <div className="container-width">
-          <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
-            Dernières Actualités
-          </h2>
-
-          {loading ? (
-            // 📌 Skeleton Loader
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {Array(4)
-                .fill(0)
-                .map((_, index) => (
-                  <div
-                    key={index}
-                    className="bg-gray-200 rounded-lg animate-pulse h-[380px]"
-                  />
-                ))}
-            </div>
-          ) : (
-            // 📌 Swiper avec les données réelles
-            <Swiper
-              modules={[Autoplay]}
-              spaceBetween={24}
-              slidesPerView={1}
-              breakpoints={{
-                640: { slidesPerView: 2 },
-                768: { slidesPerView: 3 },
-                1024: { slidesPerView: 4 },
-              }}
-              autoplay={{ delay: 5000, disableOnInteraction: false }}
-              className="pb-8"
-            >
-              {dernierAcu.map((news) => (
-                <SwiperSlide key={news.id}>
-                  <div className="bg-white rounded-lg overflow-hidden shadow-md min-h-[380px] flex flex-col">
-                    <div className="relative h-48 flex items-center justify-center bg-gray-200">
-                      {/* Loader pour l'image */}
-                      <img
-                        src={`${ImageApi}/${news.imageCover}`}
-                        alt={news.titre}
-                        className="w-full h-full object-cover transition-opacity duration-500"
-                        onLoad={(e) =>
-                          e.currentTarget.classList.remove("opacity-0")
-                        }
-                      />
-                    </div>
-                    <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm">
-                      {formatDate(news.createdAt)}
-                    </div>
-                    <div className="p-5 flex-1 flex flex-col">
-                      <h3 className="text-xl font-bold mb-2 text-gray-800 line-clamp-2">
-                        {news.titre}
-                      </h3>
-                      <p className="text-gray-600 mb-4 line-clamp-3">
-                        {news.sous_titre}
-                      </p>
-                      <div className="mt-auto">
-                        <Link
-                          to={`/actualite/${news.id}`}
-                          className="text-blue-600 font-medium hover:text-blue-700"
-                        >
-                          En savoir plus →
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </SwiperSlide>
-              ))}
-            </Swiper>
-          )}
-        </div>
+      <section className="relative w-full">
+        <Swiper
+          modules={[Autoplay, Pagination, Navigation]}
+          autoplay={{ delay: 5000, disableOnInteraction: false }}
+          pagination={{ clickable: true }}
+          navigation={{ enabled: false }}
+          spaceBetween={0}
+          slidesPerView={1}
+          breakpoints={{
+            0: { navigation: { enabled: false }, pagination: { enabled: true } },
+            640: { navigation: { enabled: true } },
+            1024: { navigation: { enabled: true } },
+          }}
+          className="w-full h-[300px] sm:h-[400px] lg:h-[600px]"
+        >
+          {heroSlides.map((slide, index) => (
+            <SwiperSlide key={index} className="relative">
+              <img
+                src={slide.image}
+                alt={slide.title}
+                className="w-full h-full object-cover brightness-50"
+              />
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-4 sm:px-6 lg:px-8">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 sm:mb-3 lg:mb-4">
+                  {slide.title}
+                </h1>
+                <p className="text-xs sm:text-sm md:text-base lg:text-lg max-w-xs sm:max-w-sm md:max-w-md lg:max-w-2xl mb-3 sm:mb-4 lg:mb-6">
+                  {slide.description}
+                </p>
+                <Link
+                  to={slide.link}
+                  className="bg-white text-indigo-600 px-3 py-1.5 sm:px-4 sm:py-2 md:px-6 md:py-3 rounded-full font-semibold hover:bg-indigo-100 transition-all text-sm md:text-base shadow-md"
+                >
+                  {slide.linkText}
+                </Link>
+              </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </section>
 
-      {/* Événements Section - Style amélioré */}
-      {loadingRecentEvent ? (
-        <div className="flex justify-center items-center">
-          <h1>Chargement...</h1>
+      {/* Actualités Section */}
+      <motion.section
+        className="py-16 px-4 sm:px-6 lg:px-8 bg-white"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={sectionVariants}
+      >
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-indigo-900 mb-6 sm:mb-8 md:mb-10 text-center tracking-tight">
+            Dernières Actualités
+          </h2>
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {Array(3).fill(0).map((_, index) => (
+                <div key={index} className="bg-gray-200 rounded-xl animate-pulse aspect-square" />
+              ))}
+            </div>
+          ) : dernierAcu.length === 0 ? (
+            <div className="bg-gray-50 rounded-xl p-6 sm:p-8 shadow-sm text-center">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-2">Aucune actualité disponible</h3>
+              <p className="text-sm sm:text-base text-gray-500">Revenez bientôt pour découvrir les dernières nouvelles !</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              {dernierAcu.map((news) => (
+                <Link
+                  key={news.id}
+                  to={`/actualite/${news.id}`}
+                  className="group bg-white rounded-xl shadow-md overflow-hidden aspect-square flex flex-col transition-transform duration-300 hover:shadow-xl hover:-translate-y-2"
+                >
+                  <div className="h-2/3 relative">
+                    <img
+                      src={`${ImageApi}/${news.imageCover}`}
+                      alt={news.titre}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <span className="absolute top-3 right-3 bg-indigo-600 text-white text-xs sm:text-sm px-2 py-1 rounded-full shadow-sm">
+                      {formatDate(news.createdAt)}
+                    </span>
+                  </div>
+                  <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 line-clamp-2 leading-tight">
+                        {news.titre}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-gray-600 line-clamp-2">{news.sous_titre}</p>
+                    </div>
+                    <div className="mt-3">
+                      <span className="inline-block text-indigo-600 group-hover:text-indigo-800 font-medium text-sm sm:text-base transition-colors">
+                        Lire plus →
+                      </span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
-      ) : (
-        <section className="section-padding bg-white m-5 p-3">
-          <div className="container-width">
-            <h2 className="text-4xl font-bold text-center text-gray-900 mb-12 relative">
-              Événements à venir
-              <div className="h-1 w-24 bg-blue-600 mx-auto mt-4 rounded-full"></div>
-            </h2>
-            <Swiper
-              modules={[Autoplay, Pagination]}
-              spaceBetween={16}
-              slidesPerView={1}
-              breakpoints={{
-                640: { slidesPerView: 3 },
-                1024: { slidesPerView: 4 },
-              }}
-              autoplay={{
-                delay: 2000,
-                disableOnInteraction: false,
-                reverseDirection: true,
-              }}
-              className="pb-8"
-            >
-              {event.map((event) => (
-                <SwiperSlide key={event.id}>
-                  <div className="group mb-3 bg-white rounded-xl overflow-hidden  hover:transition-all duration-300 transform hover:-translate-y-2 h-[360px]">
-                    <div className="relative overflow-hidden h-40">
+      </motion.section>
+
+      {/* Événements Section améliorée */}
+      <motion.section
+        className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-gray-50 to-indigo-50"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={sectionVariants}
+      >
+        <div className="max-w-7xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-indigo-900 mb-6 sm:mb-8 md:mb-10 text-center tracking-tight">
+            Événements à venir
+          </h2>
+          {loadingRecentEvent ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 sm:h-10 w-8 sm:w-10 border-t-2 border-indigo-600"></div>
+            </div>
+          ) : event.length === 0 ? (
+            <div className="bg-white rounded-xl p-6 sm:p-8 shadow-sm text-center">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-700 mb-2">Aucun événement disponible</h3>
+              <p className="text-sm sm:text-base text-gray-500">Restez à l’écoute pour les prochains événements !</p>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                {event.map((event, index) => (
+                  <motion.div
+                    key={event.id}
+                    variants={cardVariants}
+                    initial="hidden"
+                    animate="visible"
+                    transition={{ delay: index * 0.1 }} // Délai progressif pour chaque carte
+                    className="group bg-white rounded-xl shadow-md overflow-hidden flex flex-col transition-transform duration-300 hover:shadow-xl hover:-translate-y-2"
+                  >
+                    <div className="relative h-48 sm:h-56">
                       <img
                         src={`${ImageApi}/${event.imageCover}`}
                         alt={event.titre}
-                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                      <div className="absolute bottom-3 left-3 text-white">
-                        <div className="flex items-center space-x-2">
-                          <svg
-                            className="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                            />
-                          </svg>
-                          <span className="text-sm font-medium">
-                            {formatDate(event.date)}
-                          </span>
-                        </div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-75 group-hover:opacity-50 transition-opacity"></div>
+                      <div className="absolute top-3 right-3 bg-indigo-600 text-white text-xs sm:text-sm px-2 py-1 rounded-full shadow-sm">
+                        {formatDate(event.date)}
                       </div>
                     </div>
-                    <div className="p-3">
-                      <h3 className="text-lg font-bold mb-2 text-gray-800 line-clamp-1">
+                    <div className="p-4 sm:p-6 flex-1 flex flex-col">
+                      <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 mb-2 line-clamp-2 leading-tight">
                         {event.titre}
                       </h3>
-                      <div className="mb-2 text-xs text-gray-600">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <svg
-                            className="w-3 h-3"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth="2"
-                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                            />
-                          </svg>
-                          <span>{event.lieu}</span>
-                        </div>
+                      <div className="flex items-center gap-2 text-gray-600 text-xs sm:text-sm mb-3">
+                        <MapPin className="w-4 h-4 text-indigo-600" />
+                        <span className="line-clamp-1">{event.lieu}</span>
                       </div>
-                      <p className="text-gray-600 mb-3 text-sm line-clamp-2">
-                        {event.sous_titre}
-                      </p>
+                      <p className="text-xs sm:text-sm text-gray-600 mb-4 line-clamp-2">{event.sous_titre}</p>
                       <button
-                        type="button"
                         onClick={() => handleEvent(event)}
-                        className="inline-flex items-center w-full justify-center px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors duration-300 group"
+                        className="mt-auto bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm sm:text-base font-medium hover:bg-indigo-700 transition-colors duration-300 shadow-md flex items-center justify-center gap-2"
                       >
                         Participer
-                        <svg
-                          className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M17 8l4 4m0 0l-4 4m4-4H3"
-                          />
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
                         </svg>
                       </button>
                     </div>
-                  </div>
-                </SwiperSlide>
-              ))}
-            </Swiper>
-            <div className="text-center mt-8">
-              <Link to="/evenements" className="btn-primary">
-                Tout voir
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
+                  </motion.div>
+                ))}
+              </div>
+              <div className="mt-6 sm:mt-8 text-center">
+                <Link
+                  to="/evenements"
+                  className="inline-flex items-center gap-2 text-indigo-600 hover:text-indigo-800 font-semibold text-sm sm:text-base transition-colors"
+                >
+                  Voir tous les événements
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </Link>
+              </div>
+            </>
+          )}
+        </div>
+      </motion.section>
 
       {/* Newsletter Section */}
-      <section className="bg-blue-600 section-padding  m-5 p-3">
-        <div className="container-width">
-          <h2 className="text-3xl font-bold text-center text-white mb-4">
+      <motion.section
+        className="py-12 sm:py-16 bg-indigo-700 text-white relative overflow-hidden"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={sectionVariants}
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-purple-600 opacity-50"></div>
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-4 sm:mb-6 text-center tracking-tight">
             Restez informé
           </h2>
-          <p className="text-center text-white mb-8">
-            Inscrivez-vous à notre newsletter pour ne rien manquer des
-            actualités de lESAG-nde.
+          <p className="text-sm sm:text-base md:text-lg mb-6 sm:mb-8 text-center max-w-xl sm:max-w-2xl mx-auto">
+            Inscrivez-vous à notre newsletter pour recevoir les dernières actualités et événements de l’ESAG-nde directement dans votre boîte mail.
           </p>
-          <div className="max-w-2xl mx-auto flex justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 max-w-md sm:max-w-lg mx-auto">
             <input
               type="email"
               placeholder="Votre adresse email"
-              className="flex-1 p-2 rounded-l border-0"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="flex-1 p-2 sm:p-3 rounded-lg text-gray-900 border-0 focus:ring-2 focus:ring-indigo-300 shadow-md text-sm sm:text-base"
             />
             <button
-              type="submit"
-              className="bg-white text-blue-600 px-6 py-2 rounded-r font-medium hover:bg-gray-100"
+              onClick={handleSubscribe}
+              className="bg-white text-indigo-700 px-4 py-2 sm:px-6 sm:py-3 rounded-lg font-semibold hover:bg-indigo-100 transition-colors duration-300 shadow-md text-sm sm:text-base"
             >
-              Sinscrire
+              S’inscrire
             </button>
           </div>
-        </div>
-      </section>
-
-      {/* Nouvelle section Suggestions */}
-      <section className="section-padding  m-5 p-3 bg-white">
-        <div className="container-width max-w-3xl mx-auto">
-          <h2 className="text-4xl font-bold text-center text-gray-900 mb-8">
-            Donnez vos avis
-          </h2>
-
-          {showSuccess && (
-            <div className="mb-8 bg-green-100 border border-green-200 p-4 rounded-xl shadow-sm animate-fade-in">
-              <p className="text-green-700 text-center font-medium">
-                Merci pour votre suggestion ! Nous l'examinerons avec attention.
-              </p>
-            </div>
+          {isSubscribed && (
+            <p className="mt-3 sm:mt-4 text-xs sm:text-sm text-center">Merci pour votre inscription !</p>
           )}
-          <ToastContainer />
+        </div>
+      </motion.section>
 
-          <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-xl p-8 space-y-6 backdrop-blur-sm bg-white/90">
-            {/* Toggle Anonyme/Public */}
-            <div className="flex justify-center space-x-4 mb-8">
+      {/* Suggestions Section */}
+      <motion.section
+        className="py-16 px-4 sm:px-6 lg:px-8 bg-white"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={sectionVariants}
+      >
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-indigo-900 mb-6 sm:mb-8 md:mb-10 text-center tracking-tight">
+            Partagez vos idées
+          </h2>
+          <ToastContainer />
+          <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 space-y-6">
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
               <button
                 type="button"
                 onClick={() => setIsAnonymous(false)}
-                className={`flex items-center px-6 py-3 rounded-xl transition-all duration-300 ${!isAnonymous
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-200 transform scale-105"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  }`}
+                className={`flex-1 py-2 sm:py-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 ${
+                  !isAnonymous ? "bg-indigo-600 text-white shadow-md" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                } text-sm sm:text-base`}
               >
-                <UserCircle className="w-5 h-5 mr-2" />
+                <UserCircle className="w-4 sm:w-5 h-4 sm:h-5" />
                 Public
               </button>
               <button
                 type="button"
                 onClick={() => setIsAnonymous(true)}
-                className={`flex items-center px-6 py-3 rounded-xl transition-all duration-300 ${isAnonymous
-                  ? "bg-purple-600 text-white shadow-lg shadow-purple-200 transform scale-105"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                  }`}
+                className={`flex-1 py-2 sm:py-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-300 ${
+                  isAnonymous ? "bg-purple-600 text-white shadow-md" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                } text-sm sm:text-base`}
               >
-                <UserX className="w-5 h-5 mr-2" />
+                <UserX className="w-4 sm:w-5 h-4 sm:h-5" />
                 Anonyme
               </button>
             </div>
-
-            {/* Informations personnelles (conditionnelles) */}
             {!isAnonymous && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
-                <div className="group">
-                  <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
-                    Votre nom
-                  </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Votre nom</label>
                   <input
                     type="text"
                     name="nom"
                     value={suggestion.nom}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all shadow-sm text-sm sm:text-base"
                     required={!isAnonymous}
                   />
                 </div>
-                <div className="group">
-                  <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
-                    Votre email
-                  </label>
+                <div>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Votre email</label>
                   <input
                     type="email"
                     name="email"
                     value={suggestion.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all shadow-sm text-sm sm:text-base"
                     required={!isAnonymous}
                   />
                 </div>
               </div>
             )}
-
-            {/* Titre et Catégorie */}
-            <div className="space-y-6">
-              <div className="group">
-                <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
-                  Objet de la suggestion
-                </label>
+            <div className="space-y-4 sm:space-y-6">
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Objet</label>
                 <input
                   type="text"
                   name="object"
                   value={suggestion.object}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all shadow-sm text-sm sm:text-base"
                   required
                 />
               </div>
-
-              <div className="group">
-                <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
-                  Catégorie
-                </label>
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Catégorie</label>
                 <select
                   name="categorie"
                   value={suggestion.categorie}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all shadow-sm text-sm sm:text-base"
                 >
                   <option value="general">Général</option>
                   <option value="academic">Académique</option>
@@ -509,32 +464,29 @@ const Home = () => {
                   <option value="other">Autre</option>
                 </select>
               </div>
-
-              <div className="group">
-                <label className="block text-sm font-medium text-gray-700 mb-2 group-hover:text-blue-600 transition-colors">
-                  Votre suggestion
-                </label>
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">Votre suggestion</label>
                 <textarea
                   name="message"
                   value={suggestion.message}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-colors group-hover:border-blue-200 h-32 resize-none"
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all h-24 sm:h-32 resize-none shadow-sm text-sm sm:text-base"
                   required
-                  placeholder="Décrivez votre suggestion en détail..."
-                ></textarea>
+                  placeholder="Décrivez votre suggestion..."
+                />
               </div>
             </div>
-
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-4 rounded-xl font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02] shadow-lg flex items-center justify-center space-x-2"
+              disabled={loading}
+              className="w-full bg-indigo-600 text-white px-4 py-2 sm:py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors duration-300 flex items-center justify-center gap-2 disabled:bg-gray-400 shadow-md text-sm sm:text-base"
             >
-              <Send className="w-5 h-5" />
-              <span>Envoyer ma suggestion</span>
+              <Send className="w-4 sm:w-5 h-4 sm:h-5" />
+              {loading ? "Envoi en cours..." : "Envoyer"}
             </button>
           </form>
         </div>
-      </section>
+      </motion.section>
     </div>
   );
 };

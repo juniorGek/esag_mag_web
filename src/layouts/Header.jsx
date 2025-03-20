@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTheme } from "../hooks/use-theme";
-import { Bell, ChevronsLeft, Moon, Search, Sun, User, LogOut, Settings } from "lucide-react";
+import { ChevronsLeft, Moon, Search, Sun, User, LogOut, Settings } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom"; // Import de Link pour la navigation
 import profileImg from "../assets/profile-image.jpg";
 import PropTypes from "prop-types";
@@ -61,11 +61,7 @@ export const Header = ({ collapsed, setCollapsed }) => {
                     )}
                 </button>
 
-                {/* Bouton de notifications */}
-                <button className="btn-ghost size-10 relative">
-                    <Bell size={20} className="text-slate-700 dark:text-slate-300" />
-                    <span className="absolute top-0 right-0 size-2 bg-red-500 rounded-full"></span>
-                </button>
+               
 
                 {/* Bouton du profil avec menu déroulant */}
                 <div className="relative">

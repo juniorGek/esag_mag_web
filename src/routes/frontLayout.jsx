@@ -6,13 +6,25 @@ import ScrollToTop from '../components/ScrollToTop';
 
 function FrontLayout() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
+    <div className="flex flex-col min-h-screen bg-sky-100">
       <ScrollToTopOnNavigate />
-      <Navbar />
-      <main className="flex-grow">
-        <Outlet /> {/* Les routes enfants s'affichent ici */}
+      {/* Navbar fixée en haut */}
+      <header className="sticky top-0 z-50 bg-white shadow-md">
+        <Navbar />
+      </header>
+
+      {/* Main avec flex-grow et padding ajusté */}
+      <main className="flex-grow ">
+        <div className="max-w-full mx-auto ">
+          <Outlet /> {/* Les routes enfants s'affichent ici */}
+        </div>
       </main>
-      <Footer />
+
+      {/* Footer poussé en bas */}
+      <footer className="mt-auto">
+        <Footer />
+      </footer>
+
       <ScrollToTop />
     </div>
   );

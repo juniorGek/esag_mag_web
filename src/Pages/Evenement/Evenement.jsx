@@ -17,7 +17,7 @@ const Evenement = () => {
       const response = await fetch(`${API_URL}/listeEvent`);
       const data = await response.json();
       if (response.status === 200) {
-        setEvenements(data.events);
+        setEvenements(data.events || []);
       }
     } catch (error) {
       console.log(error);
@@ -26,12 +26,104 @@ const Evenement = () => {
     }
   };
 
+  // Animation pour le message "Aucun événement"
+  const messageVariants = {
+    hidden: { opacity: 0, y: 50 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.8,
+        ease: "easeOut",
+        staggerChildren: 0.2,
+      },
+    },
+  };
+
+  const childVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5 },
+    },
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       {loading ? (
-        <div className="flex justify-center items-center">
-          <h1>Chargement...</h1>
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
+      ) : evenements.length === 0 ? (
+        // Message animé et stylé pour aucun événement
+        <motion.div
+          className="flex flex-col items-center justify-center min-h-[60vh] bg-gradient-to-br from-gray-100 to-blue-50 rounded-xl shadow-lg p-8 text-center"
+          variants={messageVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.h2
+            variants={childVariants}
+            className="text-4xl md:text-5xl font-bold text-gray-800 mb-4"
+          >
+            Aucun événement pour le moment
+          </motion.h2>
+          <motion.p
+            variants={childVariants}
+            className="text-lg text-gray-600 mb-6 max-w-md"
+          >
+            Restez connecté, de nouveaux événements passionnants seront bientôt annoncés !
+          </motion.p>
+          <motion.div variants={childVariants} className="flex justify-center">
+            <Link
+              to="/"
+              className="inline-flex items-center px-6 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-colors shadow-md"
+            >
+              Retour à l&apos;accueil
+              <svg
+                className="w-5 h-5 ml-2"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
+              </svg>
+            </Link>
+          </motion.div>
+          {/* Animation décorative */}
+          <motion.div
+            className="mt-8"
+            animate={{
+              scale: [1, 1.1, 1],
+              rotate: [0, 5, -5, 0],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              repeatType: "loop",
+            }}
+          >
+            <svg
+              className="w-16 h-16 text-blue-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
+            </svg>
+          </motion.div>
+        </motion.div>
       ) : (
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
@@ -58,7 +150,6 @@ const Evenement = () => {
                       <span className="text-2xl font-bold">
                         {formatDate(evenement.date)}
                       </span>
-                      {/* <span className="text-sm">{evenement.date.split(' ')[1]}</span> */}
                     </div>
 
                     {/* Image */}
@@ -75,12 +166,6 @@ const Evenement = () => {
                     {/* Contenu */}
                     <div className="flex-1">
                       <div className="flex items-center gap-3 text-sm text-blue-600 mb-2">
-                        {/* <span className="flex items-center">
-                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        {evenement.time}
-                      </span> */}
                         <span>•</span>
                         <span className="flex items-center">
                           <svg
@@ -104,10 +189,7 @@ const Evenement = () => {
                         {evenement.titre}
                       </h2>
 
-                      <p
-                        className="text-gray-600 mb-4 line-clamp-2"
-                        
-                      >
+                      <p className="text-gray-600 mb-4 line-clamp-2">
                         {evenement.sous_titre}
                       </p>
 

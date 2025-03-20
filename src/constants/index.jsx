@@ -1,4 +1,4 @@
-import {  Home,  Package, PackagePlus, ShoppingBag, UserPlus, Users, ListChecks, MessageSquare, Calendar } from "lucide-react";
+import {  Home,  Package, PackagePlus, ShoppingBag, UserPlus, Users, ListChecks, MessageSquare, Calendar,ChartPie } from "lucide-react";
 import ProfileImage from "../assets/profile-image.jpg";
 
 export const navbarLinks = [
@@ -84,14 +84,14 @@ export const navbarLinks = [
         title: "Sondages",
         links: [
             {
-                label: "Sondages",
-                icon: ListChecks,
-                path: "/admin/polls",
-            },
-            {
                 label: "Nouveau Sondage",
                 icon: PackagePlus,
                 path: "/admin/new-poll",
+            },
+            {
+                label: "visualiser Sondages",
+                icon: ListChecks,
+                path: "/admin/view-polls",
             },
         ],
     },
@@ -121,12 +121,12 @@ export const navbarLinks = [
         ],
     },
      {
-         title: "Profil",
+         title: "Rapports",
     links: [
              {
-                 label: "Profil",
-                 icon: Users,
-                 path: "/admin/profile",
+                 label: "Rapports",
+                 icon: ChartPie,
+                 path: "/admin/rapports",
              },
          ],
      },

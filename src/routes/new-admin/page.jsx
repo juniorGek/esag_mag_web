@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, Mail, Lock } from "lucide-react"; // Import des icônes Lucide
+import { User, Mail, Lock } from "lucide-react";
 import draw from "../../assets/register.svg";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,13 +13,10 @@ const NewAdmin = () => {
     password: "",
   });
 
- 
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
 
   const resetFormData = () => {
     setFormData({
@@ -30,9 +27,7 @@ const NewAdmin = () => {
     });
   };
 
-  
-
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       const response = await fetch(`${API_URL}/createAdmin`, {
@@ -47,11 +42,11 @@ const NewAdmin = () => {
       if (response.status === 200) {
         toast.success(data.message, { autoClose: 3000 });
         resetFormData();
-      }else if (response.status === 400) {
+      } else if (response.status === 400) {
         toast.error(data.message, { autoClose: 3000 });
       }
     } catch (error) {
-      toast.error("Erreur lors de la création de l'administrateur", {
+      toast.error("Erreur lors de la création de l’administrateur", {
         autoClose: 3000,
       });
       console.log(error);
@@ -59,126 +54,128 @@ const NewAdmin = () => {
   };
 
   return (
-    <div className="min-w-screen min-h-screen shadow-xl flex items-center justify-center px-5 py-5">
-      <div className="bg-gray-200 text-gray-500 rounded-3xl shadow-xl w-full overflow-hidden" style={{ maxWidth: "900px" }}>
-        <div className="md:flex w-full">
-          {/* Section droite avec le formulaire */}
-          <div className="w-full md:w-1/2 py-6 px-5 md:px-8"> {/* Réduction du padding */}
-            <div className="text-center mb-6"> {/* Réduction de la marge */}
-              <h1 className="font-bold text-2xl text-gray-900">AJOUTER UN ADMINISTRATEUR</h1> {/* Réduction de la taille du texte */}
-              <p className="text-sm">Entrez les informations pour ajouter un administrateur</p> {/* Réduction de la taille du texte */}
-            </div>
-            <form onSubmit={handleSubmit}>
-              {/* Champ Photo avec Drag and Drop */}
-              
-             
-
-              {/* Champs Nom et Prénom sur la même ligne */}
-              <div className="flex -mx-3">
-                <div className="w-1/2 px-3 mb-4"> {/* Réduction de la marge */}
-                  <label className="text-xs font-semibold px-1">Nom</label>
-                  <div className="flex">
-                    <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                      <User className="text-gray-400 w-5 h-5" /> {/* Icône Lucide */}
-                    </div>
-                    <input
-                      type="text"
-                      name="Name"
-                      value={formData.Name}
-                      onChange={handleChange}
-                      className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
-                      placeholder="Entrer le nom"
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="w-1/2 px-3 mb-4"> {/* Réduction de la marge */}
-                  <label className="text-xs font-semibold px-1">Prénom</label>
-                  <div className="flex">
-                    <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                      <User className="text-gray-400 w-5 h-5" /> {/* Icône Lucide */}
-                    </div>
-                    <input
-                      type="text"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
-                      placeholder="Entrer le prénom"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Champ Email */}
-              <div className="flex -mx-3">
-                <div className="w-full px-3 mb-4"> {/* Réduction de la marge */}
-                  <label className="text-xs font-semibold px-1">Email</label>
-                  <div className="flex">
-                    <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                      <Mail className="text-gray-400 w-5 h-5" /> {/* Icône Lucide */}
-                    </div>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
-                      placeholder="Entrer l'email"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Champ Mot de passe */}
-              <div className="flex -mx-3">
-                <div className="w-full px-3 mb-8"> {/* Réduction de la marge */}
-                  <label className="text-xs font-semibold px-1">Mot de passe</label>
-                  <div className="flex">
-                    <div className="w-10 z-10 pl-1 text-center pointer-events-none flex items-center justify-center">
-                      <Lock className="text-gray-400 w-5 h-5" /> {/* Icône Lucide */}
-                    </div>
-                    <input
-                      type="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      className="w-full -ml-10 pl-10 pr-3 py-2 rounded-lg border-2 border-gray-200 outline-none focus:border-indigo-500"
-                      placeholder="************"
-                      required
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Bouton de soumission */}
-              <div className="flex -mx-3">
-                <div className="w-full px-3 mb-4"> {/* Réduction de la marge */}
-                  <button
-                    type="submit"
-                    className="block w-full max-w-xs mx-auto bg-indigo-500 hover:bg-indigo-700 focus:bg-indigo-700 text-white rounded-lg px-3 py-2 font-semibold" 
-                  >
-                    AJOUTER
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-          {/* Section gauche avec illustration */}
-          <div className="hidden md:block w-1/2 bg-gray-200 py-6 px-8"> {/* Réduction du padding */}
-            <img
-              src={draw}
-              alt="Illustration"
-              className="w-full h-full items-center justify-center flex"
-            />
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-gray-100 to-indigo-50 flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-4xl flex flex-col md:flex-row overflow-hidden">
+        {/* Section gauche : Illustration */}
+        <div className="hidden md:flex md:w-1/2 bg-indigo-50 items-center justify-center p-8">
+          <img
+            src={draw}
+            alt="Illustration"
+            className="w-full max-w-sm object-contain"
+          />
         </div>
-        <ToastContainer position="top-right" />
-      </div>
-    </div>
-  )
-}
 
-export default NewAdmin
+        {/* Section droite : Formulaire */}
+        <div className="w-full md:w-1/2 p-6 sm:p-8">
+          <div className="text-center mb-6">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+              Ajouter un Administrateur
+            </h1>
+            <p className="text-sm text-gray-600 mt-1">
+              Remplissez les informations ci-dessous
+            </p>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Champs Nom et Prénom */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Nom
+                </label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <User className="w-5 h-5 text-gray-400" />
+                  </span>
+                  <input
+                    type="text"
+                    name="Name"
+                    value={formData.Name}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all text-gray-900 placeholder-gray-400"
+                    placeholder="Entrer le nom"
+                    required
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Prénom
+                </label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                    <User className="w-5 h-5 text-gray-400" />
+                  </span>
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all text-gray-900 placeholder-gray-400"
+                    placeholder="Entrer le prénom"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Champ Email */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                  <Mail className="w-5 h-5 text-gray-400" />
+                </span>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all text-gray-900 placeholder-gray-400"
+                  placeholder="Entrer l’email"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Champ Mot de passe */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Mot de passe
+              </label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3">
+                  <Lock className="w-5 h-5 text-gray-400" />
+                </span>
+                <input
+                  type="password"
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-all text-gray-900 placeholder-gray-400"
+                  placeholder="********"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Bouton de soumission */}
+            <div>
+              <button
+                type="submit"
+                className="w-full bg-indigo-600 text-white py-2.5 rounded-lg font-semibold hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-300 focus:ring-offset-2 transition-all"
+              >
+                Ajouter l’Administrateur
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <ToastContainer position="top-right" />
+    </div>
+  );
+};
+
+export default NewAdmin;

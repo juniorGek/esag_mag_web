@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { PencilLine, Trash, Eye } from "lucide-react";
 import DeleteModal from "../../components/DeleteNewsModal";
-import { tr } from "framer-motion/m";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Loader from "../../components/Laoder";
+import Loader from "../../components/Laoder"; // Corrigé "Laoder" en "Loader"
 import { API_URL, ImageApi } from "../../../config/ApiUrl";
 import { useNavigate } from "react-router-dom";
 
@@ -16,8 +15,7 @@ export default function NewsTable() {
   const [currentPage, setCurrentPage] = useState(0);
   const [selectedNews, setSelectedNews] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(tr);
-
+  const [isLoading, setIsLoading] = useState(true); // Corrigé "tr" en "true"
   const navigate = useNavigate();
 
   const fetchActuListe = async () => {
@@ -31,18 +29,12 @@ export default function NewsTable() {
       });
       const data = await response.json();
       if (response.status === 200) {
-        setNews(data.actualites);
+        setNews(data.actualites || []);
       } else {
-        toast.error("Erreur lors de la récupération des actualités", {
-          position: "top-right",
-          autoClose: 5000,
-        });
+        toast.error("Erreur lors de la récupération des actualités");
       }
     } catch (error) {
-      toast.error("Erreur de recuperation connexion", {
-        position: "top-right",
-        autoClose: 5000,
-      });
+      toast.error("Erreur de connexion au serveur");
       console.log(error);
     } finally {
       setIsLoading(false);
@@ -56,8 +48,9 @@ export default function NewsTable() {
   // Filtrage des actualités
   const filteredNews = news.filter(
     (item) =>
-      item.titre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.sous_titre.toLowerCase().includes(searchTerm.toLowerCase())
+      item.titre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.sous_titre?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ""
   );
 
   // Pagination
@@ -65,12 +58,12 @@ export default function NewsTable() {
   const offset = currentPage * rowsPerPage;
   const currentNews = filteredNews.slice(offset, offset + rowsPerPage);
 
-  // Ouvrir la modale d'édition
+  // Ouvrir la page d'édition
   const openEdit = (item) => {
     navigate(`/admin/new-edit/${item.id}`);
   };
 
-  // Ouvrir la page de visualisation
+  // Ouvrir la page de visualisation dans un nouvel onglet
   const openView = (item) => {
     window.open(`/actualite/${item.id}`, "_blank");
   };
@@ -90,189 +83,193 @@ export default function NewsTable() {
   // Gérer la suppression d'une actualité
   const handleDelete = async () => {
     try {
-      closeModals();
       const response = await fetch(`${API_URL}/deleteActualite/${selectedNews.id}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
       });
       const data = await response.json();
       if (response.status === 200) {
-        toast.success(data.message, {
-          position: "top-right",
-          autoClose: 3000
-        });
-        setNews(news.filter(item => item.id !== selectedNews.id));
+        toast.success(data.message || "Actualité supprimée avec succès");
+        setNews(news.filter((item) => item.id !== selectedNews.id));
       } else {
-        toast.error(data.message, {
-          position: "top-right",
-          autoClose: 3000
-        });
+        toast.error(data.message || "Erreur lors de la suppression");
       }
     } catch (error) {
-      closeModals();
-      toast.error("Erreur lors de la suppression", {
-        position: "top-right",
-        autoClose: 3000
-      });
+      toast.error("Erreur lors de la suppression de l’actualité");
       console.log(error);
     }
+    closeModals();
   };
 
   return (
-    <>
-      {isLoading ? (
-        <div>
-          <Loader />
-        </div>
-      ) : (
-        <div className="p-4 bg-gray-50 dark:bg-slate-900 min-h-screen">
-          {/* Barre de recherche et filtre de lignes */}
-          <ToastContainer />
-          <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
-            <input
-              type="text"
-              placeholder="Rechercher une actualité..."
-              className="w-full sm:w-2/3 p-2 border border-gray-300 rounded-lg bg-white text-gray-900 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:bg-slate-800 dark:text-slate-50 dark:border-slate-600"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <select
-              className="w-full sm:w-1/3 p-2 border border-gray-300 rounded-lg bg-white text-gray-900 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:bg-slate-800 dark:text-slate-50 dark:border-slate-600"
-              value={rowsPerPage}
-              onChange={(e) => {
-                setRowsPerPage(Number(e.target.value));
-                setCurrentPage(0);
-              }}
-            >
-              <option value="5">5 lignes</option>
-              <option value="10">10 lignes</option>
-              <option value="20">20 lignes</option>
-            </select>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {isLoading ? (
+          <div className="flex justify-center items-center h-screen">
+            <Loader />
           </div>
-
-          {/* Tableau des actualités */}
-          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm overflow-hidden">
-            <div className="p-4 border-b border-gray-200 dark:border-slate-700">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">
+        ) : (
+          <>
+            {/* En-tête avec recherche et filtre */}
+            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
                 Liste des Actualités
               </h2>
+              <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                <input
+                  type="text"
+                  placeholder="Rechercher une actualité..."
+                  className="w-full sm:w-64 px-4 py-2 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors text-gray-900 shadow-sm"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <select
+                  className="w-full sm:w-32 px-4 py-2 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors text-gray-900 shadow-sm"
+                  value={rowsPerPage}
+                  onChange={(e) => {
+                    setRowsPerPage(Number(e.target.value));
+                    setCurrentPage(0);
+                  }}
+                >
+                  <option value="5">5</option>
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                </select>
+              </div>
             </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full">
-                <thead className="bg-gray-50 dark:bg-slate-700">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-slate-300">
-                      #
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-slate-300">
-                      Couverture
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-slate-300">
-                      Titre
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-slate-300">
-                      Sous-titre
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-slate-300">
-                      Statut
-                    </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-slate-300">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
-                  {currentNews.map((item) => (
-                    <tr
-                      key={item.id}
-                      className="hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
-                    >
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-slate-50">
-                        {item.id}
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="w-10 h-10 rounded-lg overflow-hidden">
-                          <img
-                            src={`${ImageApi}/${item.imageCover}`}
-                            alt="Cover"
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-slate-50">
-                        {item.titre}
-                      </td>
-                      <td className="px-4 py-3 text-sm text-gray-900 dark:text-slate-50">
-                        {item.sous_titre}
-                      </td>
-                      <td
-                        className={`px-4 py-3 text-sm font-medium ${
-                          item.enabled
-                            ? "text-green-600 dark:text-green-400"
-                            : "text-red-600 dark:text-red-400"
-                        }`}
-                      >
-                        {item.enabled ? "Activé" : "Désactivé"}
-                      </td>
-                      <td className="px-4 py-3 text-sm">
-                        <div className="flex items-center gap-x-4">
-                          <button
-                            onClick={() => openView(item)}
-                            className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-                          >
-                            <Eye size={18} />
-                          </button>
-                          <button
-                            onClick={() => openEdit(item)}
-                            className="text-green-500 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
-                          >
-                            <PencilLine size={18} />
-                          </button>
-                          <button
-                            onClick={() => openDeleteModal(item)}
-                            className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                          >
-                            <Trash size={18} />
-                          </button>
-                        </div>
-                      </td>
+
+            {/* Tableau */}
+            <div className="bg-white rounded-xl shadow-md overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-100">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        #
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Couverture
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Titre
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Sous-titre
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Statut
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                        Actions
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {currentNews.length === 0 ? (
+                      <tr>
+                        <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
+                          Aucune actualité trouvée
+                        </td>
+                      </tr>
+                    ) : (
+                      currentNews.map((item) => (
+                        <tr
+                          key={item.id}
+                          className="hover:bg-gray-50 transition-colors duration-200"
+                        >
+                          <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                            {item.id}
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="w-12 h-12 rounded-md overflow-hidden">
+                              <img
+                                src={`${ImageApi}/${item.imageCover}`}
+                                alt={item.titre}
+                                className="w-full h-full object-cover"
+                                onError={(e) => (e.target.src = "/placeholder.jpg")}
+                              />
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-900">
+                            {item.titre}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-900">
+                            {item.sous_titre || "Non spécifié"}
+                          </td>
+                          <td
+                            className={`px-6 py-4 text-sm font-medium ${
+                              item.enabled ? "text-green-600" : "text-red-600"
+                            }`}
+                          >
+                            {item.enabled ? "Actif" : "Inactif"}
+                          </td>
+                          <td className="px-6 py-4 text-sm">
+                            <div className="flex items-center gap-4">
+                              <button
+                                onClick={() => openView(item)}
+                                className="text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
+                                aria-label="Voir"
+                              >
+                                <Eye size={20} />
+                              </button>
+                              <button
+                                onClick={() => openEdit(item)}
+                                className="text-teal-600 hover:text-teal-800 transition-colors duration-200"
+                                aria-label="Modifier"
+                              >
+                                <PencilLine size={20} />
+                              </button>
+                              <button
+                                onClick={() => openDeleteModal(item)}
+                                className="text-red-600 hover:text-red-800 transition-colors duration-200"
+                                aria-label="Supprimer"
+                              >
+                                <Trash size={20} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
 
-          {/* Pagination */}
-          <div className="mt-6 flex justify-center">
-            <ReactPaginate
-              previousLabel={"← Précédent"}
-              nextLabel={"Suivant →"}
-              breakLabel={"..."}
-              pageCount={pageCount}
-              marginPagesDisplayed={1}
-              pageRangeDisplayed={3}
-              onPageChange={({ selected }) => setCurrentPage(selected)}
-              containerClassName="flex gap-2"
-              pageClassName="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-100 dark:border-slate-600 dark:hover:bg-slate-700 dark:text-slate-50"
-              activeClassName="bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600"
-              previousClassName="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-100 dark:border-slate-600 dark:hover:bg-slate-700 dark:text-slate-50"
-              nextClassName="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-100 dark:border-slate-600 dark:hover:bg-slate-700 dark:text-slate-50"
-              disabledClassName="opacity-50 cursor-not-allowed"
+            {/* Pagination */}
+            {pageCount > 1 && (
+              <div className="mt-6 flex justify-center">
+                <ReactPaginate
+                  previousLabel={"← Précédent"}
+                  nextLabel={"Suivant →"}
+                  breakLabel={"..."}
+                  pageCount={pageCount}
+                  marginPagesDisplayed={1}
+                  pageRangeDisplayed={3}
+                  onPageChange={({ selected }) => setCurrentPage(selected)}
+                  containerClassName="flex items-center gap-2"
+                  pageClassName="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+                  activeClassName="bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700"
+                  previousClassName="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+                  nextClassName="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+                  disabledClassName="opacity-50 cursor-not-allowed"
+                />
+              </div>
+            )}
+
+            {/* Modale de suppression */}
+            <DeleteModal
+              isOpen={isDeleteModalOpen}
+              onClose={closeModals}
+              onConfirm={handleDelete}
             />
-          </div>
-
-          {/* Modale de suppression */}
-          <DeleteModal
-            isOpen={isDeleteModalOpen}
-            onClose={closeModals}
-            onConfirm={handleDelete}
-          />
-        </div>
-      )}
-    </>
+          </>
+        )}
+      </div>
+      <ToastContainer />
+    </div>
   );
 }

@@ -12,6 +12,7 @@ const NewBlog = () => {
     titre: "",
     sous_titre: "",
     details: "",
+    description_mobile: "",
     imageCover: null,
     enabled: true,
   });
@@ -61,6 +62,11 @@ const NewBlog = () => {
     e.preventDefault();
   };
 
+  const stripTags = (html) => {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    return doc.body.textContent || "";
+  };
+
   const handleSubmit = async(e) => {
     e.preventDefault();
     setLoading(true);
@@ -72,6 +78,7 @@ const NewBlog = () => {
       formValues.append("details", formData.details);
       formValues.append("image", formData.imageCover);
       formValues.append("enabled", formData.enabled);
+      formValues.append("description_mobile", formData.description_mobile);
 
       const response = await fetch(`${API_URL}/createBlog`, {
         method: "POST",
@@ -204,11 +211,19 @@ const NewBlog = () => {
                 <DescriptionEditor
                   value={formData.details}
                   onChange={(html) =>
-                    setFormData({ ...formData, details: html })
+                    setFormData({ ...formData, details: html,
+                      description_mobile: stripTags(html),
+                     })
                   }
                 />
               </div>
             </div>
+
+            <textarea
+              className="w-full p-2 rounded-lg border-none outline-none hidden"
+              value={formData.description_mobile}
+              readOnly
+            />
 
             {/* Checkbox et Bouton */}
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">

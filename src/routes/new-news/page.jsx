@@ -5,13 +5,12 @@ import "react-toastify/dist/ReactToastify.css";
 import { API_URL } from "../../../config/ApiUrl";
 import DescriptionEditor from "../../components/DescriptionEditor";
 
-
-
 const NewNews = () => {
   const [formData, setFormData] = useState({
     titre: "",
     sous_titre: "",
     description: "",
+    description_mobile: "",
     imageCover: null,
     enabled: false,
   });
@@ -41,6 +40,11 @@ const NewNews = () => {
     }
   };
 
+  const stripTags = (html) => {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    return doc.body.textContent || "";
+  };
+
   const resetFormData = () => {
     setFormData({
       titre: "",
@@ -64,6 +68,7 @@ const NewNews = () => {
       formValues.append("titre", formData.titre);
       formValues.append("sous_titre", formData.sous_titre);
       formValues.append("description", formData.description);
+      formValues.append("description_mobile", formData.description_mobile);
       formValues.append("image", formData.imageCover);
       formValues.append("enabled", formData.enabled);
 
@@ -80,14 +85,14 @@ const NewNews = () => {
         toast.error(data.message, { autoClose: 3000 });
       }
     } catch (error) {
-      toast.error("Erreur lors de la création de l'actualité", { autoClose: 3000 });
+      toast.error("Erreur lors de la création de l'actualité", {
+        autoClose: 3000,
+      });
       console.log(error);
     } finally {
       setLoading(false);
     }
   };
-
-
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
@@ -97,7 +102,9 @@ const NewNews = () => {
         <div className="w-full md:w-1/3 p-6 bg-gradient-to-b from-green-100 to-white">
           <div
             className={`relative h-80 border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all duration-300 ${
-              preview ? "border-green-300 bg-green-50/50" : "border-gray-300 hover:border-green-400"
+              preview
+                ? "border-green-300 bg-green-50/50"
+                : "border-gray-300 hover:border-green-400"
             }`}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
@@ -126,7 +133,12 @@ const NewNews = () => {
                   Déposez une image ou{" "}
                   <label className="text-green-600 font-semibold cursor-pointer hover:text-green-700 transition-colors">
                     choisissez ici
-                    <input type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
                   </label>
                 </p>
                 <p className="text-sm text-gray-500">JPEG, PNG (max 5Mo)</p>
@@ -143,7 +155,9 @@ const NewNews = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="group">
-                <label className="block text-sm font-medium text-gray-800 mb-1">Titre</label>
+                <label className="block text-sm font-medium text-gray-800 mb-1">
+                  Titre
+                </label>
                 <div className="relative">
                   <input
                     type="text"
@@ -161,7 +175,9 @@ const NewNews = () => {
               </div>
 
               <div className="group">
-                <label className="block text-sm font-medium text-gray-800 mb-1">Sous-titre</label>
+                <label className="block text-sm font-medium text-gray-800 mb-1">
+                  Sous-titre
+                </label>
                 <div className="relative">
                   <input
                     type="text"
@@ -179,16 +195,28 @@ const NewNews = () => {
             </div>
 
             <div className="group">
-              <label className="block text-sm font-medium text-gray-800 mb-1">Description</label>
+              <label className="block text-sm font-medium text-gray-800 mb-1">
+                Description
+              </label>
               <div className="border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-300">
                 <DescriptionEditor
                   value={formData.description}
                   onChange={(html) =>
-                    setFormData({ ...formData, description: html })
+                    setFormData({
+                      ...formData,
+                      description: html,
+                      description_mobile: stripTags(html), // Mise à jour automatique du texte brut
+                    })
                   }
                 />
               </div>
             </div>
+            
+            <textarea
+              className="w-full p-2 rounded-lg border-none outline-none hidden"
+              value={formData.description_mobile}
+              readOnly
+            />
 
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
               <div className="flex items-center group">
@@ -207,7 +235,9 @@ const NewNews = () => {
                 type="submit"
                 disabled={loading}
                 className={`relative w-full md:w-1/3 bg-gradient-to-r from-green-500 to-gray-800 text-white py-3 px-6 rounded-xl font-semibold shadow-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transform transition-all duration-300 ${
-                  loading ? "opacity-70 cursor-not-allowed" : "hover:from-green-600 hover:to-gray-900 hover:scale-105"
+                  loading
+                    ? "opacity-70 cursor-not-allowed"
+                    : "hover:from-green-600 hover:to-gray-900 hover:scale-105"
                 }`}
               >
                 {loading ? (
@@ -218,8 +248,19 @@ const NewNews = () => {
                       fill="none"
                       viewBox="0 0 24 24"
                     >
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      />
                     </svg>
                     En cours...
                   </div>
