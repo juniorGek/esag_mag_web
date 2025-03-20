@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import {
   Calendar,
   MapPin,
-
   Ticket,
 } from "lucide-react";
 import { ToastContainer } from "react-toastify";

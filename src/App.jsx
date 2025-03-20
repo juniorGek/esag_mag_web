@@ -34,20 +34,22 @@ import PollsTable from "./routes/polls/page";
 import NewEvent from "./routes/new-event/page";
 import EventsTable from "./routes/events/page";
 import SettingsPage from "./routes/settings/page";
-import ProfilePage from "./routes/profile/page";
 import SuggestionsTable from "./routes/suggestions/page";
 import SuggestionDetail from "./routes/suggestions/SuggestionDetail";
+import StatsPage from "./routes/stats/page";
 
 import BlogDetail from "./Pages/Blog/BlogDetail";
 import EditNews from "./routes/new-news/EditPage";
 import EditBlog from "./routes/new-blogs/EditPage";
 import AdminBlogDetail from "./routes/blog-detail/page";
+import AdminEventsDetails from "./routes/events-detail/page";
 import AcheterTicket from "./Pages/AcheterTicket";
 import MesTickets from "./Pages/MesTickets";
 import AgentLogin from "./Pages/Agent/AgentLogin";
 import ScanCodePage from "./Pages/Agent/ScanCodePage";
 import MobileOnlyRoute from "./hooks/MobileOnlyRoute";
 import ScannerPage from "./Pages/Agent/ScanPage";
+
 import PublicAgentRoute from "./hooks/AgentPublicRoute";
 import ProtectedAgentRoute from "./hooks/AgentProtectedRoute";
 import { AuthProvider } from "./contexts/AgentAuthContext";
@@ -148,8 +150,8 @@ function App() {
           element: <UsersTable />, // Page des Utilisateurs
         },
         {
-          path: "new-user",
-          element: <h1 className="title">Nouvel utilisateur</h1>, // Page des utilisateurs vérifiés
+          path: "rapports",
+          element: <StatsPage/>, // Page des utilisateurs vérifiés
         },
         {
           path: "admins",
@@ -192,6 +194,10 @@ function App() {
           element: <AdminBlogDetail />, // Page de détail du blog (admin)
         },
         {
+          path: "events-detail/:id",
+          element: <AdminEventsDetails />, // Page des Événements
+        },
+        {
           path: "new-blogs",
           element: <NewBlog />, // Page pour ajouter un nouveau blog
         },
@@ -227,10 +233,7 @@ function App() {
           path: "settings",
           element: <SettingsPage />, // Page des Paramètres
         },
-        {
-          path: "Profile",
-          element: <ProfilePage />, // Page des Paramètres
-        },
+        
       ],
     },
     {

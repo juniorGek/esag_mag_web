@@ -88,7 +88,7 @@ const AcheterTicket = () => {
             className="inline-flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
-            <span>Retour à l'événement</span>
+            <span>Retour à l&apos;événement</span>
           </button>
         </div>
       </div>
@@ -104,7 +104,7 @@ const AcheterTicket = () => {
           className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 mb-8"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span>Retour à l'événement</span>
+          <span>Retour à l&apos;événement</span>
         </button>
 
         <div className="max-w-2xl mx-auto">

@@ -3,7 +3,6 @@ import ReactPaginate from "react-paginate";
 import { PencilLine } from "lucide-react";
 import { API_URL } from "../../../config/ApiUrl";
 
-
 export default function UsersTable() {
   const [students, setStudents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,7 +14,7 @@ export default function UsersTable() {
 
   const fetchUser = async () => {
     try {
-      const response = await fetch(`${API_URL}/getUsers`,{
+      const response = await fetch(`${API_URL}/getUsers`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -23,8 +22,8 @@ export default function UsersTable() {
         },
       });
       const data = await response.json();
-      if(response.status === 200){
-        setStudents(data.users)
+      if (response.status === 200) {
+        setStudents(data.users);
       }
     } catch (error) {
       console.log(error);
@@ -47,14 +46,16 @@ export default function UsersTable() {
 
   const handleEditClick = (student) => {
     setSelectedStudent(student);
-    setNewEtat(student.etat);
+    setNewEtat(student.enabled ? "Actif" : "Inactif");
     setIsModalOpen(true);
   };
 
   const handleSave = () => {
     if (selectedStudent) {
       const updatedStudents = students.map((student) =>
-        student.id === selectedStudent.id ? { ...student, etat: newEtat } : student
+        student.id === selectedStudent.id
+          ? { ...student, enabled: newEtat === "Actif" }
+          : student
       );
       setStudents(updatedStudents);
       setIsModalOpen(false);
@@ -63,149 +64,156 @@ export default function UsersTable() {
   };
 
   return (
-    <div className="p-4 bg-gray-50 dark:bg-slate-900 min-h-screen">
-      {/* Barre de recherche et filtre de lignes */}
-      <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Rechercher..."
-          className="w-full sm:w-2/3 p-2 border border-gray-300 rounded-lg bg-white text-gray-900 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:bg-slate-800 dark:text-slate-50 dark:border-slate-600"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <select
-          className="w-full sm:w-1/3 p-2 border border-gray-300 rounded-lg bg-white text-gray-900 transition-colors focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:bg-slate-800 dark:text-slate-50 dark:border-slate-600"
-          value={rowsPerPage}
-          onChange={(e) => {
-            setRowsPerPage(Number(e.target.value));
-            setCurrentPage(0);
-          }}
-        >
-          <option value="5">5 lignes</option>
-          <option value="10">10 lignes</option>
-          <option value="20">20 lignes</option>
-        </select>
-      </div>
-
-      {/* Tableau des admins */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-gray-200 dark:border-slate-700">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-slate-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        {/* En-tête avec recherche et filtre */}
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
             Liste des Utilisateurs
           </h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full">
-            <thead className="bg-gray-50 dark:bg-slate-700">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-slate-300">
-                  #
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-slate-300">
-                  Nom
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-slate-300">
-                  Prénom
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-slate-300">
-                  État
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-slate-300">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-slate-700">
-              {currentStudents.map((student) => (
-                <tr
-                  key={student.id}
-                  className="hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
-                >
-                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-slate-50">
-                    {student.id}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-slate-50">
-                    {student.nom}
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-900 dark:text-slate-50">
-                    {student.prenom}
-                  </td>
-                  <td
-                    className={`px-4 py-3 text-sm font-medium ${
-                      student.enabled
-                        ? "text-green-600 dark:text-green-400"
-                        : "text-red-600 dark:text-red-400"
-                    }`}
-                  >
-                    {student.enabled ? "Activé" : "Désactivé"}
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    <div className="flex items-center">
-                      <button
-                        onClick={() => handleEditClick(student)}
-                        className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-                      >
-                        <PencilLine size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-slate-50 mb-4">
-              Modifier l&apos;état de {selectedStudent?.prenom} {selectedStudent?.nom}
-            </h3>
+          <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+            <input
+              type="text"
+              placeholder="Rechercher un utilisateur..."
+              className="w-full sm:w-64 px-4 py-2 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors text-gray-900 shadow-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
             <select
-              value={newEtat}
-              onChange={(e) => setNewEtat(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg bg-white text-gray-900 dark:bg-slate-800 dark:text-slate-50 dark:border-slate-600 mb-4"
+              className="w-full sm:w-32 px-4 py-2 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors text-gray-900 shadow-sm"
+              value={rowsPerPage}
+              onChange={(e) => {
+                setRowsPerPage(Number(e.target.value));
+                setCurrentPage(0);
+              }}
             >
-              <option value="Actif">Actif</option>
-              <option value="Inactif">Inactif</option>
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="20">20</option>
             </select>
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 dark:bg-slate-700 dark:text-slate-50 dark:hover:bg-slate-600"
-              >
-                Annuler
-              </button>
-              <button
-                onClick={handleSave}
-                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-              >
-                Sauvegarder
-              </button>
-            </div>
           </div>
         </div>
-      )}
 
-      {/* Pagination */}
-      <div className="mt-6 flex justify-center">
-        <ReactPaginate
-          previousLabel={"← Précédent"}
-          nextLabel={"Suivant →"}
-          breakLabel={"..."}
-          pageCount={pageCount}
-          marginPagesDisplayed={1}
-          pageRangeDisplayed={3}
-          onPageChange={({ selected }) => setCurrentPage(selected)}
-          containerClassName="flex gap-2"
-          pageClassName="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-100 dark:border-slate-600 dark:hover:bg-slate-700 dark:text-slate-50"
-          activeClassName="bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600"
-          previousClassName="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-100 dark:border-slate-600 dark:hover:bg-slate-700 dark:text-slate-50"
-          nextClassName="px-3 py-1 border border-gray-300 rounded-lg hover:bg-gray-100 dark:border-slate-600 dark:hover:bg-slate-700 dark:text-slate-50"
-          disabledClassName="opacity-50 cursor-not-allowed"
-        />
+        {/* Tableau */}
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-100">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    #
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Nom
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Prénom
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    État
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {currentStudents.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
+                      Aucun utilisateur trouvé
+                    </td>
+                  </tr>
+                ) : (
+                  currentStudents.map((student) => (
+                    <tr
+                      key={student.id}
+                      className="hover:bg-gray-50 transition-colors duration-200"
+                    >
+                      <td className="px-6 py-4 text-sm text-gray-900 font-medium">
+                        {student.id}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        {student.nom}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        {student.prenom}
+                      </td>
+                      <td
+                        className={`px-6 py-4 text-sm font-medium ${
+                          student.enabled ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
+                        {student.enabled ? "Actif" : "Inactif"}
+                      </td>
+                      <td className="px-6 py-4 text-sm">
+                        <button
+                          onClick={() => handleEditClick(student)}
+                          className="text-indigo-600 hover:text-indigo-800 transition-colors duration-200"
+                          aria-label="Modifier"
+                        >
+                          <PencilLine size={20} />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Pagination */}
+        <div className="mt-6 flex justify-center">
+          <ReactPaginate
+            previousLabel={"← Précédent"}
+            nextLabel={"Suivant →"}
+            breakLabel={"..."}
+            pageCount={pageCount}
+            marginPagesDisplayed={1}
+            pageRangeDisplayed={3}
+            onPageChange={({ selected }) => setCurrentPage(selected)}
+            containerClassName="flex items-center gap-2"
+            pageClassName="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+            activeClassName="bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700"
+            previousClassName="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+            nextClassName="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+            disabledClassName="opacity-50 cursor-not-allowed"
+          />
+        </div>
+
+        {/* Modal */}
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Modifier l&apos;état de {selectedStudent?.prenom} {selectedStudent?.nom}
+              </h3>
+              <select
+                value={newEtat}
+                onChange={(e) => setNewEtat(e.target.value)}
+                className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-gray-900 mb-6"
+              >
+                <option value="Actif">Actif</option>
+                <option value="Inactif">Inactif</option>
+              </select>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                >
+                  Annuler
+                </button>
+                <button
+                  onClick={handleSave}
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                >
+                  Sauvegarder
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
