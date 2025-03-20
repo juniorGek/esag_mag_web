@@ -17,7 +17,7 @@ import Evenement from "./Pages/Evenement/Evenement";
 import Blog from "./Pages/Blog/Blog";
 import Actualites from "./Pages/Actualite/Actualites";
 import { PublicRoute } from "./hooks/PublicRoute";
-// import { ProtectedRoute } from "./hooks/ProtectedRoute";
+import { ProtectedRoute } from "./hooks/ProtectedRoute";
 import ActualiteDetail from "./Pages/Actualite/ActualiteDetail";
 import EvenementDetail from "./Pages/Evenement/EvenementDetail";
 import { MessageProvider } from "./utils/messageContext";
@@ -133,9 +133,9 @@ function App() {
     {
       path: "/admin",
       element: (
-        // <ProtectedRoute>
+        <ProtectedRoute>
           <Layout />
-        // </ProtectedRoute>
+        </ProtectedRoute>
       ),
       children: [
         {
