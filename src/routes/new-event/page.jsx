@@ -19,6 +19,7 @@ const NewEvent = () => {
     saleStartDate: "",
     saleEndDate: "",
     details: "",
+    description_mobile: "",
     imageCover: null,
   });
 
@@ -57,6 +58,11 @@ const NewEvent = () => {
     }
   };
 
+  const stripTags = (html) => {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    return doc.body.textContent || "";
+  };
+
   const resetFormData = () => {
     setFormData({
       imageCover: null,
@@ -68,6 +74,7 @@ const NewEvent = () => {
       saleEndDate:'',
       saleStartDate:'',
       lieu:'',
+      description_mobile: "",
       date:'',
     })
     setPreview(null)
@@ -103,6 +110,7 @@ const NewEvent = () => {
         formValues.append("saleStartDate", formData.saleStartDate);
         formValues.append("saleEndDate", formData.saleEndDate);
       }
+      formValues.append("description_mobile", formData.description_mobile);
       
       formValues.append("details", formData.details);
       formValues.append("image", formData.imageCover);
@@ -279,11 +287,19 @@ const NewEvent = () => {
                 <DescriptionEditor
                   value={formData.details}
                   onChange={(html) =>
-                    setFormData({ ...formData, details: html })
+                    setFormData({ ...formData, details: html,
+                      description_mobile: stripTags(html),
+                     })
                   }
                 />
               </div>
             </div>
+
+            <textarea
+              className="w-full p-2 rounded-lg border-none outline-none hidden"
+              value={formData.description_mobile}
+              readOnly
+            />
 
             {/* Actions */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-200">

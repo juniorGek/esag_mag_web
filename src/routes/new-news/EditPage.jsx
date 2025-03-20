@@ -26,6 +26,7 @@ function EditNews() {
     sous_titre: "",
     description: "",
     imageCover: "",
+    description_mobile: "",
     imageFile: null,
     enabled: false,
   });
@@ -47,6 +48,7 @@ function EditNews() {
     formValues.append("sous_titre", editedNews.sous_titre);
     formValues.append("description", editedNews.description);
     formValues.append("image", editedNews.imageFile);
+    formValues.append("description_mobile", editedNews.description_mobile);
     /* formValues.append("enabled", editedNews.enabled); */
    
 
@@ -132,6 +134,11 @@ function EditNews() {
         imageFile: file, // le fichier réel pour l'upload
       });
     }
+  };
+
+  const stripTags = (html) => {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    return doc.body.textContent || "";
   };
   
 
@@ -254,11 +261,19 @@ function EditNews() {
                 <DescriptionEditor
                   value={editedNews.description}
                   onChange={(html) =>
-                    setEditedNews({ ...editedNews, description: html })
+                    setEditedNews({ ...editedNews, description: html,
+                      description_mobile: stripTags(html),
+                     })
                   }
                 />
             </div>
           </div>
+
+          <textarea
+              className="w-full p-2 rounded-lg border-none outline-none hidden"
+              value={editedNews.description_mobile}
+              readOnly
+            />
 
           {/* Statut */}
           <div className="space-y-2">

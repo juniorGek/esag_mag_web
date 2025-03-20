@@ -84,14 +84,14 @@ export const navbarLinks = [
         title: "Sondages",
         links: [
             {
-                label: "Sondages",
-                icon: ListChecks,
-                path: "/admin/polls",
-            },
-            {
                 label: "Nouveau Sondage",
                 icon: PackagePlus,
                 path: "/admin/new-poll",
+            },
+            {
+                label: "visualiser Sondages",
+                icon: ListChecks,
+                path: "/admin/view-polls",
             },
         ],
     },

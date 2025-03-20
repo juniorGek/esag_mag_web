@@ -30,13 +30,15 @@ import BlogTable from "./routes/blogs/page";
 import NewBlog from "./routes/new-blogs/page";
 import Agents from "./routes/agents/page";
 import NewPoll from "./routes/new-poll/page";
-import PollsTable from "./routes/polls/page";
 import NewEvent from "./routes/new-event/page";
 import EventsTable from "./routes/events/page";
 import SettingsPage from "./routes/settings/page";
 import ProfilePage from "./routes/profile/page";
 import SuggestionsTable from "./routes/suggestions/page";
 import SuggestionDetail from "./routes/suggestions/SuggestionDetail";
+import ViewPolls from "./routes/view-polls/page";
+import PollStatistics from "./routes/poll-statistics/page";
+
 
 import BlogDetail from "./Pages/Blog/BlogDetail";
 import EditNews from "./routes/new-news/EditPage";
@@ -52,6 +54,7 @@ import PublicAgentRoute from "./hooks/AgentPublicRoute";
 import ProtectedAgentRoute from "./hooks/AgentProtectedRoute";
 import { AuthProvider } from "./contexts/AgentAuthContext";
 import SondageSubmit from "./Pages/SondageSubmit";
+
 
 function App() {
   const router = createBrowserRouter([
@@ -73,7 +76,7 @@ function App() {
         },
         { path: "evenement/:id/mes-tickets", element: <MesTickets /> },
         { path: "sondages", element: <Sondage /> },
-        {path: "sondage_details/:id", element: <SondageSubmit /> },
+        { path: "sondage_details/:id", element: <SondageSubmit /> },
         { path: "about", element: <About /> },
       ],
     },
@@ -84,9 +87,9 @@ function App() {
           path: "options", // /ticket/code/options
           element: (
             <MobileOnlyRoute>
-                <ProtectedAgentRoute>
-                    <ScanCodePage />
-                </ProtectedAgentRoute>
+              <ProtectedAgentRoute>
+                <ScanCodePage />
+              </ProtectedAgentRoute>
             </MobileOnlyRoute>
           ),
         },
@@ -94,21 +97,21 @@ function App() {
           path: "agentLogin", // /ticket/code/agentLogin
           element: (
             <MobileOnlyRoute>
-                <PublicAgentRoute>
-                    <AgentLogin />
-                </PublicAgentRoute>
+              <PublicAgentRoute>
+                <AgentLogin />
+              </PublicAgentRoute>
             </MobileOnlyRoute>
-                
-           
+
+
           ),
         },
         {
           path: "scanner", // /ticket/code/scanner
           element: (
             <MobileOnlyRoute>
-                <ProtectedAgentRoute>
-                    <ScannerPage />
-                </ProtectedAgentRoute>
+              <ProtectedAgentRoute>
+                <ScannerPage />
+              </ProtectedAgentRoute>
             </MobileOnlyRoute>
           ),
         },
@@ -200,12 +203,16 @@ function App() {
           element: <EditBlog />,
         },
         {
-          path: "polls",
-          element: <PollsTable />, // Page des Sondages
-        },
-        {
           path: "new-poll",
           element: <NewPoll />, // Page pour créer un nouveau sondage
+        },
+        {
+          path: "view-polls",
+          element: <ViewPolls />, // Page pour voir  sondage coté admin
+        },
+        {
+          path: "poll-statistics/:id",
+          element: <PollStatistics />, // Page pour créer un nouveau sondage
         },
         {
           path: "suggestions",
@@ -214,7 +221,7 @@ function App() {
         {
           path: "suggestions/:id",
           element: <SuggestionDetail />, // Page des Suggestions
-      },
+        },
         {
           path: "events",
           element: <EventsTable />, // Page des Événements
@@ -243,9 +250,9 @@ function App() {
     <ThemeProvider storageKey="theme">
       <MessageProvider>
         <AuthProvider>
-            <RouterProvider router={router} />
+          <RouterProvider router={router} />
         </AuthProvider>
-        
+
       </MessageProvider>
     </ThemeProvider>
   );

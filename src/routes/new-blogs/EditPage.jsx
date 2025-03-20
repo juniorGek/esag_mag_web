@@ -15,7 +15,6 @@ import DescriptionEditor from "../../components/DescriptionEditor";
 import { useMessage } from "../../utils/messageContext";
 import { toast } from "react-toastify";
 
-
 function EditBlog() {
   const { id } = useParams();
   const [blog, setBlog] = useState(null);
@@ -27,6 +26,7 @@ function EditBlog() {
     sous_titre: "",
     details: "",
     imageCover: "",
+    description_mobile: "",
     imageFile: null,
     enabled: false,
   });
@@ -44,7 +44,8 @@ function EditBlog() {
     formValues.append("sous_titre", editedBlog.sous_titre);
     formValues.append("details", editedBlog.details);
     formValues.append("image", editedBlog.imageFile);
-   /* formValues.append("enabled", editedBlog.enabled);*/
+    formValues.append("description_mobile", editedBlog.description_mobile);
+    /* formValues.append("enabled", editedBlog.enabled);*/
 
     try {
       const response = await fetch(`${API_URL}/updateBlog/${id}`, {
@@ -105,7 +106,6 @@ function EditBlog() {
         details: blog.details || "",
         imageCover: blog.imageCover || "",
       });
-      
     }
   }, [blog]);
 
@@ -119,7 +119,6 @@ function EditBlog() {
       });
     }
   };
-  
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -133,11 +132,14 @@ function EditBlog() {
     }
   };
 
+  const stripTags = (html) => {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    return doc.body.textContent || "";
+  };
+
   const handleDragOver = (e) => {
     e.preventDefault();
   };
-
-
 
   if (loading) {
     return (
@@ -152,7 +154,9 @@ function EditBlog() {
       <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg overflow-hidden transform transition-all hover:shadow-xl">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-5 border-b border-blue-900">
-          <h2 className="text-xl font-semibold text-white tracking-tight">Modification de blog</h2>
+          <h2 className="text-xl font-semibold text-white tracking-tight">
+            Modification de blog
+          </h2>
         </div>
 
         {/* Form */}
@@ -172,10 +176,11 @@ function EditBlog() {
               required
             />
           </div>
-           {/* Sous Titre */}
-           <div className="space-y-2">
+          {/* Sous Titre */}
+          <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <Type className="w-5 h-5 text-blue-600" />Sous Titre
+              <Type className="w-5 h-5 text-blue-600" />
+              Sous Titre
             </label>
             <input
               type="text"
@@ -191,7 +196,8 @@ function EditBlog() {
           {/* Image de couverture */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700 flex items-center gap-2">
-              <ImageIcon className="w-5 h-5 text-blue-600" /> Image de couverture
+              <ImageIcon className="w-5 h-5 text-blue-600" /> Image de
+              couverture
             </label>
             <div
               className="w-full h-40 border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center relative rounded-lg transition-all duration-300 hover:border-blue-500 hover:bg-gray-100"
@@ -210,7 +216,9 @@ function EditBlog() {
                     className="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
                   />
                   <button
-                    onClick={() => setEditedBlog({ ...editedBlog, imageCover: "" })}
+                    onClick={() =>
+                      setEditedBlog({ ...editedBlog, imageCover: "" })
+                    }
                     className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-full opacity-80 hover:opacity-100 hover:bg-red-600 transition-all duration-300"
                   >
                     <X className="w-4 h-4" />
@@ -219,7 +227,9 @@ function EditBlog() {
               ) : (
                 <label className="flex flex-col items-center justify-center h-full text-gray-500 cursor-pointer">
                   <Upload className="w-8 h-8 mb-2 text-blue-500 animate-bounce" />
-                  <span className="text-sm font-medium">Déposez ou cliquez pour choisir une image</span>
+                  <span className="text-sm font-medium">
+                    Déposez ou cliquez pour choisir une image
+                  </span>
                   <input
                     type="file"
                     accept="image/*"
@@ -237,14 +247,24 @@ function EditBlog() {
               <Text className="w-5 h-5 text-blue-600" /> Contenu
             </label>
             <div className="border border-gray-300 rounded-lg bg-white shadow-sm">
-            <DescriptionEditor
-                  value={editedBlog.details}
-                  onChange={(html) =>
-                    setEditedBlog({ ...editedBlog, details: html })
-                  }
-                />
+              <DescriptionEditor
+                value={editedBlog.details}
+                onChange={(html) =>
+                  setEditedBlog({
+                    ...editedBlog,
+                    details: html,
+                    description_mobile: stripTags(html),
+                  })
+                }
+              />
             </div>
           </div>
+
+          <textarea
+            className="w-full p-2 rounded-lg border-none outline-none hidden"
+            value={editedBlog.description_mobile}
+            readOnly
+          />
 
           {/* Actions */}
           <div className="flex justify-end gap-4 pt-6 border-t border-gray-200">
