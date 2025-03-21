@@ -8,22 +8,7 @@ const BlogDetail = () => {
   const { id } = useParams();
   const [blog, setBlog] = useState("");
   const [loading, setLoading] = useState(true);
-  const [commentText, setCommentText] = useState("");
-  // Quelques commentaires statiques pour l'exemple
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      author: "Alice",
-      date: "2023-03-01T10:30:00Z",
-      content: "Super article ! Merci pour le partage.",
-    },
-    {
-      id: 2,
-      author: "Bob",
-      date: "2023-03-02T12:00:00Z",
-      content: "Vraiment intéressant, hâte de lire la suite.",
-    },
-  ]);
+  const [comments, setComments] = useState([]);
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -40,21 +25,22 @@ const BlogDetail = () => {
       }
     };
 
+    const fetchComment = async () => {
+      try {
+        const response = await fetch(`${API_URL}/getComments/${id}`);
+        const data = await response.json();
+        if (response.status === 200) {
+          setComments(data.comments);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
     fetchBlog();
+    fetchComment();
   }, [id]);
 
-  const handleCommentSubmit = (e) => {
-    e.preventDefault();
-    if (commentText.trim() === "") return;
-    const newComment = {
-      id: comments.length + 1,
-      author: "Vous",
-      date: new Date().toISOString(),
-      content: commentText,
-    };
-    setComments([...comments, newComment]);
-    setCommentText("");
-  };
 
   if (loading) {
     return (
@@ -103,10 +89,10 @@ const BlogDetail = () => {
             {/* Section d'interactions sociales */}
             <div className="flex items-center justify-between border-t border-gray-200 pt-4">
               <div className="flex space-x-4">
-                <button className="flex items-center space-x-1 text-gray-600 hover:text-red-500">
+                <div className="flex items-center space-x-1 text-gray-600">
                   <span className="text-xl">❤️</span>
-                  <span>Aimer</span>
-                </button>
+                  <span>{blog.likeAccount}</span>
+                </div>
                 <button className="flex items-center space-x-1 text-gray-600 hover:text-blue-500">
                   <span className="text-xl">🔗</span>
                   <span>Partager</span>
@@ -130,14 +116,17 @@ const BlogDetail = () => {
                     <div className="flex-shrink-0">
                       {/* Avatar généré à partir de la première lettre du nom */}
                       <div className="h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold">
-                        {comment.author.charAt(0)}
+                      <img
+                          src={`${ImageApi}/${comment.User.profile}`}
+                          className="w-full h-full rounded-full object-cover"
+                        />
                       </div>
                     </div>
-                    <div>
+                    <div className="" >
                       <div className="flex items-center justify-between">
-                        <h4 className="font-semibold">{comment.author}</h4>
+                        <h4 className="font-semibold">{comment.User.nom}</h4>
                         <span className="text-xs text-gray-500">
-                          {formatDate(comment.date)}
+                          {formatDate(comment.createdAt)}
                         </span>
                       </div>
                       <p className="mt-1 text-gray-700">{comment.content}</p>
@@ -146,25 +135,6 @@ const BlogDetail = () => {
                 ))}
               </div>
 
-              {/* Formulaire d'ajout de commentaire */}
-              <form onSubmit={handleCommentSubmit} className="mt-8">
-                <h4 className="text-xl font-semibold mb-2">
-                  Ajouter un commentaire
-                </h4>
-                <textarea
-                  value={commentText}
-                  onChange={(e) => setCommentText(e.target.value)}
-                  placeholder="Votre commentaire..."
-                  className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  rows="4"
-                />
-                <button
-                  type="submit"
-                  className="mt-4 w-full px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-                >
-                  Poster le commentaire
-                </button>
-              </form>
             </div>
           </div>
         </motion.div>
