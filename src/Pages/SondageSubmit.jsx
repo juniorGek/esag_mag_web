@@ -10,13 +10,14 @@ function SondageSubmit() {
     const {id} = useParams()
     const [poll, setPoll] = useState(null);
     const [loading, setLoading] = useState(true);
-    const { register, handleSubmit } = useForm();
+    const [successMessage, setSuccessMessage] = useState('');
+    const { register, handleSubmit,reset  } = useForm();
 
     const fetchPoll = async () => {
         try {
             const response = await fetch(`${API_URL}/getPoll/${id}`);
             const data = await response.json();
-            console.log(data)
+           
             if (response.status === 200) {
                 setPoll(data.poll);
             }
@@ -31,8 +32,32 @@ function SondageSubmit() {
         fetchPoll();
     }, []);
 
-    const onSubmit = (data) => {
-        console.log(data)
+    const onSubmit = async(data) => {
+      const submissionData = {
+        pollId: id,
+        firstName: data.firstName || null,
+        lastName: data.lastName || null,
+        answers: data.answers,
+      };   
+
+        try {
+          const response = await fetch(`${API_URL}/submitPoll`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(submissionData),
+          });
+          const result = await response.json();
+          if(response.ok){
+            setSuccessMessage('Votre soumission a été prise en compte.');
+                reset();
+          }else{
+            console.log(result);
+          }
+        } catch (error) {
+          console.log(error);
+        }
     }
 
     return (
@@ -50,6 +75,7 @@ function SondageSubmit() {
           ) : (
             <form onSubmit={handleSubmit(onSubmit)} className="max-w-3xl mx-auto bg-white rounded-xl shadow-md p-8">
               {/* En-tête */}
+              {successMessage}
               <div className="mb-8 border-b pb-6">
                 <h1 className="text-3xl font-medium text-slate-800 mb-2">{poll.title}</h1>
                 <p className="text-slate-600 text-lg">{poll.description}</p>
